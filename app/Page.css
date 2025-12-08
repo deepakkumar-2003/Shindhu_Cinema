@@ -5,7 +5,7 @@
   margin-right: auto;
   padding-left: 1rem;
   padding-right: 1rem;
-  padding-top: 0;
+  padding-top: 4.5rem; /* Account for fixed header + mobile search on small screens */
   margin-top: 0;
 }
 
@@ -13,6 +13,12 @@
   .home-page {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .home-page {
+    padding-top: 1rem; /* Smaller padding on larger screens */
   }
 }
 

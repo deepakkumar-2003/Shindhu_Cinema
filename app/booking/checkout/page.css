@@ -1,0 +1,868 @@
+/* Checkout Page Styles */
+
+/* Container */
+.checkout-container {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-bottom: 4rem;
+  padding-top: 4.5rem;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+@media (min-width: 375px) {
+  .checkout-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .checkout-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .checkout-container {
+    padding-top: 1rem; /* Smaller padding on larger screens */
+  }
+}
+
+@media (min-width: 1024px) {
+  .checkout-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Loading State */
+.checkout-loading {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+  text-align: center;
+}
+
+.checkout-loading-text {
+  color: var(--color-muted, #888888);
+}
+
+/* Progress Indicator */
+.progress-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 375px) {
+  .progress-indicator {
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+}
+
+.progress-step {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+@media (min-width: 375px) {
+  .progress-step {
+    gap: 0.5rem;
+  }
+}
+
+.progress-circle {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+@media (min-width: 375px) {
+  .progress-circle {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.875rem;
+  }
+}
+
+.progress-circle-completed {
+  background-color: var(--color-success, #22c55e);
+}
+
+.progress-circle-active {
+  background-color: var(--color-primary, #e50914);
+}
+
+.progress-label {
+  font-size: 0.6875rem;
+}
+
+@media (min-width: 375px) {
+  .progress-label {
+    font-size: 0.875rem;
+  }
+}
+
+.progress-label-active {
+  font-weight: 500;
+}
+
+.progress-line {
+  width: 1rem;
+  height: 2px;
+  background-color: var(--color-success, #22c55e);
+  flex-shrink: 0;
+}
+
+@media (min-width: 375px) {
+  .progress-line {
+    width: 2rem;
+  }
+}
+
+/* Main Grid Layout */
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .checkout-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Main Content */
+.checkout-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Card Styles */
+.checkout-card {
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+@media (min-width: 375px) {
+  .checkout-card {
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+}
+
+.checkout-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 375px) {
+  .checkout-card-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Booking Summary - Movie Info */
+.movie-info {
+  display: flex;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border, #2a2a2a);
+}
+
+@media (min-width: 375px) {
+  .movie-info {
+    gap: 1rem;
+  }
+}
+
+.movie-poster {
+  width: 4rem;
+  height: 5.5rem;
+  object-fit: cover;
+  border-radius: 0.375rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 375px) {
+  .movie-poster {
+    width: 5rem;
+    height: 7rem;
+    border-radius: 0.5rem;
+  }
+}
+
+.movie-details {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.movie-title {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+@media (min-width: 375px) {
+  .movie-title {
+    font-size: 1.125rem;
+  }
+}
+
+.movie-meta {
+  font-size: 0.75rem;
+  color: var(--color-muted, #888888);
+}
+
+@media (min-width: 375px) {
+  .movie-meta {
+    font-size: 0.875rem;
+  }
+}
+
+.movie-showtime {
+  font-size: 0.75rem;
+  margin-top: 0.375rem;
+  word-wrap: break-word;
+}
+
+@media (min-width: 375px) {
+  .movie-showtime {
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+}
+
+.movie-theater {
+  font-size: 0.75rem;
+  color: var(--color-muted, #888888);
+  margin-top: 0.25rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+@media (min-width: 375px) {
+  .movie-theater {
+    font-size: 0.875rem;
+  }
+}
+
+/* Tickets Section */
+.tickets-section {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border, #2a2a2a);
+}
+
+@media (min-width: 375px) {
+  .tickets-section {
+    padding: 1rem 0;
+  }
+}
+
+.tickets-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.tickets-label {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+@media (min-width: 375px) {
+  .tickets-label {
+    font-size: 1rem;
+  }
+}
+
+.tickets-seats {
+  font-size: 0.75rem;
+  color: var(--color-muted, #888888);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+@media (min-width: 375px) {
+  .tickets-seats {
+    font-size: 0.875rem;
+  }
+}
+
+.tickets-price {
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 375px) {
+  .tickets-price {
+    font-size: 1rem;
+  }
+}
+
+/* Snacks Section */
+.snacks-section {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-border, #2a2a2a);
+}
+
+.snacks-title {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.snack-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.snack-name {
+  color: var(--color-muted, #888888);
+}
+
+.snacks-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.snacks-pickup {
+  color: var(--color-muted, #888888);
+}
+
+.snacks-total-price {
+  font-weight: 600;
+}
+
+/* Promo Code Section */
+.promo-applied {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.625rem;
+  background-color: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 0.5rem;
+}
+
+@media (min-width: 375px) {
+  .promo-applied {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+  }
+}
+
+.promo-applied-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.promo-applied-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-success, #22c55e);
+  flex-shrink: 0;
+}
+
+@media (min-width: 375px) {
+  .promo-applied-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.promo-applied-text {
+  font-weight: 500;
+  font-size: 0.8125rem;
+  color: var(--color-success, #22c55e);
+}
+
+@media (min-width: 375px) {
+  .promo-applied-text {
+    font-size: 1rem;
+  }
+}
+
+.promo-applied-right {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+@media (min-width: 375px) {
+  .promo-applied-right {
+    gap: 1rem;
+  }
+}
+
+.promo-discount {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-success, #22c55e);
+}
+
+.promo-remove {
+  color: var(--color-muted, #888888);
+  font-size: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+@media (min-width: 375px) {
+  .promo-remove {
+    font-size: 0.875rem;
+  }
+}
+
+.promo-remove:hover {
+  color: var(--color-error, #ef4444);
+}
+
+.promo-input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 375px) {
+  .promo-input-row {
+    flex-direction: row;
+  }
+}
+
+.promo-input {
+  flex: 1;
+  padding: 0.625rem 0.75rem;
+  background-color: var(--color-secondary, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 0.5rem;
+  color: var(--color-foreground, #ffffff);
+  font-size: 0.875rem;
+  outline: none;
+  min-width: 0;
+}
+
+@media (min-width: 375px) {
+  .promo-input {
+    padding: 0.75rem 1rem;
+  }
+}
+
+.promo-input:focus {
+  border-color: var(--color-primary, #e50914);
+}
+
+.promo-input::placeholder {
+  color: var(--color-muted, #888888);
+}
+
+.promo-apply-btn {
+  padding: 0.625rem 1rem;
+  background-color: var(--color-secondary, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 0.5rem;
+  color: var(--color-foreground, #ffffff);
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+
+@media (min-width: 375px) {
+  .promo-apply-btn {
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+.promo-apply-btn:hover {
+  background-color: var(--color-border, #2a2a2a);
+  border-color: var(--color-muted, #888888);
+}
+
+.promo-hint {
+  font-size: 0.6875rem;
+  color: var(--color-muted, #888888);
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 375px) {
+  .promo-hint {
+    font-size: 0.75rem;
+  }
+}
+
+/* Payment Methods */
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 375px) {
+  .payment-methods {
+    gap: 0.75rem;
+  }
+}
+
+.payment-method-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border, #2a2a2a);
+  background: none;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+@media (min-width: 375px) {
+  .payment-method-btn {
+    padding: 1rem;
+    gap: 1rem;
+  }
+}
+
+.payment-method-btn:hover {
+  border-color: var(--color-muted, #888888);
+}
+
+.payment-method-btn-selected {
+  border-color: var(--color-primary, #e50914);
+  background-color: rgba(229, 9, 20, 0.1);
+}
+
+.payment-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 375px) {
+  .payment-icon {
+    font-size: 1.5rem;
+  }
+}
+
+.payment-info {
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+}
+
+.payment-name {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--color-foreground, #ffffff);
+}
+
+@media (min-width: 375px) {
+  .payment-name {
+    font-size: 1rem;
+  }
+}
+
+.payment-description {
+  font-size: 0.6875rem;
+  color: var(--color-muted, #888888);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 375px) {
+  .payment-description {
+    font-size: 0.875rem;
+    white-space: normal;
+  }
+}
+
+.payment-check-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-primary, #e50914);
+  flex-shrink: 0;
+}
+
+@media (min-width: 375px) {
+  .payment-check-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+/* Payment Form */
+.payment-form {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--color-secondary, #1a1a1a);
+  border-radius: 0.5rem;
+}
+
+.payment-form-group {
+  margin-bottom: 1rem;
+}
+
+.payment-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.payment-form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.payment-form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 0.5rem;
+  color: var(--color-foreground, #ffffff);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.payment-form-input:focus {
+  border-color: var(--color-primary, #e50914);
+}
+
+.payment-form-input::placeholder {
+  color: var(--color-muted, #888888);
+}
+
+.payment-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Sidebar */
+.checkout-sidebar {
+  position: relative;
+}
+
+.sidebar-card {
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  position: sticky;
+  top: 8rem;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+@media (min-width: 375px) {
+  .sidebar-card {
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+}
+
+.sidebar-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 375px) {
+  .sidebar-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Order Summary */
+.order-summary-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border, #2a2a2a);
+}
+
+.order-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.order-label {
+  color: var(--color-muted, #888888);
+}
+
+.order-row-success {
+  color: var(--color-success, #22c55e);
+}
+
+.order-subtotal {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-border, #2a2a2a);
+}
+
+.order-subtotal-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.order-subtotal-row:last-child {
+  margin-bottom: 0;
+}
+
+.order-total {
+  padding: 1rem 0;
+}
+
+.order-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-total-label {
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+@media (min-width: 375px) {
+  .order-total-label {
+    font-size: 1.125rem;
+  }
+}
+
+.order-total-amount {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary, #e50914);
+}
+
+@media (min-width: 375px) {
+  .order-total-amount {
+    font-size: 1.5rem;
+  }
+}
+
+/* Pay Button */
+.pay-button {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: var(--color-primary, #e50914);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+@media (min-width: 375px) {
+  .pay-button {
+    padding: 1rem;
+    font-size: 1.125rem;
+  }
+}
+
+.pay-button:hover:not(:disabled) {
+  background-color: #c2070f;
+}
+
+.pay-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  height: 1.25rem;
+  width: 1.25rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-track {
+  opacity: 0.25;
+}
+
+.spinner-path {
+  opacity: 0.75;
+}
+
+/* Security Badge */
+.security-badge {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--color-muted, #888888);
+}
+
+.security-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Terms Text */
+.terms-text {
+  font-size: 0.75rem;
+  color: var(--color-muted, #888888);
+  text-align: center;
+  margin-top: 1rem;
+}
