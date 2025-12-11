@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { getSupabaseClient, isSupabaseConfigured } from '@/lib/supabase/client';
+import { movies as localMovies, getMovieById as getLocalMovieById } from '@/lib/data';
 import type { Movie } from '@/lib/types';
 import type { Tables } from '@/lib/supabase/database.types';
 
@@ -17,6 +18,26 @@ interface MovieFilters {
   format?: string;
 }
 
+// Helper function to filter local movies
+function filterLocalMovies(filters?: MovieFilters): Movie[] {
+  let filtered = [...localMovies];
+
+  if (filters?.status) {
+    filtered = filtered.filter(m => m.status === filters.status);
+  }
+  if (filters?.language) {
+    filtered = filtered.filter(m => m.language === filters.language);
+  }
+  if (filters?.genre) {
+    filtered = filtered.filter(m => m.genres.includes(filters.genre!));
+  }
+  if (filters?.format) {
+    filtered = filtered.filter(m => m.format.includes(filters.format as '2D' | '3D' | 'IMAX'));
+  }
+
+  return filtered;
+}
+
 export function useMovies(filters?: MovieFilters) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +47,14 @@ export function useMovies(filters?: MovieFilters) {
     async function fetchMovies() {
       setIsLoading(true);
       setError(null);
+
+      // If Supabase is not configured, use local mock data
+      if (!isSupabaseConfigured) {
+        const filtered = filterLocalMovies(filters);
+        setMovies(filtered);
+        setIsLoading(false);
+        return;
+      }
 
       try {
         const supabase = getSupabaseClient();
@@ -159,6 +188,14 @@ export function useMovie(id: string) {
 
       setIsLoading(true);
       setError(null);
+
+      // If Supabase is not configured, use local mock data
+      if (!isSupabaseConfigured) {
+        const localMovie = getLocalMovieById(id);
+        setMovie(localMovie || null);
+        setIsLoading(false);
+        return;
+      }
 
       try {
         const supabase = getSupabaseClient();
