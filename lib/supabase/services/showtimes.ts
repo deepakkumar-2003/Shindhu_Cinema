@@ -52,7 +52,7 @@ export async function fetchShowtimesByMovie(
 ): Promise<TransformedShowtime[]> {
   const supabase = getSupabaseClient();
 
-  let query = supabase
+  const query = supabase
     .from('showtimes')
     .select('*')
     .eq('movie_id', movieId)

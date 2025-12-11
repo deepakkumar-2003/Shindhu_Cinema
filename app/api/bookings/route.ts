@@ -99,8 +99,8 @@ export async function POST(request: NextRequest) {
       payment_status: 'pending',
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: bookingData, error: bookingError } = await (supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .from('bookings') as any)
       .insert(bookingInsert)
       .select()
@@ -183,8 +183,8 @@ export async function POST(request: NextRequest) {
       : null;
 
     // Update booking with QR codes
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: updateError } = await (supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .from('bookings') as any)
       .update({
         ticket_qr: ticketQR,

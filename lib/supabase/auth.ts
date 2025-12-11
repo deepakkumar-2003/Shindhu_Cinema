@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { getSupabaseClient } from './client';
-import type { Profile, UpdateTables } from './database.types';
+import type { Profile } from './database.types';
 
 // Types for auth state
 export interface AuthState {
@@ -291,8 +291,8 @@ export function useAuth() {
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .from('profiles') as any)
         .update(updates)
         .eq('id', state.user.id);

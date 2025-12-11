@@ -33,6 +33,7 @@ export default function ShowtimesPage({ params }: ShowtimesPageProps) {
     };
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (dates.length > 0 && !selectedDate) {
       setSelectedDate(dates[0].date);

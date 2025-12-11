@@ -218,7 +218,7 @@ export default function Header() {
                     <>
                       {/* Search Results */}
                       <div className="search-suggestions-header">
-                        <span className="search-suggestions-title">Results for "{searchQuery}"</span>
+                        <span className="search-suggestions-title">Results for &quot;{searchQuery}&quot;</span>
                       </div>
                       {trendingSearches
                         .filter((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -243,7 +243,7 @@ export default function Header() {
                           <svg className="search-no-results-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                           </svg>
-                          <p className="search-no-results-text">No results found for "{searchQuery}"</p>
+                          <p className="search-no-results-text">No results found for &quot;{searchQuery}&quot;</p>
                         </div>
                       )}
                     </>
@@ -561,7 +561,7 @@ export default function Header() {
                 <h4 className="notification-card-title">Booking Confirmed!</h4>
                 <span className="notification-card-time">2h ago</span>
               </div>
-              <p className="notification-card-text">Your tickets for "Avatar 3" have been confirmed. Show starts at 7:00 PM.</p>
+              <p className="notification-card-text">Your tickets for &quot;Avatar 3&quot; have been confirmed. Show starts at 7:00 PM.</p>
             </div>
             <div className="notification-card">
               <div className="notification-card-header">
@@ -575,7 +575,7 @@ export default function Header() {
                 <h4 className="notification-card-title">New Movie Alert</h4>
                 <span className="notification-card-time">3d ago</span>
               </div>
-              <p className="notification-card-text">"Mission Impossible 8" is now showing! Book your tickets now.</p>
+              <p className="notification-card-text">&quot;Mission Impossible 8&quot; is now showing! Book your tickets now.</p>
             </div>
           </div>
 

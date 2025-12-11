@@ -32,6 +32,7 @@ function SeatSelectionContent() {
     setIsHydrated(true);
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!isHydrated) return;
 
@@ -54,6 +55,7 @@ function SeatSelectionContent() {
   }, [isHydrated, selectedMovie, selectedTheater, selectedShowtime, searchParams]);
 
   // Countdown timer
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => {

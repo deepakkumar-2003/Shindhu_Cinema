@@ -39,7 +39,6 @@ export default function CheckoutPage() {
     getConvenienceFee,
     getTax,
     getGrandTotal,
-    resetBooking,
   } = useBookingStore();
 
   // Wait for hydration before checking state

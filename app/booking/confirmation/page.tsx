@@ -1,15 +1,30 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useBookingStore } from '@/lib/store';
 import './page.css';
+
+// Generate confetti styles once, outside render
+function generateConfettiStyles() {
+  const colors = ['#e50914', '#ffd700', '#22c55e', '#3b82f6', '#a855f7'];
+  return Array.from({ length: 50 }).map((_, i) => ({
+    id: i,
+    left: `${(i * 17 + 7) % 100}%`,
+    animationDelay: `${(i * 0.04) % 2}s`,
+    backgroundColor: colors[i % 5],
+    borderRadius: i % 2 === 0 ? '50%' : '0',
+  }));
+}
 
 function ConfirmationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
   const [showConfetti, setShowConfetti] = useState(true);
+
+  // Memoize confetti styles to avoid regenerating on each render
+  const confettiStyles = useMemo(() => generateConfettiStyles(), []);
 
   const {
     selectedMovie,
@@ -55,19 +70,17 @@ function ConfirmationContent() {
       {/* Confetti Animation */}
       {showConfetti && (
         <div className="confirmation-confetti-container">
-          {Array.from({ length: 50 }).map((_, i) => (
+          {confettiStyles.map((style) => (
             <div
-              key={i}
+              key={style.id}
               className="confirmation-confetti"
               style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 2}s`,
-                backgroundColor: ['#e50914', '#ffd700', '#22c55e', '#3b82f6', '#a855f7'][
-                  Math.floor(Math.random() * 5)
-                ],
+                left: style.left,
+                animationDelay: style.animationDelay,
+                backgroundColor: style.backgroundColor,
                 width: '10px',
                 height: '10px',
-                borderRadius: Math.random() > 0.5 ? '50%' : '0',
+                borderRadius: style.borderRadius,
               }}
             />
           ))}

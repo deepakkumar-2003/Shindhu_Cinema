@@ -82,9 +82,6 @@ export default function Home() {
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
-  // Current hero movie
-  const currentHeroMovie = heroMovies[currentSlide];
-
   return (
     <div className="home-page">
       {/* Hero Banner */}
