@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
-import { getSupabaseClient } from './client';
+import { getSupabaseClient, isSupabaseConfigured } from './client';
 import type { Profile } from './database.types';
 
 // Types for auth state
@@ -43,7 +43,7 @@ export function useAuth() {
     user: null,
     session: null,
     profile: null,
-    isLoading: true,
+    isLoading: !isSupabaseConfigured, // Not loading if not configured
     isAuthenticated: false,
   });
 
@@ -51,6 +51,8 @@ export function useAuth() {
 
   // Fetch user profile from database
   const fetchProfile = useCallback(async (userId: string): Promise<Profile | null> => {
+    if (!isSupabaseConfigured || !supabase) return null;
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -67,6 +69,12 @@ export function useAuth() {
 
   // Initialize auth state
   useEffect(() => {
+    // Skip auth initialization if Supabase is not configured
+    if (!isSupabaseConfigured || !supabase) {
+      setState(prev => ({ ...prev, isLoading: false }));
+      return;
+    }
+
     const initializeAuth = async () => {
       try {
         // Get current session
