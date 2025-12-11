@@ -2,7 +2,8 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { getMovieById, theaters, generateShowtimes } from '@/lib/data';
+import { theaters, generateShowtimes } from '@/lib/data';
+import { useMovie } from '@/lib/hooks/useMovies';
 import { useBookingStore } from '@/lib/store';
 import { Showtime, Theater } from '@/lib/types';
 import './Page.css';
@@ -14,7 +15,7 @@ interface ShowtimesPageProps {
 export default function ShowtimesPage({ params }: ShowtimesPageProps) {
   const { id } = use(params);
   const router = useRouter();
-  const movie = getMovieById(id);
+  const { movie, isLoading: movieLoading } = useMovie(id);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [showtimes, setShowtimes] = useState<Showtime[]>([]);
   const [selectedFormat, setSelectedFormat] = useState<string>('All');
@@ -46,6 +47,16 @@ export default function ShowtimesPage({ params }: ShowtimesPageProps) {
       setShowtimes(generated);
     }
   }, [selectedDate, movie]);
+
+  if (movieLoading) {
+    return (
+      <div className="error-container">
+        <div className="error-content">
+          <p>Loading movie...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!movie) {
     return (

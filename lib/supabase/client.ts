@@ -1,28 +1,36 @@
 import { createBrowserClient } from '@supabase/ssr';
 import type { Database } from './database.types';
 
-// Check if Supabase credentials are available
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+// Function to check if Supabase credentials are available (evaluated at runtime)
+export function getIsSupabaseConfigured(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return Boolean(url && key);
+}
 
-// Flag to check if Supabase is configured
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
+// For backward compatibility - evaluated at runtime via getter
+export const isSupabaseConfigured = getIsSupabaseConfigured();
 
 // Create a Supabase client for browser/client-side usage
 export function createClient() {
-  if (!isSupabaseConfigured) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
     // Return a dummy client during build time when env vars aren't available
-    // This will be replaced with real client at runtime
     return null as unknown as ReturnType<typeof createBrowserClient<Database>>;
   }
-  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+  return createBrowserClient<Database>(url, key);
 }
 
 // Singleton instance for client-side usage
 let clientInstance: ReturnType<typeof createBrowserClient<Database>> | null = null;
 
 export function getSupabaseClient() {
-  if (!isSupabaseConfigured) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
     return null as unknown as ReturnType<typeof createBrowserClient<Database>>;
   }
   if (!clientInstance) {
