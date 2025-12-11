@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useBookingStore } from '@/lib/store';
+import './page.css';
 
 function ConfirmationContent() {
   const router = useRouter();
@@ -17,10 +18,6 @@ function ConfirmationContent() {
     selectedSeats,
     cartSnacks,
     snackPickupTime,
-    getTicketTotal,
-    getSnackTotal,
-    getConvenienceFee,
-    getTax,
     getGrandTotal,
     resetBooking,
   } = useBookingStore();
@@ -32,9 +29,9 @@ function ConfirmationContent() {
 
   if (!selectedMovie || !selectedTheater || !selectedShowtime || selectedSeats.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">No booking found</h1>
-        <button onClick={() => router.push('/')} className="btn-primary">
+      <div className="confirmation-no-booking">
+        <h1 className="confirmation-no-booking-title">No booking found</h1>
+        <button onClick={() => router.push('/')} className="confirmation-home-btn">
           Go Home
         </button>
       </div>
@@ -54,14 +51,14 @@ function ConfirmationContent() {
   const snackQRUrl = snackQRData ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(snackQRData)}` : '';
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+    <div className="confirmation-page">
       {/* Confetti Animation */}
       {showConfetti && (
-        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+        <div className="confirmation-confetti-container">
           {Array.from({ length: 50 }).map((_, i) => (
             <div
               key={i}
-              className="absolute animate-confetti"
+              className="confirmation-confetti"
               style={{
                 left: `${Math.random() * 100}%`,
                 animationDelay: `${Math.random() * 2}s`,
@@ -78,44 +75,40 @@ function ConfirmationContent() {
       )}
 
       {/* Success Header */}
-      <div className="text-center mb-8 pt-8">
-        <div className="w-20 h-20 mx-auto mb-4 bg-success/20 rounded-full flex items-center justify-center animate-bounce">
-          <svg className="w-10 h-10 text-success" fill="currentColor" viewBox="0 0 24 24">
+      <div className="confirmation-header">
+        <div className="confirmation-success-icon">
+          <svg fill="currentColor" viewBox="0 0 24 24">
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
           </svg>
         </div>
-        <h1 className="text-3xl font-bold mb-2">Booking Confirmed!</h1>
-        <p className="text-muted">Your tickets have been booked successfully</p>
-        <p className="text-sm text-muted mt-2">Order ID: <span className="font-mono font-semibold text-foreground">{orderId}</span></p>
+        <h1 className="confirmation-title">Booking Confirmed!</h1>
+        <p className="confirmation-subtitle">Your tickets have been booked successfully</p>
+        <p className="confirmation-order-id">Order ID: <span>{orderId}</span></p>
       </div>
 
       {/* Ticket Card */}
-      <div className="card overflow-hidden mb-6">
+      <div className="confirmation-ticket-card">
         {/* Movie Banner */}
-        <div className="relative h-32 sm:h-48">
-          <img
-            src={selectedMovie.backdrop}
-            alt={selectedMovie.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
+        <div className="confirmation-banner">
+          <img src={selectedMovie.backdrop} alt={selectedMovie.title} />
+          <div className="confirmation-banner-overlay" />
         </div>
 
-        <div className="p-6">
-          <div className="flex flex-col sm:flex-row gap-6">
+        <div className="confirmation-ticket-content">
+          <div className="confirmation-ticket-details">
             {/* Movie Details */}
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold mb-2">{selectedMovie.title}</h2>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="badge badge-primary">{selectedShowtime.format}</span>
-                <span className="badge bg-secondary">{selectedMovie.language}</span>
-                <span className="badge bg-secondary">{selectedMovie.certification}</span>
+            <div className="confirmation-movie-info">
+              <h2 className="confirmation-movie-title">{selectedMovie.title}</h2>
+              <div className="confirmation-badges">
+                <span className="confirmation-badge confirmation-badge-primary">{selectedShowtime.format}</span>
+                <span className="confirmation-badge confirmation-badge-secondary">{selectedMovie.language}</span>
+                <span className="confirmation-badge confirmation-badge-secondary">{selectedMovie.certification}</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="confirmation-info-grid">
                 <div>
-                  <p className="text-muted">Date</p>
-                  <p className="font-semibold">
+                  <p className="confirmation-info-label">Date</p>
+                  <p className="confirmation-info-value">
                     {new Date(selectedShowtime.date).toLocaleDateString('en-US', {
                       weekday: 'long',
                       day: 'numeric',
@@ -125,20 +118,20 @@ function ConfirmationContent() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-muted">Time</p>
-                  <p className="font-semibold">{selectedShowtime.time}</p>
+                  <p className="confirmation-info-label">Time</p>
+                  <p className="confirmation-info-value">{selectedShowtime.time}</p>
                 </div>
                 <div>
-                  <p className="text-muted">Cinema</p>
-                  <p className="font-semibold">{selectedTheater.name}</p>
+                  <p className="confirmation-info-label">Cinema</p>
+                  <p className="confirmation-info-value">{selectedTheater.name}</p>
                 </div>
                 <div>
-                  <p className="text-muted">Screen</p>
-                  <p className="font-semibold">Screen 1</p>
+                  <p className="confirmation-info-label">Screen</p>
+                  <p className="confirmation-info-value">Screen 1</p>
                 </div>
-                <div className="col-span-2">
-                  <p className="text-muted">Seats</p>
-                  <p className="font-semibold text-lg text-primary">
+                <div className="confirmation-info-full">
+                  <p className="confirmation-info-label">Seats</p>
+                  <p className="confirmation-seats-value">
                     {selectedSeats.map((s) => s.id).join(', ')}
                   </p>
                 </div>
@@ -146,42 +139,42 @@ function ConfirmationContent() {
             </div>
 
             {/* QR Code */}
-            <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg">
-              <img src={ticketQRUrl} alt="Ticket QR Code" className="w-40 h-40" />
-              <p className="text-black text-xs mt-2 font-medium">Scan at Entry</p>
+            <div className="confirmation-qr-container">
+              <img src={ticketQRUrl} alt="Ticket QR Code" />
+              <p className="confirmation-qr-text">Scan at Entry</p>
             </div>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="relative">
-          <div className="absolute left-0 w-6 h-6 bg-background rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute right-0 w-6 h-6 bg-background rounded-full translate-x-1/2 -translate-y-1/2"></div>
-          <div className="border-t border-dashed border-border mx-8"></div>
+        <div className="confirmation-divider">
+          <div className="confirmation-divider-left"></div>
+          <div className="confirmation-divider-right"></div>
+          <div className="confirmation-divider-line"></div>
         </div>
 
         {/* Footer */}
-        <div className="p-6 flex flex-wrap justify-between items-center gap-4">
+        <div className="confirmation-ticket-footer">
           <div>
-            <p className="text-sm text-muted">Total Paid</p>
-            <p className="text-2xl font-bold text-primary">₹{getGrandTotal()}</p>
+            <p className="confirmation-total-label">Total Paid</p>
+            <p className="confirmation-total-value">₹{getGrandTotal()}</p>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-muted">{selectedSeats.length} Ticket(s)</p>
-            <p className="text-sm text-muted">{selectedTheater.location}</p>
+          <div className="confirmation-footer-right">
+            <p className="confirmation-footer-text">{selectedSeats.length} Ticket(s)</p>
+            <p className="confirmation-footer-text">{selectedTheater.location}</p>
           </div>
         </div>
       </div>
 
       {/* Snacks QR (if any) */}
       {cartSnacks.length > 0 && (
-        <div className="card p-6 mb-6">
-          <div className="flex flex-col sm:flex-row gap-6 items-center">
-            <div className="flex-1">
-              <h3 className="text-xl font-bold mb-4">Snack Order</h3>
-              <div className="space-y-2 mb-4">
+        <div className="confirmation-snacks-card">
+          <div className="confirmation-snacks-content">
+            <div className="confirmation-snacks-info">
+              <h3 className="confirmation-snacks-title">Snack Order</h3>
+              <div className="confirmation-snacks-list">
                 {cartSnacks.map((item, index) => (
-                  <div key={index} className="flex justify-between text-sm">
+                  <div key={index} className="confirmation-snack-item">
                     <span>
                       {item.quantity}x {item.snack.name}
                       {item.variant.size !== 'regular' && ` (${item.variant.size})`}
@@ -192,33 +185,30 @@ function ConfirmationContent() {
                   </div>
                 ))}
               </div>
-              <div className="flex items-center gap-2 p-3 bg-accent/10 rounded-lg">
-                <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="confirmation-pickup-info">
+                <svg className="confirmation-pickup-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
-                  <p className="text-sm font-medium">
+                  <p className="confirmation-pickup-title">
                     Pickup: {snackPickupTime === 'pre-show' ? '15 mins before showtime' : 'During Interval'}
                   </p>
-                  <p className="text-xs text-muted">Counter will be displayed on screen</p>
+                  <p className="confirmation-pickup-subtitle">Counter will be displayed on screen</p>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-center p-4 bg-white rounded-lg">
-              <img src={snackQRUrl} alt="Snack QR Code" className="w-32 h-32" />
-              <p className="text-black text-xs mt-2 font-medium">Scan at Counter</p>
+            <div className="confirmation-snack-qr">
+              <img src={snackQRUrl} alt="Snack QR Code" />
+              <p className="confirmation-snack-qr-text">Scan at Counter</p>
             </div>
           </div>
         </div>
       )}
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <button
-          onClick={() => window.print()}
-          className="btn-secondary flex items-center justify-center gap-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="confirmation-actions">
+        <button onClick={() => window.print()} className="confirmation-btn confirmation-btn-secondary">
+          <svg className="confirmation-btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
           </svg>
           Print Ticket
@@ -232,15 +222,15 @@ function ConfirmationContent() {
               });
             }
           }}
-          className="btn-secondary flex items-center justify-center gap-2"
+          className="confirmation-btn confirmation-btn-secondary"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="confirmation-btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
           </svg>
           Share
         </button>
-        <button onClick={handleNewBooking} className="btn-primary flex items-center justify-center gap-2">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button onClick={handleNewBooking} className="confirmation-btn confirmation-btn-primary">
+          <svg className="confirmation-btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
           Book Another
@@ -248,29 +238,29 @@ function ConfirmationContent() {
       </div>
 
       {/* Important Notes */}
-      <div className="mt-8 p-4 bg-secondary rounded-lg">
-        <h3 className="font-semibold mb-3">Important Information</h3>
-        <ul className="space-y-2 text-sm text-muted">
-          <li className="flex items-start gap-2">
-            <svg className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+      <div className="confirmation-notes">
+        <h3 className="confirmation-notes-title">Important Information</h3>
+        <ul className="confirmation-notes-list">
+          <li className="confirmation-note-item">
+            <svg className="confirmation-note-icon" fill="currentColor" viewBox="0 0 24 24">
               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
             </svg>
             Please arrive at least 15 minutes before the showtime
           </li>
-          <li className="flex items-start gap-2">
-            <svg className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+          <li className="confirmation-note-item">
+            <svg className="confirmation-note-icon" fill="currentColor" viewBox="0 0 24 24">
               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
             </svg>
             Show the QR code at the entry for ticket verification
           </li>
-          <li className="flex items-start gap-2">
-            <svg className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+          <li className="confirmation-note-item">
+            <svg className="confirmation-note-icon" fill="currentColor" viewBox="0 0 24 24">
               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
             </svg>
             Outside food and beverages are not allowed
           </li>
-          <li className="flex items-start gap-2">
-            <svg className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+          <li className="confirmation-note-item">
+            <svg className="confirmation-note-icon" fill="currentColor" viewBox="0 0 24 24">
               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
             </svg>
             Cancellation is allowed up to 2 hours before showtime
@@ -279,26 +269,9 @@ function ConfirmationContent() {
       </div>
 
       {/* Contact */}
-      <div className="mt-6 text-center text-sm text-muted">
-        <p>Need help? Contact us at <a href="mailto:support@shindhucinemas.com" className="text-primary hover:underline">support@shindhucinemas.com</a></p>
+      <div className="confirmation-contact">
+        <p>Need help? Contact us at <a href="mailto:support@shindhucinemas.com">support@shindhucinemas.com</a></p>
       </div>
-
-      {/* Add confetti animation styles */}
-      <style jsx>{`
-        @keyframes confetti {
-          0% {
-            transform: translateY(-100vh) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(100vh) rotate(720deg);
-            opacity: 0;
-          }
-        }
-        .animate-confetti {
-          animation: confetti 3s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 }
@@ -306,8 +279,8 @@ function ConfirmationContent() {
 export default function ConfirmationPage() {
   return (
     <Suspense fallback={
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <p className="text-muted">Loading...</p>
+      <div className="confirmation-loading">
+        <p className="confirmation-loading-text">Loading...</p>
       </div>
     }>
       <ConfirmationContent />

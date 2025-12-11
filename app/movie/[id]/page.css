@@ -39,6 +39,17 @@
   }
 }
 
+@media (max-width: 336px) {
+  .movie-info-overlay {
+    padding: 0 0.5rem;
+  }
+
+  .movie-info-container {
+    gap: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
 .movie-not-found-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -60,6 +71,23 @@
 
 .movie-not-found-btn:hover {
   background-color: #c2070f;
+}
+
+/* Loading Spinner */
+.movie-loading-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid var(--color-secondary, #1a1a1a);
+  border-top-color: var(--color-primary, #e50914);
+  border-radius: 50%;
+  animation: movie-spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes movie-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Hero Section */
@@ -150,6 +178,12 @@
   padding-top: 1rem;
 }
 
+@media (max-width: 336px) {
+  .movie-info {
+    padding-top: 0.5rem;
+  }
+}
+
 .movie-badges {
   display: flex;
   flex-wrap: wrap;
@@ -158,12 +192,26 @@
   margin-bottom: 0.75rem;
 }
 
+@media (max-width: 336px) {
+  .movie-badges {
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
 .movie-badge {
   display: inline-block;
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
   font-weight: 500;
   border-radius: 0.25rem;
+}
+
+@media (max-width: 336px) {
+  .movie-badge {
+    padding: 0.125rem 0.375rem;
+    font-size: 0.625rem;
+  }
 }
 
 .movie-badge-primary {

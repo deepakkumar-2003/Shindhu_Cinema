@@ -1,63 +1,176 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import MovieCard from '@/components/movies/MovieCard';
-import { movies, getMoviesByStatus } from '@/lib/data';
+import { useMoviesByStatus } from '@/lib/hooks/useMovies';
 import './Page.css';
 
 const languages = ['All', 'Hindi', 'English', 'Telugu', 'Tamil', 'Malayalam'];
 const genres = ['All', 'Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Romance', 'Thriller'];
 const formats = ['All', '2D', '3D', 'IMAX'];
 
+const AUTO_SLIDE_INTERVAL = 5000; // 5 seconds
+
 export default function Home() {
   const [selectedLanguage, setSelectedLanguage] = useState('All');
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [selectedFormat, setSelectedFormat] = useState('All');
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  const nowShowingMovies = getMoviesByStatus('now_showing');
-  const comingSoonMovies = getMoviesByStatus('coming_soon');
+  const { movies: nowShowingMovies, isLoading: nowShowingLoading } = useMoviesByStatus('now_showing');
+  const { movies: comingSoonMovies, isLoading: comingSoonLoading } = useMoviesByStatus('coming_soon');
 
-  const filteredMovies = nowShowingMovies.filter((movie) => {
-    if (selectedLanguage !== 'All' && movie.language !== selectedLanguage) return false;
-    if (selectedGenre !== 'All' && !movie.genres.includes(selectedGenre)) return false;
-    if (selectedFormat !== 'All' && !movie.format.includes(selectedFormat as '2D' | '3D' | 'IMAX')) return false;
-    return true;
-  });
+  // Get movies for hero banner (limit to first 5 for slideshow)
+  const heroMovies = useMemo(() => nowShowingMovies.slice(0, 5), [nowShowingMovies]);
+
+  const filteredMovies = useMemo(() => {
+    return nowShowingMovies.filter((movie) => {
+      if (selectedLanguage !== 'All' && movie.language !== selectedLanguage) return false;
+      if (selectedGenre !== 'All' && !movie.genres.includes(selectedGenre)) return false;
+      if (selectedFormat !== 'All' && !movie.format.includes(selectedFormat as '2D' | '3D' | 'IMAX')) return false;
+      return true;
+    });
+  }, [nowShowingMovies, selectedLanguage, selectedGenre, selectedFormat]);
+
+  // Navigate to next slide
+  const goToNextSlide = useCallback(() => {
+    if (heroMovies.length === 0) return;
+    setCurrentSlide((prev) => (prev + 1) % heroMovies.length);
+  }, [heroMovies.length]);
+
+  // Navigate to previous slide
+  const goToPrevSlide = useCallback(() => {
+    if (heroMovies.length === 0) return;
+    setCurrentSlide((prev) => (prev - 1 + heroMovies.length) % heroMovies.length);
+  }, [heroMovies.length]);
+
+  // Navigate to specific slide
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+    setIsAutoPlaying(false);
+    // Resume auto-play after 10 seconds
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  // Auto-slide effect
+  useEffect(() => {
+    if (!isAutoPlaying || heroMovies.length <= 1) return;
+
+    const interval = setInterval(goToNextSlide, AUTO_SLIDE_INTERVAL);
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, heroMovies.length, goToNextSlide]);
+
+  // Reset current slide when movies change
+  useEffect(() => {
+    if (currentSlide >= heroMovies.length && heroMovies.length > 0) {
+      setCurrentSlide(0);
+    }
+  }, [heroMovies.length, currentSlide]);
+
+  // Handle arrow navigation
+  const handlePrevClick = () => {
+    goToPrevSlide();
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const handleNextClick = () => {
+    goToNextSlide();
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  // Current hero movie
+  const currentHeroMovie = heroMovies[currentSlide];
 
   return (
     <div className="home-page">
       {/* Hero Banner */}
       <section className="hero-section">
-        <div className="hero-banner">
-          <img
-            src={movies[0].backdrop}
-            alt="Featured Movie"
-            className="hero-image"
-          />
-          <div className="hero-gradient" />
-          <div className="hero-content">
-            <div className="hero-content-inner">
-              <span className="hero-badge">Now Showing</span>
-              <h1 className="hero-title">
-                {movies[0].title}
-              </h1>
-              <p className="hero-description">
-                {movies[0].synopsis}
-              </p>
-              <div className="hero-buttons">
-                <a href={`/movie/${movies[0].id}`} className="hero-btn-primary">
-                  Book Tickets
-                </a>
-                <a href={`/movie/${movies[0].id}`} className="hero-btn-secondary">
-                  <svg className="hero-btn-icon" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                  Watch Trailer
-                </a>
-              </div>
-            </div>
+        {nowShowingLoading ? (
+          <div className="hero-banner hero-loading">
+            <div className="hero-loading-spinner"></div>
           </div>
-        </div>
+        ) : heroMovies.length > 0 ? (
+          <div className="hero-slider">
+            {/* Slides Container */}
+            <div className="hero-slides">
+              {heroMovies.map((movie, index) => (
+                <div
+                  key={movie.id}
+                  className={`hero-slide ${index === currentSlide ? 'hero-slide-active' : ''}`}
+                >
+                  <div className="hero-banner">
+                    <img
+                      src={movie.backdrop}
+                      alt={movie.title}
+                      className="hero-image"
+                    />
+                    <div className="hero-gradient" />
+                    <div className="hero-content">
+                      <div className="hero-content-inner">
+                        <span className="hero-badge">Now Showing</span>
+                        <h1 className="hero-title">{movie.title}</h1>
+                        <p className="hero-description">{movie.synopsis}</p>
+                        <div className="hero-buttons">
+                          <Link href={`/movie/${movie.id}`} className="hero-btn-primary">
+                            Book Tickets
+                          </Link>
+                          <Link href={`/movie/${movie.id}`} className="hero-btn-secondary">
+                            <svg className="hero-btn-icon" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                            Watch Trailer
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Navigation Arrows */}
+            {heroMovies.length > 1 && (
+              <>
+                <button
+                  className="hero-arrow hero-arrow-prev"
+                  onClick={handlePrevClick}
+                  aria-label="Previous slide"
+                >
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  className="hero-arrow hero-arrow-next"
+                  onClick={handleNextClick}
+                  aria-label="Next slide"
+                >
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {/* Dot Indicators */}
+            {heroMovies.length > 1 && (
+              <div className="hero-dots">
+                {heroMovies.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`hero-dot ${index === currentSlide ? 'hero-dot-active' : ''}`}
+                    onClick={() => goToSlide(index)}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : null}
       </section>
 
       {/* Filters */}
@@ -113,7 +226,12 @@ export default function Home() {
 
       {/* Now Showing Movies */}
       <section className="movies-section">
-        {filteredMovies.length > 0 ? (
+        {nowShowingLoading ? (
+          <div className="movies-loading">
+            <div className="movies-loading-spinner"></div>
+            <p>Loading movies...</p>
+          </div>
+        ) : filteredMovies.length > 0 ? (
           <div className="movies-grid">
             {filteredMovies.map((movie) => (
               <MovieCard key={movie.id} movie={movie} />
@@ -147,11 +265,17 @@ export default function Home() {
             View All
           </a>
         </div>
-        <div className="movies-grid">
-          {comingSoonMovies.map((movie) => (
-            <MovieCard key={movie.id} movie={movie} showStatus />
-          ))}
-        </div>
+        {comingSoonLoading ? (
+          <div className="movies-loading">
+            <div className="movies-loading-spinner"></div>
+          </div>
+        ) : (
+          <div className="movies-grid">
+            {comingSoonMovies.map((movie) => (
+              <MovieCard key={movie.id} movie={movie} showStatus />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Promotional Banners */}

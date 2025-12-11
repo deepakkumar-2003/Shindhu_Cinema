@@ -411,3 +411,36 @@
 .cs-subscribe-btn:hover {
   background-color: #c2070f;
 }
+
+/* Loading States */
+.cs-featured-loading,
+.cs-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  color: var(--color-muted, #888888);
+  gap: 1rem;
+}
+
+.cs-featured-loading {
+  min-height: 300px;
+  background-color: var(--color-card, #141414);
+  border-radius: 0.75rem;
+}
+
+.cs-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border, #2a2a2a);
+  border-top-color: var(--color-primary, #e50914);
+  border-radius: 50%;
+  animation: cs-spin 1s linear infinite;
+}
+
+@keyframes cs-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

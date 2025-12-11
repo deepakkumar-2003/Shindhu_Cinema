@@ -2,7 +2,8 @@
 
 import { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { getMovieById, reviews } from '@/lib/data';
+import { useMovie } from '@/lib/hooks/useMovies';
+import { reviews } from '@/lib/data';
 import './page.css';
 
 interface MoviePageProps {
@@ -12,10 +13,19 @@ interface MoviePageProps {
 export default function MoviePage({ params }: MoviePageProps) {
   const { id } = use(params);
   const router = useRouter();
-  const movie = getMovieById(id);
+  const { movie, isLoading, error } = useMovie(id);
   const [showTrailer, setShowTrailer] = useState(false);
 
-  if (!movie) {
+  if (isLoading) {
+    return (
+      <div className="movie-not-found">
+        <div className="movie-loading-spinner"></div>
+        <p>Loading movie...</p>
+      </div>
+    );
+  }
+
+  if (error || !movie) {
     return (
       <div className="movie-not-found">
         <h1 className="movie-not-found-title">Movie not found</h1>

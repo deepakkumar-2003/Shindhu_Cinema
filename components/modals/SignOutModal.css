@@ -1,0 +1,170 @@
+/* Sign Out Modal Styles */
+
+.signout-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  animation: signout-fade-in 0.2s ease-out;
+}
+
+@keyframes signout-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.signout-modal {
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  animation: signout-slide-up 0.3s ease-out;
+}
+
+@keyframes signout-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.signout-modal-icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1.5rem;
+  background-color: rgba(229, 9, 20, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signout-modal-icon svg {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-primary, #e50914);
+}
+
+.signout-modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-foreground, #ffffff);
+  margin: 0 0 0.75rem 0;
+}
+
+.signout-modal-message {
+  font-size: 0.95rem;
+  color: var(--color-muted, #888888);
+  margin: 0 0 2rem 0;
+  line-height: 1.5;
+}
+
+.signout-modal-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.signout-modal-btn {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+}
+
+.signout-modal-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.signout-modal-btn-cancel {
+  background-color: var(--color-secondary, #1a1a1a);
+  color: var(--color-foreground, #ffffff);
+  border: 1px solid var(--color-border, #2a2a2a);
+}
+
+.signout-modal-btn-cancel:hover:not(:disabled) {
+  background-color: var(--color-border, #2a2a2a);
+}
+
+.signout-modal-btn-confirm {
+  background-color: var(--color-primary, #e50914);
+  color: white;
+  border: none;
+}
+
+.signout-modal-btn-confirm:hover:not(:disabled) {
+  background-color: #c2070f;
+}
+
+.signout-modal-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: signout-spin 0.8s linear infinite;
+}
+
+@keyframes signout-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .signout-modal {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .signout-modal-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .signout-modal-icon svg {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .signout-modal-title {
+    font-size: 1.25rem;
+  }
+
+  .signout-modal-message {
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .signout-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .signout-modal-btn {
+    padding: 0.75rem 1rem;
+  }
+}

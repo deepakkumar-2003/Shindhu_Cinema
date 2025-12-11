@@ -46,6 +46,25 @@
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logo-link img {
+  width: auto;
+  height: 3.5rem;
+  object-fit: contain;
+}
+
+@media (min-width: 640px) {
+  .logo-link img {
+    height: 3rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .logo-link img {
+    height: 3rem;
+  }
 }
 
 .logo-icon-wrapper {
@@ -628,6 +647,23 @@
   color: var(--color-primary, #e50914);
 }
 
+/* Active Nav Link */
+.nav-link-active {
+  color: var(--color-primary, #e50914);
+  position: relative;
+}
+
+.nav-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: -0.75rem;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--color-primary, #e50914);
+  border-radius: 1px;
+}
+
 
 /* Off-Canvas Overlay */
 .offcanvas-overlay {
@@ -769,6 +805,16 @@
 }
 
 .offcanvas-nav-link:hover .offcanvas-nav-icon {
+  color: var(--color-primary, #e50914);
+}
+
+/* Active Off-Canvas Nav Link */
+.offcanvas-nav-link-active {
+  background-color: rgba(229, 9, 20, 0.1);
+  color: var(--color-primary, #e50914);
+}
+
+.offcanvas-nav-link-active .offcanvas-nav-icon {
   color: var(--color-primary, #e50914);
 }
 
@@ -973,4 +1019,27 @@
 .quick-action-label {
   font-size: 0.8125rem;
   font-weight: 500;
+}
+
+/* Auth Loading State */
+.auth-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+}
+
+.auth-loading-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--color-border, #2a2a2a);
+  border-top-color: var(--color-primary, #e50914);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

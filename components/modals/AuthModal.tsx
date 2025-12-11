@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useUserStore, useUIStore } from '@/lib/store';
+import { useAuth } from '@/lib/supabase/auth';
+import { toast } from '@/lib/hooks/useToast';
 import './AuthModal.css';
 
 interface AuthModalProps {
@@ -10,15 +11,16 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'otp'>('login');
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'otp' | 'forgot'>('login');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const { setUser } = useUserStore();
+  const { signIn, signUp, signInWithOTP, verifyOTP, signInWithGoogle, resetPassword } = useAuth();
 
   if (!isOpen) return null;
 
@@ -35,80 +37,136 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   };
 
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      const prevInput = document.getElementById(`otp-${index - 1}`);
+      prevInput?.focus();
+    }
+  };
+
   const handleSendOtp = async () => {
-    if (!phone || phone.length !== 10) return;
+    if (!phone || phone.length !== 10) {
+      toast.error('Please enter a valid 10-digit phone number');
+      return;
+    }
+
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const result = await signInWithOTP({ phone: `+91${phone}` });
+
     setIsLoading(false);
-    setAuthMode('otp');
+
+    if (result.success) {
+      setAuthMode('otp');
+      toast.success('OTP sent successfully');
+    } else {
+      toast.error(result.error || 'Failed to send OTP');
+    }
   };
 
   const handleVerifyOtp = async () => {
     const otpValue = otp.join('');
-    if (otpValue.length !== 6) return;
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (otpValue.length !== 6) {
+      toast.error('Please enter the complete 6-digit OTP');
+      return;
+    }
 
-    // Mock user creation
-    setUser({
-      id: '1',
-      name: name || 'User',
-      email: email || `user${phone}@example.com`,
-      phone,
-      city: 'Mumbai',
-      walletBalance: 0,
-      referralCode: 'SHINDHU' + Math.random().toString(36).substring(7).toUpperCase(),
-      bookings: [],
-    });
+    setIsLoading(true);
+
+    const result = await verifyOTP(`+91${phone}`, otpValue);
 
     setIsLoading(false);
-    onClose();
-    resetForm();
+
+    if (result.success) {
+      toast.success('Signed in successfully!');
+      onClose();
+      resetForm();
+    } else {
+      toast.error(result.error || 'Invalid OTP');
+    }
   };
 
   const handleEmailLogin = async () => {
-    if (!email || !password) return;
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (!email || !password) {
+      toast.error('Please enter email and password');
+      return;
+    }
 
-    setUser({
-      id: '1',
-      name: email.split('@')[0],
+    setIsLoading(true);
+
+    const result = await signIn({ email, password });
+
+    setIsLoading(false);
+
+    if (result.success) {
+      toast.success('Signed in successfully!');
+      onClose();
+      resetForm();
+    } else {
+      toast.error(result.error || 'Invalid credentials');
+    }
+  };
+
+  const handleEmailSignUp = async () => {
+    if (!email || !password) {
+      toast.error('Please enter email and password');
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    setIsLoading(true);
+
+    const result = await signUp({
       email,
-      phone: '',
-      city: 'Mumbai',
-      walletBalance: 100,
-      referralCode: 'SHINDHU' + Math.random().toString(36).substring(7).toUpperCase(),
-      bookings: [],
+      password,
+      name: name || undefined,
+      phone: phone ? `+91${phone}` : undefined,
     });
 
     setIsLoading(false);
-    onClose();
-    resetForm();
+
+    if (result.success) {
+      toast.success('Account created! Please check your email to verify your account.');
+      setAuthMode('login');
+    } else {
+      toast.error(result.error || 'Sign up failed');
+    }
   };
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    setUser({
-      id: '1',
-      name: 'Google User',
-      email: 'user@gmail.com',
-      phone: '',
-      city: 'Mumbai',
-      walletBalance: 50,
-      referralCode: 'SHINDHU' + Math.random().toString(36).substring(7).toUpperCase(),
-      bookings: [],
-    });
+    const result = await signInWithGoogle();
+
+    if (!result.success) {
+      setIsLoading(false);
+      toast.error(result.error || 'Google sign in failed');
+    }
+    // If successful, user will be redirected
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast.error('Please enter your email address');
+      return;
+    }
+
+    setIsLoading(true);
+
+    const result = await resetPassword(email);
 
     setIsLoading(false);
-    onClose();
-    resetForm();
+
+    if (result.success) {
+      toast.success('Password reset email sent! Check your inbox.');
+      setAuthMode('login');
+    } else {
+      toast.error(result.error || 'Failed to send reset email');
+    }
   };
 
   const resetForm = () => {
@@ -118,6 +176,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setName('');
     setOtp(['', '', '', '', '', '']);
     setAuthMode('login');
+    setShowPassword(false);
   };
 
   return (
@@ -136,7 +195,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         {/* Header */}
         <div className="auth-modal-header">
           <h2 className="auth-modal-title">
-            {authMode === 'otp' ? 'Verify OTP' : authMode === 'signup' ? 'Create Account' : 'Sign In'}
+            {authMode === 'otp' ? 'Verify OTP' :
+             authMode === 'signup' ? 'Create Account' :
+             authMode === 'forgot' ? 'Reset Password' : 'Sign In'}
           </h2>
           <button
             onClick={() => {
@@ -168,9 +229,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     key={index}
                     id={`otp-${index}`}
                     type="text"
+                    inputMode="numeric"
                     maxLength={1}
                     value={digit}
-                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    onChange={(e) => handleOtpChange(index, e.target.value.replace(/\D/g, ''))}
+                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
                     className="otp-input"
                   />
                 ))}
@@ -186,7 +249,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
               <div className="otp-text-center">
                 <button
-                  onClick={() => setAuthMode('login')}
+                  onClick={() => {
+                    setAuthMode('login');
+                    setOtp(['', '', '', '', '', '']);
+                  }}
                   className="auth-link"
                 >
                   Change phone number
@@ -195,8 +261,44 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
               <div className="resend-otp-section">
                 <span className="resend-otp-text">Didn&apos;t receive OTP? </span>
-                <button className="auth-link-primary">
+                <button
+                  className="auth-link-primary"
+                  onClick={handleSendOtp}
+                  disabled={isLoading}
+                >
                   Resend OTP
+                </button>
+              </div>
+            </div>
+          ) : authMode === 'forgot' ? (
+            /* Forgot Password */
+            <div className="auth-form">
+              <p className="auth-form-description">
+                Enter your email address and we&apos;ll send you a link to reset your password.
+              </p>
+              <div className="auth-form-group">
+                <label className="auth-form-label">Email</label>
+                <input
+                  type="email"
+                  placeholder="Enter email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="auth-input"
+                />
+              </div>
+              <button
+                onClick={handleForgotPassword}
+                disabled={isLoading || !email}
+                className="auth-btn-primary"
+              >
+                {isLoading ? 'Sending...' : 'Send Reset Link'}
+              </button>
+              <div className="auth-mode-toggle">
+                <button
+                  onClick={() => setAuthMode('login')}
+                  className="auth-mode-btn"
+                >
+                  Back to Sign In
                 </button>
               </div>
             </div>
@@ -291,20 +393,50 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 </div>
                 <div className="auth-form-group">
                   <label className="auth-form-label">Password</label>
-                  <input
-                    type="password"
-                    placeholder="Enter password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="auth-input"
-                  />
+                  <div className="password-input-wrapper">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Enter password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="auth-input auth-input-password"
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle-btn"
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex={-1}
+                    >
+                      {showPassword ? (
+                        <svg className="password-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                        </svg>
+                      ) : (
+                        <svg className="password-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                 </div>
+
+                {authMode === 'login' && (
+                  <button
+                    onClick={() => setAuthMode('forgot')}
+                    className="auth-forgot-link"
+                  >
+                    Forgot password?
+                  </button>
+                )}
+
                 <button
-                  onClick={handleEmailLogin}
+                  onClick={authMode === 'signup' ? handleEmailSignUp : handleEmailLogin}
                   disabled={isLoading || !email || !password}
-                  className="auth-btn-secondary"
+                  className={`auth-btn-secondary ${email && password ? 'ready' : ''}`}
                 >
-                  {isLoading ? 'Signing in...' : 'Sign in with Email'}
+                  {isLoading ? (authMode === 'signup' ? 'Creating account...' : 'Signing in...') :
+                   (authMode === 'signup' ? 'Create Account' : 'Sign in with Email')}
                 </button>
               </div>
 

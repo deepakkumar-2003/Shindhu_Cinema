@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import MovieCard from '@/components/movies/MovieCard';
-import { getMoviesByStatus } from '@/lib/data';
+import { useMoviesByStatus } from '@/lib/hooks/useMovies';
 import './page.css';
 
 export default function ComingSoonPage() {
   const [notifyList, setNotifyList] = useState<string[]>([]);
-  const comingSoonMovies = getMoviesByStatus('coming_soon');
+  const { movies: comingSoonMovies, isLoading } = useMoviesByStatus('coming_soon');
 
   const handleNotify = (movieId: string) => {
     if (notifyList.includes(movieId)) {
@@ -16,6 +16,8 @@ export default function ComingSoonPage() {
       setNotifyList([...notifyList, movieId]);
     }
   };
+
+  const featuredMovie = comingSoonMovies[0];
 
   return (
     <div className="coming-soon-page">
@@ -28,12 +30,19 @@ export default function ComingSoonPage() {
       </div>
 
       {/* Featured Coming Soon */}
-      {comingSoonMovies.length > 0 && (
+      {isLoading ? (
+        <section className="cs-featured-section">
+          <div className="cs-featured-loading">
+            <div className="cs-loading-spinner"></div>
+            <p>Loading movies...</p>
+          </div>
+        </section>
+      ) : featuredMovie ? (
         <section className="cs-featured-section">
           <div className="cs-featured-banner">
             <img
-              src={comingSoonMovies[0].backdrop}
-              alt={comingSoonMovies[0].title}
+              src={featuredMovie.backdrop}
+              alt={featuredMovie.title}
               className="cs-featured-image"
             />
             <div className="cs-featured-gradient" />
@@ -41,18 +50,18 @@ export default function ComingSoonPage() {
               <div className="cs-featured-content-inner">
                 <span className="cs-featured-badge">Coming Soon</span>
                 <h2 className="cs-featured-title">
-                  {comingSoonMovies[0].title}
+                  {featuredMovie.title}
                 </h2>
                 <p className="cs-featured-synopsis">
-                  {comingSoonMovies[0].synopsis}
+                  {featuredMovie.synopsis}
                 </p>
                 <div className="cs-featured-meta">
-                  <span>{comingSoonMovies[0].language}</span>
+                  <span>{featuredMovie.language}</span>
                   <span className="cs-featured-meta-dot">•</span>
-                  <span>{comingSoonMovies[0].genres.join(', ')}</span>
+                  <span>{featuredMovie.genres.join(', ')}</span>
                   <span className="cs-featured-meta-dot">•</span>
                   <span>
-                    {new Date(comingSoonMovies[0].releaseDate).toLocaleDateString('en-US', {
+                    {new Date(featuredMovie.releaseDate).toLocaleDateString('en-US', {
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric',
@@ -60,14 +69,14 @@ export default function ComingSoonPage() {
                   </span>
                 </div>
                 <button
-                  onClick={() => handleNotify(comingSoonMovies[0].id)}
+                  onClick={() => handleNotify(featuredMovie.id)}
                   className={`cs-notify-btn ${
-                    notifyList.includes(comingSoonMovies[0].id)
+                    notifyList.includes(featuredMovie.id)
                       ? 'cs-notify-btn-secondary'
                       : 'cs-notify-btn-primary'
                   }`}
                 >
-                  {notifyList.includes(comingSoonMovies[0].id) ? (
+                  {notifyList.includes(featuredMovie.id) ? (
                     <>
                       <svg className="cs-notify-icon" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
@@ -87,12 +96,17 @@ export default function ComingSoonPage() {
             </div>
           </div>
         </section>
-      )}
+      ) : null}
 
       {/* All Coming Soon Movies */}
       <section>
         <h2 className="cs-movies-section-title">All Upcoming Movies</h2>
-        {comingSoonMovies.length > 0 ? (
+        {isLoading ? (
+          <div className="cs-loading-state">
+            <div className="cs-loading-spinner"></div>
+            <p>Loading movies...</p>
+          </div>
+        ) : comingSoonMovies.length > 0 ? (
           <div className="cs-movies-grid">
             {comingSoonMovies.map((movie) => (
               <div key={movie.id} className="cs-movie-item">

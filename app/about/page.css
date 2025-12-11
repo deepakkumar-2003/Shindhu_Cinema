@@ -1,0 +1,361 @@
+/* About Page Styles */
+
+.about-page {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem 1rem 4rem;
+}
+
+@media (min-width: 640px) {
+  .about-page {
+    padding: 2rem 1.5rem 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .about-page {
+    padding: 2rem 2rem 4rem;
+  }
+}
+
+/* Hero Section */
+.about-hero {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.about-hero-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  color: var(--color-foreground, #ffffff);
+}
+
+@media (min-width: 640px) {
+  .about-hero-title {
+    font-size: 2.5rem;
+  }
+}
+
+.about-hero-subtitle {
+  color: var(--color-muted, #888888);
+  max-width: 48rem;
+  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* Section Titles */
+.about-section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-foreground, #ffffff);
+  text-align: center;
+  margin: 0 0 0.5rem 0;
+}
+
+.about-section-subtitle {
+  color: var(--color-muted, #888888);
+  text-align: center;
+  margin: 0 0 2rem 0;
+}
+
+/* Mission Section */
+.about-mission-section {
+  margin-bottom: 3rem;
+}
+
+.about-mission-card {
+  background: linear-gradient(135deg, rgba(229, 9, 20, 0.1) 0%, rgba(20, 20, 20, 1) 100%);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .about-mission-card {
+    padding: 3rem;
+  }
+}
+
+.about-mission-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-foreground, #ffffff);
+  margin: 0 0 1rem 0;
+}
+
+.about-mission-text {
+  color: var(--color-muted, #888888);
+  max-width: 48rem;
+  margin: 0 auto;
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+/* Values Section */
+.about-values-section {
+  margin-bottom: 3rem;
+}
+
+.about-values-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .about-values-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .about-values-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.about-value-card {
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.about-value-card:hover {
+  border-color: var(--color-primary, #e50914);
+  transform: translateY(-4px);
+}
+
+.about-value-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  background-color: rgba(229, 9, 20, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  color: var(--color-primary, #e50914);
+}
+
+.about-value-icon svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.about-value-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-foreground, #ffffff);
+  margin: 0 0 0.5rem 0;
+}
+
+.about-value-description {
+  font-size: 0.875rem;
+  color: var(--color-muted, #888888);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Timeline Section */
+.about-timeline-section {
+  margin-bottom: 3rem;
+}
+
+.about-timeline {
+  max-width: 40rem;
+  margin: 2rem auto 0;
+}
+
+.about-timeline-item {
+  display: flex;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.about-timeline-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.about-timeline-dot {
+  width: 1rem;
+  height: 1rem;
+  background-color: var(--color-primary, #e50914);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.about-timeline-line {
+  width: 2px;
+  flex: 1;
+  background-color: var(--color-border, #2a2a2a);
+  margin: 0.5rem 0;
+}
+
+.about-timeline-content {
+  padding-bottom: 2rem;
+}
+
+.about-timeline-year {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary, #e50914);
+  margin-bottom: 0.25rem;
+}
+
+.about-timeline-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-foreground, #ffffff);
+  margin: 0 0 0.5rem 0;
+}
+
+.about-timeline-description {
+  font-size: 0.875rem;
+  color: var(--color-muted, #888888);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Team Section */
+.about-team-section {
+  margin-bottom: 3rem;
+}
+
+.about-team-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .about-team-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.about-team-card {
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.about-team-card:hover {
+  border-color: var(--color-primary, #e50914);
+}
+
+.about-team-avatar {
+  width: 5rem;
+  height: 5rem;
+  background-color: var(--color-secondary, #1a1a1a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  color: var(--color-muted, #888888);
+}
+
+.about-team-avatar svg {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.about-team-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-foreground, #ffffff);
+  margin: 0 0 0.25rem 0;
+}
+
+.about-team-role {
+  font-size: 0.875rem;
+  color: var(--color-muted, #888888);
+  margin: 0;
+}
+
+/* Contact Section */
+.about-contact-section {
+  margin-top: 3rem;
+}
+
+.about-contact-card {
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 1rem;
+  padding: 2rem;
+}
+
+@media (min-width: 640px) {
+  .about-contact-card {
+    padding: 2.5rem;
+  }
+}
+
+.about-contact-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-foreground, #ffffff);
+  text-align: center;
+  margin: 0 0 2rem 0;
+}
+
+.about-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .about-contact-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .about-contact-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.about-contact-item {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.about-contact-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: rgba(229, 9, 20, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  color: var(--color-primary, #e50914);
+  flex-shrink: 0;
+}
+
+.about-contact-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-foreground, #ffffff);
+  margin: 0 0 0.25rem 0;
+}
+
+.about-contact-value {
+  font-size: 0.875rem;
+  color: var(--color-muted, #888888);
+  margin: 0;
+  line-height: 1.5;
+}

@@ -1,10 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
-import { useBookingStore, useUserStore, useUIStore } from '@/lib/store';
+import { usePathname } from 'next/navigation';
+import { useBookingStore, useUIStore } from '@/lib/store';
+import { useAuth } from '@/lib/supabase/auth';
 import CityModal from '../modals/CityModal';
 import AuthModal from '../modals/AuthModal';
+import SignOutModal from '../modals/SignOutModal';
 import './Header.css';
 
 // Sample trending and recent searches for demo
@@ -25,13 +29,27 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
+  const pathname = usePathname();
   const { selectedCity } = useBookingStore();
-  const { user, isAuthenticated, logout } = useUserStore();
+  const { profile, isAuthenticated, signOut, isLoading: authLoading } = useAuth();
   const { setIsCityModalOpen, setIsAuthModalOpen, isCityModalOpen, isAuthModalOpen } = useUIStore();
+
+  // Helper function to check if a nav link is active
+  const isActiveLink = (href: string) => {
+    if (href === '/') {
+      // Movies tab is active on home page or any /movie/* page
+      return pathname === '/' || pathname.startsWith('/movie');
+    }
+    return pathname === href || pathname.startsWith(href);
+  };
+
+  // Get display name from profile or email
+  const displayName = profile?.name || profile?.email?.split('@')[0] || 'User';
 
   // Handle ESC key to close search
   useEffect(() => {
@@ -115,12 +133,13 @@ export default function Header() {
           <div className="header-content">
             {/* Logo */}
             <Link href="/" className="logo-link">
-              <div className="logo-icon-wrapper">
+              {/* <div className="logo-icon-wrapper">
                 <svg className="logo-icon" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z" />
                 </svg>
-              </div>
-              <span className="logo-text">Shindhu Cinemas</span>
+              </div> */}
+              {/* <span className="logo-text">Shindhu Cinemas</span> */}
+              <Image src="/images/logo.jpg" alt="Shindhu Cinemas" width={120} height={48} priority />
             </Link>
 
             {/* Search Bar - Desktop */}
@@ -271,7 +290,11 @@ export default function Header() {
               </button>
 
               {/* Auth Buttons */}
-              {isAuthenticated ? (
+              {authLoading ? (
+                <div className="auth-loading">
+                  <div className="auth-loading-spinner"></div>
+                </div>
+              ) : isAuthenticated ? (
                 <div className="user-menu-container" ref={userMenuRef}>
                   <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -279,10 +302,10 @@ export default function Header() {
                   >
                     <div className="user-avatar">
                       <span className="user-avatar-text">
-                        {user?.name?.charAt(0).toUpperCase()}
+                        {displayName.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <span className="user-name">{user?.name?.split(' ')[0]}</span>
+                    <span className="user-name">{displayName.split(' ')[0]}</span>
                   </button>
 
                   {isMenuOpen && (
@@ -311,8 +334,8 @@ export default function Header() {
                       <hr className="dropdown-divider" />
                       <button
                         onClick={() => {
-                          logout();
                           setIsMenuOpen(false);
+                          setIsSignOutModalOpen(true);
                         }}
                         className="dropdown-logout"
                       >
@@ -422,17 +445,23 @@ export default function Header() {
         <nav className="nav">
           <div className="nav-container">
             <div className="nav-links">
-              <Link href="/" className="nav-link">
+              <Link href="/" className={`nav-link ${isActiveLink('/') ? 'nav-link-active' : ''}`}>
                 Movies
               </Link>
-              <Link href="/coming-soon" className="nav-link">
+              <Link href="/coming-soon" className={`nav-link ${isActiveLink('/coming-soon') ? 'nav-link-active' : ''}`}>
                 Coming Soon
               </Link>
-              <Link href="/snacks" className="nav-link">
+              <Link href="/snacks" className={`nav-link ${isActiveLink('/snacks') ? 'nav-link-active' : ''}`}>
                 Food & Beverages
               </Link>
-              <Link href="/offers" className="nav-link">
+              <Link href="/offers" className={`nav-link ${isActiveLink('/offers') ? 'nav-link-active' : ''}`}>
                 Offers
+              </Link>
+              <Link href="/advertisement" className={`nav-link ${isActiveLink('/advertisement') ? 'nav-link-active' : ''}`}>
+                Advertisement
+              </Link>
+              <Link href="/about" className={`nav-link ${isActiveLink('/about') ? 'nav-link-active' : ''}`}>
+                About Us
               </Link>
             </div>
           </div>
@@ -465,29 +494,41 @@ export default function Header() {
           {/* Navigation Links */}
           <div className="offcanvas-section">
             <div className="offcanvas-nav-links">
-              <Link href="/" className="offcanvas-nav-link" onClick={() => setIsOffCanvasOpen(false)}>
+              <Link href="/" className={`offcanvas-nav-link ${isActiveLink('/') ? 'offcanvas-nav-link-active' : ''}`} onClick={() => setIsOffCanvasOpen(false)}>
                 <svg className="offcanvas-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
                 </svg>
                 Movies
               </Link>
-              <Link href="/coming-soon" className="offcanvas-nav-link" onClick={() => setIsOffCanvasOpen(false)}>
+              <Link href="/coming-soon" className={`offcanvas-nav-link ${isActiveLink('/coming-soon') ? 'offcanvas-nav-link-active' : ''}`} onClick={() => setIsOffCanvasOpen(false)}>
                 <svg className="offcanvas-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 Coming Soon
               </Link>
-              <Link href="/snacks" className="offcanvas-nav-link" onClick={() => setIsOffCanvasOpen(false)}>
+              <Link href="/snacks" className={`offcanvas-nav-link ${isActiveLink('/snacks') ? 'offcanvas-nav-link-active' : ''}`} onClick={() => setIsOffCanvasOpen(false)}>
                 <svg className="offcanvas-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
                 Food & Beverages
               </Link>
-              <Link href="/offers" className="offcanvas-nav-link" onClick={() => setIsOffCanvasOpen(false)}>
+              <Link href="/offers" className={`offcanvas-nav-link ${isActiveLink('/offers') ? 'offcanvas-nav-link-active' : ''}`} onClick={() => setIsOffCanvasOpen(false)}>
                 <svg className="offcanvas-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                 </svg>
                 Offers
+              </Link>
+              <Link href="/advertisement" className={`offcanvas-nav-link ${isActiveLink('/advertisement') ? 'offcanvas-nav-link-active' : ''}`} onClick={() => setIsOffCanvasOpen(false)}>
+                <svg className="offcanvas-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                </svg>
+                Advertisement
+              </Link>
+              <Link href="/about" className={`offcanvas-nav-link ${isActiveLink('/about') ? 'offcanvas-nav-link-active' : ''}`} onClick={() => setIsOffCanvasOpen(false)}>
+                <svg className="offcanvas-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                About Us
               </Link>
             </div>
           </div>
@@ -607,6 +648,11 @@ export default function Header() {
       {/* Modals */}
       <CityModal isOpen={isCityModalOpen} onClose={() => setIsCityModalOpen(false)} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <SignOutModal
+        isOpen={isSignOutModalOpen}
+        onClose={() => setIsSignOutModalOpen(false)}
+        onConfirm={signOut}
+      />
     </>
   );
 }
