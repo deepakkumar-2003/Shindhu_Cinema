@@ -4,18 +4,24 @@
   max-width: 80rem;
   margin-left: auto;
   margin-right: auto;
-  padding: 2rem 1rem 4rem;
+  padding: 4.5rem 1rem 4rem; /* 6rem top padding = 4rem header + 2rem spacing */
 }
 
 @media (min-width: 640px) {
   .about-page {
-    padding: 2rem 1.5rem 4rem;
+    padding: 5rem 1.5rem 4rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .about-page {
+    padding: 1rem 1.5rem 4rem;
   }
 }
 
 @media (min-width: 1024px) {
   .about-page {
-    padding: 2rem 2rem 4rem;
+    padding: 6rem 2rem 4rem;
   }
 }
 

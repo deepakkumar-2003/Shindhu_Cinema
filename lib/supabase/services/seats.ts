@@ -150,7 +150,8 @@ export async function lockSeats(
     return { success: false, message: 'Not authenticated', lockedSeats: [] };
   }
 
-  const { data, error } = await supabase.rpc('lock_seats', {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('lock_seats', {
     p_showtime_id: showtimeId,
     p_seat_ids: seatIds,
     p_user_id: user.id,
@@ -162,10 +163,11 @@ export async function lockSeats(
     return { success: false, message: error.message, lockedSeats: [] };
   }
 
+  const result = data as { success: boolean; message: string; locked_seats?: string[] };
   return {
-    success: data.success,
-    message: data.message,
-    lockedSeats: data.locked_seats || [],
+    success: result.success,
+    message: result.message,
+    lockedSeats: result.locked_seats || [],
   };
 }
 
@@ -176,7 +178,8 @@ export async function releaseSeatLocks(showtimeId: string): Promise<boolean> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return false;
 
-  const { data, error } = await supabase.rpc('release_seat_locks', {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('release_seat_locks', {
     p_showtime_id: showtimeId,
     p_user_id: user.id,
   });
@@ -186,7 +189,7 @@ export async function releaseSeatLocks(showtimeId: string): Promise<boolean> {
     return false;
   }
 
-  return data;
+  return data as boolean;
 }
 
 // Subscribe to seat updates (real-time)

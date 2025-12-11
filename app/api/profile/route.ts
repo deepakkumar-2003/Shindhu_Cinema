@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@/lib/supabase/server';
+import type { UpdateTables } from '@/lib/supabase/database.types';
 
 // GET /api/profile - Get current user's profile
 export async function GET(request: NextRequest) {
@@ -45,7 +46,7 @@ export async function PATCH(request: NextRequest) {
     const { name, phone, city, avatar_url } = body;
 
     // Build update object with only provided fields
-    const updates: Record<string, string> = {};
+    const updates: UpdateTables<'profiles'> = {};
     if (name !== undefined) updates.name = name;
     if (phone !== undefined) updates.phone = phone;
     if (city !== undefined) updates.city = city;
@@ -55,8 +56,9 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
     }
 
-    const { data, error } = await supabase
-      .from('profiles')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase
+      .from('profiles') as any)
       .update(updates)
       .eq('id', user.id)
       .select()

@@ -33,7 +33,8 @@ export async function POST(
     }
 
     // Call the confirm_booking function
-    const { data: confirmed, error: confirmError } = await supabase.rpc(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: confirmed, error: confirmError } = await (supabase.rpc as any)(
       'confirm_booking',
       { p_booking_id: id }
     );

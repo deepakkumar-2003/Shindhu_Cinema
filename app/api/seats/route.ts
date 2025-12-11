@@ -54,7 +54,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Call the lock_seats function
-    const { data, error } = await supabase.rpc('lock_seats', {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)('lock_seats', {
       p_showtime_id: showtimeId,
       p_seat_ids: seatIds,
       p_user_id: user.id,
@@ -92,7 +93,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Call the release_seat_locks function
-    const { data, error } = await supabase.rpc('release_seat_locks', {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)('release_seat_locks', {
       p_showtime_id: showtimeId,
       p_user_id: user.id,
     });

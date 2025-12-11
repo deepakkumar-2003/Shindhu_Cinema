@@ -1,7 +1,9 @@
 'use client';
 
 import { getSupabaseClient } from '../client';
-import type { Showtime as SupabaseShowtime } from '../database.types';
+import type { Showtime as SupabaseShowtime, Tables } from '../database.types';
+
+type TheaterRow = Tables<'theaters'>;
 
 // Transform to app format
 export interface TransformedShowtime {
@@ -73,8 +75,10 @@ export async function fetchShowtimesByMovie(
       .eq('city_id', cityId);
 
     if (theaterData) {
-      const theaterIds = new Set(theaterData.map(t => t.id));
-      return data
+      const theaters = theaterData as Pick<TheaterRow, 'id'>[];
+      const theaterIds = new Set(theaters.map(t => t.id));
+      const showtimesData = data as SupabaseShowtime[];
+      return showtimesData
         .filter(s => theaterIds.has(s.theater_id))
         .map(transformShowtime);
     }

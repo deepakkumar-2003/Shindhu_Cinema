@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@/lib/supabase/server';
+import type { Tables } from '@/lib/supabase/database.types';
+
+type TheaterRow = Tables<'theaters'>;
 
 // GET /api/showtimes - Fetch showtimes with filters
 export async function GET(request: NextRequest) {
@@ -44,7 +47,8 @@ export async function GET(request: NextRequest) {
         .eq('city_id', cityId);
 
       if (theaterData && theaterData.length > 0) {
-        const theaterIds = theaterData.map(t => t.id);
+        const theaters = theaterData as Pick<TheaterRow, 'id'>[];
+        const theaterIds = theaters.map(t => t.id);
         query = query.in('theater_id', theaterIds);
       }
     }

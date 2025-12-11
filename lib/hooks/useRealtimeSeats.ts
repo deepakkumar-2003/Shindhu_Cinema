@@ -3,6 +3,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import type { TransformedSeat, SeatLayout, SeatRow, SeatType } from '@/lib/supabase/services/seats';
+import type { Tables } from '@/lib/supabase/database.types';
+
+type SeatRow_DB = Tables<'seats'>;
 
 interface UseRealtimeSeatsOptions {
   showtimeId: string;
@@ -136,8 +139,11 @@ export function useRealtimeSeats({
       }
 
       if (data && data.length > 0) {
+        // Type assertion for seats data
+        const seatsData = data as SeatRow_DB[];
+
         // Transform DB seats
-        const transformedSeats: TransformedSeat[] = data.map((seat) => ({
+        const transformedSeats: TransformedSeat[] = seatsData.map((seat) => ({
           id: seat.seat_id,
           row: seat.row_label,
           number: seat.seat_number,

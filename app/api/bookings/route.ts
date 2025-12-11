@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@/lib/supabase/server';
+import type { Tables, InsertTables } from '@/lib/supabase/database.types';
+
+type BookingRow = Tables<'bookings'>;
 
 // GET /api/bookings - Fetch user's bookings
 export async function GET(request: NextRequest) {
@@ -79,26 +82,31 @@ export async function POST(request: NextRequest) {
     const totalAmount = ticketAmount + snackAmount + convenienceFee + taxAmount - discountAmount;
 
     // Start a transaction by creating the booking first
-    const { data: booking, error: bookingError } = await supabase
-      .from('bookings')
-      .insert({
-        user_id: user.id,
-        movie_id: movieId,
-        theater_id: theaterId,
-        showtime_id: showtimeId,
-        total_amount: totalAmount,
-        ticket_amount: ticketAmount,
-        snack_amount: snackAmount,
-        convenience_fee: convenienceFee,
-        tax_amount: taxAmount,
-        discount_amount: discountAmount,
-        promo_code: promoCode,
-        payment_method: paymentMethod,
-        booking_status: 'pending',
-        payment_status: 'pending',
-      })
+    const bookingInsert: InsertTables<'bookings'> = {
+      user_id: user.id,
+      movie_id: movieId,
+      theater_id: theaterId,
+      showtime_id: showtimeId,
+      total_amount: totalAmount,
+      ticket_amount: ticketAmount,
+      snack_amount: snackAmount,
+      convenience_fee: convenienceFee,
+      tax_amount: taxAmount,
+      discount_amount: discountAmount,
+      promo_code: promoCode,
+      payment_method: paymentMethod,
+      booking_status: 'pending',
+      payment_status: 'pending',
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: bookingData, error: bookingError } = await (supabase
+      .from('bookings') as any)
+      .insert(bookingInsert)
       .select()
       .single();
+
+    const booking = bookingData as BookingRow;
 
     if (bookingError) {
       console.error('Error creating booking:', bookingError);
@@ -175,8 +183,9 @@ export async function POST(request: NextRequest) {
       : null;
 
     // Update booking with QR codes
-    const { error: updateError } = await supabase
-      .from('bookings')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: updateError } = await (supabase
+      .from('bookings') as any)
       .update({
         ticket_qr: ticketQR,
         snack_qr: snackQR,

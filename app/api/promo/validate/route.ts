@@ -23,7 +23,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Call the validate_promo_code function
-    const { data, error } = await supabase.rpc('validate_promo_code', {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)('validate_promo_code', {
       p_code: code,
       p_order_amount: orderAmount,
     });
