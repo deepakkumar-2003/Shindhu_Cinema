@@ -141,6 +141,10 @@ export function useAuth() {
 
   // Sign up with email/password
   const signUp = async (credentials: SignUpCredentials): Promise<AuthResult> => {
+    if (!isSupabaseConfigured || !supabase) {
+      return { success: false, error: 'Authentication service is not configured' };
+    }
+
     try {
       const { data, error } = await supabase.auth.signUp({
         email: credentials.email,
@@ -170,6 +174,10 @@ export function useAuth() {
 
   // Sign in with email/password
   const signIn = async (credentials: SignInCredentials): Promise<AuthResult> => {
+    if (!isSupabaseConfigured || !supabase) {
+      return { success: false, error: 'Authentication service is not configured' };
+    }
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
@@ -193,6 +201,10 @@ export function useAuth() {
 
   // Sign in with OTP (phone)
   const signInWithOTP = async (credentials: OTPCredentials): Promise<AuthResult> => {
+    if (!isSupabaseConfigured || !supabase) {
+      return { success: false, error: 'Authentication service is not configured' };
+    }
+
     try {
       const { error } = await supabase.auth.signInWithOtp({
         phone: credentials.phone,
@@ -212,6 +224,10 @@ export function useAuth() {
 
   // Verify OTP
   const verifyOTP = async (phone: string, token: string): Promise<AuthResult> => {
+    if (!isSupabaseConfigured || !supabase) {
+      return { success: false, error: 'Authentication service is not configured' };
+    }
+
     try {
       const { data, error } = await supabase.auth.verifyOtp({
         phone,
@@ -236,6 +252,10 @@ export function useAuth() {
 
   // Sign in with Google
   const signInWithGoogle = async (): Promise<AuthResult> => {
+    if (!isSupabaseConfigured || !supabase) {
+      return { success: false, error: 'Authentication service is not configured' };
+    }
+
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -258,16 +278,20 @@ export function useAuth() {
 
   // Sign out
   const signOut = async (): Promise<AuthResult> => {
-    try {
-      // Immediately clear local state for instant UI feedback
-      setState({
-        user: null,
-        session: null,
-        profile: null,
-        isLoading: false,
-        isAuthenticated: false,
-      });
+    // Immediately clear local state for instant UI feedback
+    setState({
+      user: null,
+      session: null,
+      profile: null,
+      isLoading: false,
+      isAuthenticated: false,
+    });
 
+    if (!isSupabaseConfigured || !supabase) {
+      return { success: true };
+    }
+
+    try {
       // Then sign out from Supabase (with timeout)
       const signOutPromise = supabase.auth.signOut();
       const timeoutPromise = new Promise<{ error: null }>((resolve) =>
@@ -298,6 +322,10 @@ export function useAuth() {
       return { success: false, error: 'Not authenticated' };
     }
 
+    if (!isSupabaseConfigured || !supabase) {
+      return { success: false, error: 'Authentication service is not configured' };
+    }
+
     try {
       const { error } = await (supabase
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -323,6 +351,10 @@ export function useAuth() {
 
   // Reset password
   const resetPassword = async (email: string): Promise<AuthResult> => {
+    if (!isSupabaseConfigured || !supabase) {
+      return { success: false, error: 'Authentication service is not configured' };
+    }
+
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
@@ -342,6 +374,10 @@ export function useAuth() {
 
   // Refresh session
   const refreshSession = async (): Promise<void> => {
+    if (!isSupabaseConfigured || !supabase) {
+      return;
+    }
+
     const { data: { session } } = await supabase.auth.refreshSession();
     if (session) {
       const profile = await fetchProfile(session.user.id);
