@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useBookingStore } from '@/lib/store';
+import { useBookingStore, useUIStore } from '@/lib/store';
+import { useAuth } from '@/lib/supabase/auth';
 import { generateSeatLayout } from '@/lib/data';
 import { Seat, SeatLayout } from '@/lib/types';
+import AuthModal from '@/components/modals/AuthModal';
 import './page.css';
 
 function SeatSelectionContent() {
@@ -26,6 +28,9 @@ function SeatSelectionContent() {
     clearSeats,
     getTicketTotal,
   } = useBookingStore();
+
+  const { isAuthenticated } = useAuth();
+  const { isAuthModalOpen, setIsAuthModalOpen } = useUIStore();
 
   // Wait for hydration before checking state
   useEffect(() => {
@@ -61,8 +66,6 @@ function SeatSelectionContent() {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          clearSeats();
-          router.push('/');
           return 0;
         }
         return prev - 1;
@@ -72,6 +75,14 @@ function SeatSelectionContent() {
     return () => clearInterval(timer);
   }, []);
 
+  // Handle timer expiry - redirect when time runs out
+  useEffect(() => {
+    if (timeLeft === 0) {
+      clearSeats();
+      router.push('/');
+    }
+  }, [timeLeft, clearSeats, router]);
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -80,6 +91,12 @@ function SeatSelectionContent() {
 
   const handleSeatClick = (seat: Seat) => {
     if (seat.status === 'booked' || seat.status === 'locked') return;
+
+    // Check if user is authenticated before allowing seat selection
+    if (!isAuthenticated) {
+      setIsAuthModalOpen(true);
+      return;
+    }
 
     const isSelected = selectedSeats.some((s) => s.id === seat.id);
     if (isSelected) {
@@ -129,6 +146,22 @@ function SeatSelectionContent() {
 
   return (
     <div className="seats-page">
+      {/* Sign-in Warning Banner - Only shown when not authenticated */}
+      {!isAuthenticated && (
+        <div className="seats-auth-warning">
+          <svg className="seats-auth-warning-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span>Please sign in to select and book seats</span>
+          <button
+            className="seats-auth-warning-btn"
+            onClick={() => setIsAuthModalOpen(true)}
+          >
+            Sign In
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="seats-header">
         <div>
@@ -286,7 +319,9 @@ function SeatSelectionContent() {
                 </div>
               </>
             ) : (
-              <p className="seats-placeholder-text">Select seats to continue</p>
+              <p className="seats-placeholder-text">
+                {isAuthenticated ? 'Select seats to continue' : 'Sign in to select seats'}
+              </p>
             )}
           </div>
           <div className="seats-actions">
@@ -306,6 +341,12 @@ function SeatSelectionContent() {
           </div>
         </div>
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </div>
   );
 }

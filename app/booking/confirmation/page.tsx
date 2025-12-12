@@ -42,6 +42,26 @@ function ConfirmationContent() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Prevent going back to previous booking pages after confirmation
+  useEffect(() => {
+    // Replace history state so back button goes to home
+    window.history.replaceState(null, '', window.location.href);
+
+    // Push home page to history, so when user presses back, they go to home
+    window.history.pushState(null, '', window.location.href);
+
+    const handlePopState = () => {
+      // When user presses back, redirect to home
+      router.replace('/');
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [router]);
+
   if (!selectedMovie || !selectedTheater || !selectedShowtime || selectedSeats.length === 0) {
     return (
       <div className="confirmation-no-booking">

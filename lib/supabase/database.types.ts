@@ -16,6 +16,8 @@ export type Database = {
           email: string;
           name: string | null;
           phone: string | null;
+          gender: 'male' | 'female' | 'other' | null;
+          date_of_birth: string | null;
           avatar_url: string | null;
           city: string | null;
           wallet_balance: number;
@@ -28,6 +30,8 @@ export type Database = {
           email: string;
           name?: string | null;
           phone?: string | null;
+          gender?: 'male' | 'female' | 'other' | null;
+          date_of_birth?: string | null;
           avatar_url?: string | null;
           city?: string | null;
           wallet_balance?: number;
@@ -40,6 +44,8 @@ export type Database = {
           email?: string;
           name?: string | null;
           phone?: string | null;
+          gender?: 'male' | 'female' | 'other' | null;
+          date_of_birth?: string | null;
           avatar_url?: string | null;
           city?: string | null;
           wallet_balance?: number;

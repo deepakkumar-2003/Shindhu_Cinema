@@ -18,9 +18,15 @@ export default function Home() {
   const [selectedFormat, setSelectedFormat] = useState('All');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const { movies: nowShowingMovies, isLoading: nowShowingLoading } = useMoviesByStatus('now_showing');
   const { movies: comingSoonMovies, isLoading: comingSoonLoading } = useMoviesByStatus('coming_soon');
+
+  // Wait for hydration to complete
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Get movies for hero banner (limit to first 5 for slideshow)
   const heroMovies = useMemo(() => nowShowingMovies.slice(0, 5), [nowShowingMovies]);
@@ -82,11 +88,14 @@ export default function Home() {
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
+  // Show loading state until hydration is complete
+  const isLoading = !isHydrated || nowShowingLoading;
+
   return (
     <div className="home-page">
       {/* Hero Banner */}
       <section className="hero-section">
-        {nowShowingLoading ? (
+        {isLoading ? (
           <div className="hero-banner hero-loading">
             <div className="hero-loading-spinner"></div>
           </div>
@@ -223,7 +232,7 @@ export default function Home() {
 
       {/* Now Showing Movies */}
       <section className="movies-section">
-        {nowShowingLoading ? (
+        {isLoading ? (
           <div className="movies-loading">
             <div className="movies-loading-spinner"></div>
             <p>Loading movies...</p>
@@ -262,7 +271,7 @@ export default function Home() {
             View All
           </a>
         </div>
-        {comingSoonLoading ? (
+        {!isHydrated || comingSoonLoading ? (
           <div className="movies-loading">
             <div className="movies-loading-spinner"></div>
           </div>

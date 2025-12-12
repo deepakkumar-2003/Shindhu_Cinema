@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Toast from "@/components/ui/Toast";
+import { AuthProvider } from "@/lib/supabase/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,12 +33,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <Header />
-        <main className="min-h-screen" style={{ paddingTop: 'calc(4rem + 3rem + 1rem)' }}>
-          {children}
-        </main>
-        <Footer />
-        <Toast />
+        <AuthProvider>
+          <Header />
+          <main className="min-h-screen" style={{ paddingTop: 'calc(4rem + 3rem + 1rem)' }}>
+            {children}
+          </main>
+          <Footer />
+          <Toast />
+        </AuthProvider>
       </body>
     </html>
   );

@@ -7,6 +7,110 @@ import { snacks } from '@/lib/data';
 import { Snack, SnackVariant, Addon, CartSnack } from '@/lib/types';
 import './page.css';
 
+// Cart Dropdown Component
+function CartDropdown({
+  cartSnacks,
+  removeSnack,
+  updateSnackQuantity,
+  getSnackTotal,
+  isOpen,
+  onClose,
+}: {
+  cartSnacks: CartSnack[];
+  removeSnack: (index: number) => void;
+  updateSnackQuantity: (index: number, quantity: number) => void;
+  getSnackTotal: () => number;
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="bsnacks-cart-dropdown" ref={dropdownRef}>
+      <div className="bsnacks-cart-dropdown-header">
+        <h3 className="bsnacks-cart-dropdown-title">Your Cart</h3>
+        <button onClick={onClose} className="bsnacks-cart-dropdown-close">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      {cartSnacks.length === 0 ? (
+        <div className="bsnacks-cart-dropdown-empty">
+          <p>Your cart is empty</p>
+        </div>
+      ) : (
+        <>
+          <div className="bsnacks-cart-dropdown-items">
+            {cartSnacks.map((item, index) => (
+              <div key={index} className="bsnacks-cart-dropdown-item">
+                <div className="bsnacks-cart-dropdown-item-info">
+                  <p className="bsnacks-cart-dropdown-item-name">{item.snack.name}</p>
+                  <p className="bsnacks-cart-dropdown-item-details">
+                    {item.variant.size !== 'regular' && `${item.variant.size} • `}
+                    {item.addons.length > 0 && item.addons.map((a) => a.name).join(', ')}
+                  </p>
+                </div>
+                <div className="bsnacks-cart-dropdown-item-controls">
+                  <div className="bsnacks-cart-dropdown-qty">
+                    <button
+                      onClick={() => {
+                        if (item.quantity === 1) {
+                          removeSnack(index);
+                        } else {
+                          updateSnackQuantity(index, item.quantity - 1);
+                        }
+                      }}
+                      className="bsnacks-cart-dropdown-qty-btn"
+                    >
+                      -
+                    </button>
+                    <span className="bsnacks-cart-dropdown-qty-value">{item.quantity}</span>
+                    <button
+                      onClick={() => updateSnackQuantity(index, item.quantity + 1)}
+                      className="bsnacks-cart-dropdown-qty-btn"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <p className="bsnacks-cart-dropdown-item-price">
+                    ₹{(item.variant.price + item.addons.reduce((s, a) => s + a.price, 0)) * item.quantity}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="bsnacks-cart-dropdown-footer">
+            <div className="bsnacks-cart-dropdown-total">
+              <span>Total</span>
+              <span className="bsnacks-cart-dropdown-total-value">₹{getSnackTotal()}</span>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 const categories = [
   { id: 'all', name: 'All' },
   { id: 'combos', name: 'Combos' },
@@ -154,6 +258,7 @@ export default function SnacksPage() {
   const [selectedSnack, setSelectedSnack] = useState<Snack | null>(null);
   const [vegOnly, setVegOnly] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const hasCheckedState = useRef(false);
 
   const {
@@ -212,6 +317,8 @@ export default function SnacksPage() {
     router.push('/booking/checkout');
   };
 
+  const cartItemCount = cartSnacks.length;
+
   return (
     <div className="bsnacks-page">
       {/* Header */}
@@ -220,9 +327,33 @@ export default function SnacksPage() {
           <h1 className="bsnacks-title">Add Snacks</h1>
           <p className="bsnacks-subtitle">Skip the queue - Pre-order your snacks!</p>
         </div>
-        <button onClick={handleSkip} className="bsnacks-skip-btn">
-          Skip & Continue
-        </button>
+        <div className="bsnacks-header-actions">
+          {/* Cart Toggle Button */}
+          <div className="bsnacks-cart-container">
+            <button
+              onClick={() => setIsCartOpen(!isCartOpen)}
+              className="bsnacks-cart-toggle"
+            >
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              {cartItemCount > 0 && (
+                <span className="bsnacks-cart-badge">{cartItemCount}</span>
+              )}
+            </button>
+            <CartDropdown
+              cartSnacks={cartSnacks}
+              removeSnack={removeSnack}
+              updateSnackQuantity={updateSnackQuantity}
+              getSnackTotal={getSnackTotal}
+              isOpen={isCartOpen}
+              onClose={() => setIsCartOpen(false)}
+            />
+          </div>
+          <button onClick={handleSkip} className="bsnacks-skip-btn">
+            Skip & Continue
+          </button>
+        </div>
       </div>
 
       {/* Booking Summary */}
@@ -363,58 +494,6 @@ export default function SnacksPage() {
           ))}
         </div>
       </section>
-
-      {/* Cart Summary - Side Panel for Desktop */}
-      {cartSnacks.length > 0 && (
-        <div className="bsnacks-cart-panel">
-          <div className="bsnacks-cart-header">
-            <h3 className="bsnacks-cart-title">Your Cart</h3>
-          </div>
-          <div className="bsnacks-cart-items">
-            {cartSnacks.map((item, index) => (
-              <div key={index} className="bsnacks-cart-item">
-                <div className="bsnacks-cart-item-info">
-                  <p className="bsnacks-cart-item-name">{item.snack.name}</p>
-                  <p className="bsnacks-cart-item-details">
-                    {item.variant.size !== 'regular' && `${item.variant.size} • `}
-                    {item.addons.length > 0 && item.addons.map((a) => a.name).join(', ')}
-                  </p>
-                </div>
-                <div className="bsnacks-cart-item-qty">
-                  <button
-                    onClick={() => {
-                      if (item.quantity === 1) {
-                        removeSnack(index);
-                      } else {
-                        updateSnackQuantity(index, item.quantity - 1);
-                      }
-                    }}
-                    className="bsnacks-qty-btn"
-                  >
-                    -
-                  </button>
-                  <span className="bsnacks-qty-value">{item.quantity}</span>
-                  <button
-                    onClick={() => updateSnackQuantity(index, item.quantity + 1)}
-                    className="bsnacks-qty-btn"
-                  >
-                    +
-                  </button>
-                </div>
-                <p className="bsnacks-cart-item-price">
-                  ₹{(item.variant.price + item.addons.reduce((s, a) => s + a.price, 0)) * item.quantity}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="bsnacks-cart-footer">
-            <div className="bsnacks-cart-total">
-              <span className="bsnacks-cart-total-label">Snacks Total</span>
-              <span className="bsnacks-cart-total-value">₹{getSnackTotal()}</span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Bottom Bar */}
       <div className="bsnacks-bottom-bar">

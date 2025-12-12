@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMovie } from '@/lib/hooks/useMovies';
 import { reviews } from '@/lib/data';
@@ -15,8 +15,15 @@ export default function MoviePage({ params }: MoviePageProps) {
   const router = useRouter();
   const { movie, isLoading, error } = useMovie(id);
   const [showTrailer, setShowTrailer] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  if (isLoading) {
+  // Wait for hydration to complete before rendering content
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  // Show loading state until hydration is complete
+  if (!isHydrated || isLoading) {
     return (
       <div className="movie-not-found">
         <div className="movie-loading-spinner"></div>
