@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBookingStore } from '@/lib/store';
 import { snacks } from '@/lib/data';
@@ -154,6 +154,7 @@ export default function SnacksPage() {
   const [selectedSnack, setSelectedSnack] = useState<Snack | null>(null);
   const [vegOnly, setVegOnly] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const hasCheckedState = useRef(false);
 
   const {
     selectedMovie,
@@ -170,15 +171,22 @@ export default function SnacksPage() {
     getSnackTotal,
   } = useBookingStore();
 
-  // Wait for hydration before checking state
+  // Wait for hydration and store rehydration before checking state
   useEffect(() => {
-    setIsHydrated(true);
+    // Give the persist middleware time to rehydrate from localStorage
+    const timer = setTimeout(() => {
+      setIsHydrated(true);
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Only redirect after hydration is complete
+  // Only redirect after hydration is complete and we've confirmed no booking data
   useEffect(() => {
-    if (isHydrated && (!selectedMovie || !selectedTheater || !selectedShowtime || selectedSeats.length === 0)) {
-      router.push('/');
+    if (isHydrated && !hasCheckedState.current) {
+      hasCheckedState.current = true;
+      if (!selectedMovie || !selectedTheater || !selectedShowtime || selectedSeats.length === 0) {
+        router.push('/');
+      }
     }
   }, [isHydrated, selectedMovie, selectedTheater, selectedShowtime, selectedSeats, router]);
 
