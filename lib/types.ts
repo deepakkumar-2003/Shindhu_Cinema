@@ -43,6 +43,7 @@ export interface Theater {
   address: string;
   amenities: string[];
   distance?: number; // in km
+  screen?: number; // Screen number for multiplex theaters
 }
 
 export interface Showtime {

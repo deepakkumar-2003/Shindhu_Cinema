@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useBookingStore } from '@/lib/store';
+import { movies as moviesData, theaters } from '@/lib/data';
+import { Showtime } from '@/lib/types';
 import './page.css';
 
 // Demo data for 4 screens
@@ -139,6 +142,9 @@ const generateDates = () => {
 };
 
 export default function ShowTimingsPage() {
+  const router = useRouter();
+  const { selectedCity, setSelectedMovie, setSelectedTheater, setSelectedShowtime, setSelectedDate: setBookingDate } = useBookingStore();
+
   const [selectedDate, setSelectedDate] = useState(0);
   const [selectedScreen, setSelectedScreen] = useState<number | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
@@ -154,6 +160,51 @@ export default function ShowTimingsPage() {
   });
 
   const getScreenById = (id: number) => screens.find((s) => s.id === id);
+
+  // Handle showtime selection - navigate directly to seat selection
+  const handleShowtimeClick = (movieId: string, screenId: number, time: string, price: { standard: number; premium: number }) => {
+    // Get movie data from lib/data.ts
+    const movie = moviesData.find(m => m.id === movieId);
+    if (!movie) return;
+
+    // Get the theater/screen based on selected city
+    const locationScreens = theaters.filter(
+      t => t.city === selectedCity?.name || t.location === selectedCity?.name
+    );
+
+    // Map screenId to actual theater screen
+    const theaterScreen = locationScreens[screenId - 1] || locationScreens[0];
+    if (!theaterScreen) return;
+
+    // Create showtime object
+    const dateStr = dates[selectedDate].date.toISOString().split('T')[0];
+    const showtime: Showtime = {
+      id: `${movieId}-${theaterScreen.id}-${dateStr}-${time}`,
+      movieId,
+      theaterId: theaterScreen.id,
+      time,
+      date: dateStr,
+      format: screenId === 1 ? 'IMAX' : '2D',
+      language: movie.language,
+      price: {
+        standard: price.standard,
+        premium: price.premium,
+        recliner: Math.round(price.premium * 1.3),
+        vip: Math.round(price.premium * 1.8),
+      },
+      availableSeats: 150,
+      totalSeats: 200,
+    };
+
+    // Set booking store data
+    setSelectedMovie(movie);
+    setSelectedTheater(theaterScreen);
+    setSelectedShowtime(showtime);
+    setBookingDate(dateStr);
+
+    // Navigate to seat selection
+    router.push(`/booking/seats?showtime=${showtime.id}`);
+  };
 
   return (
     <div className="showtimings-page">
@@ -302,13 +353,13 @@ export default function ShowTimingsPage() {
                           </div>
                           <div className="showtime-buttons">
                             {show.times.map((time, index) => (
-                              <Link
+                              <button
                                 key={index}
-                                href={`/movie/${movie.movieId}/showtimes`}
+                                onClick={() => handleShowtimeClick(movie.movieId, show.screenId, time, show.price)}
                                 className={`showtime-btn ${screen?.type === 'premium' ? 'showtime-btn-premium' : screen?.type === 'dolby' ? 'showtime-btn-dolby' : ''}`}
                               >
                                 {time}
-                              </Link>
+                              </button>
                             ))}
                           </div>
                         </div>

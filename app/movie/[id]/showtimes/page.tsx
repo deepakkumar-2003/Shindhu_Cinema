@@ -20,7 +20,12 @@ export default function ShowtimesPage({ params }: ShowtimesPageProps) {
   const [showtimes, setShowtimes] = useState<Showtime[]>([]);
   const [selectedFormat, setSelectedFormat] = useState<string>('All');
 
-  const { setSelectedMovie, setSelectedTheater, setSelectedShowtime, setSelectedDate: setBookingDate } = useBookingStore();
+  const { selectedCity, setSelectedMovie, setSelectedTheater, setSelectedShowtime, setSelectedDate: setBookingDate } = useBookingStore();
+
+  // Filter screens based on selected city (location)
+  const locationScreens = theaters.filter(
+    (theater) => theater.city === selectedCity?.name || theater.location === selectedCity?.name
+  );
 
   // Generate dates for next 7 days
   const dates = Array.from({ length: 7 }, (_, i) => {
@@ -85,11 +90,12 @@ export default function ShowtimesPage({ params }: ShowtimesPageProps) {
     );
   }
 
-  const groupedShowtimes = theaters.map((theater) => ({
-    theater,
+  // Group showtimes by screen for the selected location
+  const groupedShowtimes = locationScreens.map((screen) => ({
+    theater: screen,
     shows: showtimes.filter(
       (s) =>
-        s.theaterId === theater.id &&
+        s.theaterId === screen.id &&
         (selectedFormat === 'All' || s.format === selectedFormat)
     ),
   })).filter((g) => g.shows.length > 0);
@@ -165,7 +171,7 @@ export default function ShowtimesPage({ params }: ShowtimesPageProps) {
         </div>
       </div>
 
-      {/* Theaters and Showtimes */}
+      {/* Screens and Showtimes */}
       <div className="theaters-section">
         <div className="theaters-list">
           {groupedShowtimes.map(({ theater, shows }) => (
@@ -178,8 +184,7 @@ export default function ShowtimesPage({ params }: ShowtimesPageProps) {
                   </div>
                   <div className="theater-info-icon">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>Info</span>
                   </div>
@@ -214,7 +219,18 @@ export default function ShowtimesPage({ params }: ShowtimesPageProps) {
             </div>
           ))}
 
-          {groupedShowtimes.length === 0 && (
+          {!selectedCity && (
+            <div className="empty-state">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <p className="empty-title">Please select a location</p>
+              <p className="empty-subtitle">Choose Anthiyur or Komarapalayam to view showtimes</p>
+            </div>
+          )}
+
+          {selectedCity && groupedShowtimes.length === 0 && (
             <div className="empty-state">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
