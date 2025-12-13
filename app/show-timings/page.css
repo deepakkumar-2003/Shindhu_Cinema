@@ -1,0 +1,588 @@
+/* Show Timings Page Styles */
+
+.showtimings-page {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 4.5rem 1rem 4rem;
+}
+
+@media (min-width: 640px) {
+  .showtimings-page {
+    padding: 5rem 1.5rem 4rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .showtimings-page {
+    padding: 1rem 1.5rem 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .showtimings-page {
+    padding: 2rem 2rem 4rem;
+  }
+}
+
+/* Hero Section */
+.showtimings-hero {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.showtimings-hero-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  color: var(--color-foreground, #ffffff);
+}
+
+@media (min-width: 640px) {
+  .showtimings-hero-title {
+    font-size: 2.5rem;
+  }
+}
+
+.showtimings-hero-subtitle {
+  color: var(--color-muted, #888888);
+  max-width: 36rem;
+  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Date Selector */
+.showtimings-date-selector {
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.showtimings-date-selector::-webkit-scrollbar {
+  display: none;
+}
+
+.date-scroll-container {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.25rem;
+  min-width: max-content;
+}
+
+.date-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 4.5rem;
+}
+
+.date-card:hover {
+  border-color: var(--color-primary, #e50914);
+}
+
+.date-card-active {
+  background-color: var(--color-primary, #e50914);
+  border-color: var(--color-primary, #e50914);
+}
+
+.date-day {
+  font-size: 0.75rem;
+  color: var(--color-muted, #888888);
+  text-transform: uppercase;
+}
+
+.date-card-active .date-day {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.date-num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-foreground, #ffffff);
+  line-height: 1.2;
+}
+
+.date-month {
+  font-size: 0.75rem;
+  color: var(--color-muted, #888888);
+  text-transform: uppercase;
+}
+
+.date-card-active .date-month {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Filters */
+.showtimings-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 1rem;
+}
+
+@media (min-width: 768px) {
+  .showtimings-filters {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filter-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-foreground, #ffffff);
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  background-color: var(--color-secondary, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 0.5rem;
+  color: var(--color-muted, #888888);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  border-color: var(--color-primary, #e50914);
+  color: var(--color-foreground, #ffffff);
+}
+
+.filter-btn-active {
+  background-color: var(--color-primary, #e50914);
+  border-color: var(--color-primary, #e50914);
+  color: #ffffff;
+}
+
+/* Screens Overview */
+.screens-overview {
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-foreground, #ffffff);
+  margin: 0 0 1.5rem 0;
+}
+
+.screens-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .screens-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .screens-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.screen-card {
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.screen-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary, #e50914);
+}
+
+.screen-card-premium {
+  border-left: 3px solid #ffd700;
+}
+
+.screen-card-dolby {
+  border-left: 3px solid #00bfff;
+}
+
+.screen-card-standard {
+  border-left: 3px solid #32cd32;
+}
+
+.screen-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.screen-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: rgba(229, 9, 20, 0.1);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary, #e50914);
+  flex-shrink: 0;
+}
+
+.screen-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.screen-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-foreground, #ffffff);
+  margin: 0;
+}
+
+.screen-capacity {
+  font-size: 0.875rem;
+  color: var(--color-muted, #888888);
+  margin: 0.25rem 0 0 0;
+}
+
+.screen-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.feature-tag {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background-color: var(--color-secondary, #1a1a1a);
+  border-radius: 0.25rem;
+  color: var(--color-muted, #888888);
+}
+
+/* Movies with Showtimes */
+.movies-showtimes {
+  margin-bottom: 3rem;
+}
+
+.movies-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.movie-showtime-card {
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: border-color 0.2s;
+}
+
+.movie-showtime-card:hover {
+  border-color: rgba(229, 9, 20, 0.5);
+}
+
+.movie-info {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border, #2a2a2a);
+}
+
+.movie-poster {
+  width: 5rem;
+  height: 7.5rem;
+  background-color: var(--color-secondary, #1a1a1a);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted, #888888);
+  flex-shrink: 0;
+}
+
+.movie-poster svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.movie-details {
+  flex: 1;
+}
+
+.movie-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-foreground, #ffffff);
+  margin: 0 0 0.5rem 0;
+}
+
+.movie-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.movie-rating {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(229, 9, 20, 0.2);
+  color: var(--color-primary, #e50914);
+  border-radius: 0.25rem;
+  border: 1px solid var(--color-primary, #e50914);
+}
+
+.movie-language {
+  font-size: 0.875rem;
+  color: var(--color-muted, #888888);
+}
+
+.movie-duration {
+  font-size: 0.875rem;
+  color: var(--color-muted, #888888);
+}
+
+.movie-genre {
+  font-size: 0.875rem;
+  color: var(--color-muted, #888888);
+  margin: 0;
+}
+
+/* Screen Showtimes */
+.movie-screens {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.screen-showtimes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .screen-showtimes {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+  }
+}
+
+.screen-showtime-header {
+  display: flex;
+  flex-direction: column;
+  min-width: 10rem;
+}
+
+@media (min-width: 768px) {
+  .screen-showtime-header {
+    min-width: 12rem;
+  }
+}
+
+.screen-showtime-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-foreground, #ffffff);
+}
+
+.screen-showtime-price {
+  font-size: 0.75rem;
+  color: var(--color-muted, #888888);
+}
+
+.showtime-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.showtime-btn {
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: var(--color-secondary, #1a1a1a);
+  border: 1px solid #32cd32;
+  border-radius: 0.5rem;
+  color: #32cd32;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.showtime-btn:hover {
+  background-color: #32cd32;
+  color: #000000;
+}
+
+.showtime-btn-premium {
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+.showtime-btn-premium:hover {
+  background-color: #ffd700;
+  color: #000000;
+}
+
+.showtime-btn-dolby {
+  border-color: #00bfff;
+  color: #00bfff;
+}
+
+.showtime-btn-dolby:hover {
+  background-color: #00bfff;
+  color: #000000;
+}
+
+/* No Movies State */
+.no-movies {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 1rem;
+}
+
+.no-movies-icon {
+  width: 4rem;
+  height: 4rem;
+  color: var(--color-muted, #888888);
+  margin-bottom: 1rem;
+}
+
+.no-movies p {
+  color: var(--color-muted, #888888);
+  margin: 0 0 1.5rem 0;
+}
+
+.reset-filters-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background-color: var(--color-primary, #e50914);
+  border: none;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.reset-filters-btn:hover {
+  background-color: #b8070f;
+}
+
+/* Legend */
+.showtimings-legend {
+  background-color: var(--color-card, #141414);
+  border: 1px solid var(--color-border, #2a2a2a);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.legend-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-foreground, #ffffff);
+  margin: 0 0 1rem 0;
+}
+
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-muted, #888888);
+}
+
+.legend-color {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+}
+
+.legend-color-premium {
+  background-color: #ffd700;
+}
+
+.legend-color-dolby {
+  background-color: #00bfff;
+}
+
+.legend-color-standard {
+  background-color: #32cd32;
+}
+
+/* Info Section */
+.showtimings-info {
+  margin-bottom: 2rem;
+}
+
+.info-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+  background-color: rgba(229, 9, 20, 0.05);
+  border: 1px solid rgba(229, 9, 20, 0.2);
+  border-radius: 0.75rem;
+}
+
+.info-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-primary, #e50914);
+  flex-shrink: 0;
+}
+
+.info-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-foreground, #ffffff);
+  margin: 0 0 0.25rem 0;
+}
+
+.info-text {
+  font-size: 0.875rem;
+  color: var(--color-muted, #888888);
+  margin: 0;
+  line-height: 1.5;
+}

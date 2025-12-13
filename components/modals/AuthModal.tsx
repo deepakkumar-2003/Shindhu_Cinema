@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { toast } from '@/lib/hooks/useToast';
 import './AuthModal.css';
@@ -11,6 +11,14 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Scroll modal to top when it opens
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      modalRef.current.scrollTop = 0;
+    }
+  }, [isOpen]);
   const [authMode, setAuthMode] = useState<'login' | 'signup' | 'otp' | 'forgot'>('login');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -365,7 +373,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       />
 
       {/* Modal */}
-      <div className="auth-modal">
+      <div className="auth-modal" ref={modalRef}>
         {/* Header */}
         <div className="auth-modal-header">
           <h2 className="auth-modal-title">

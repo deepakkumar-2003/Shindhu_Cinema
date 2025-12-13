@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Toast from "@/components/ui/Toast";
+import ScrollToTop from "@/components/layout/ScrollToTop";
 import { AuthProvider } from "@/lib/supabase/auth";
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AuthProvider>
+          <ScrollToTop />
           <Header />
           <main className="min-h-screen" style={{ paddingTop: 'calc(4rem + 3rem + 1rem)' }}>
             {children}

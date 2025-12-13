@@ -2,39 +2,66 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect, useRef } from 'react';
-import { usePathname } from 'next/navigation';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { useBookingStore, useUIStore } from '@/lib/store';
 import { useAuth } from '@/lib/supabase/auth';
+import { useMovies } from '@/lib/hooks/useMovies';
 import CityModal from '../modals/CityModal';
 import AuthModal from '../modals/AuthModal';
 import SignOutModal from '../modals/SignOutModal';
 import './Header.css';
 
-// Sample trending and recent searches for demo
-const trendingSearches = [
-  { id: 1, title: 'Avatar 3', type: 'movie' },
-  { id: 2, title: 'Pushpa 2', type: 'movie' },
-  { id: 3, title: 'Salaar', type: 'movie' },
-];
-
-const recentSearches = [
-  { id: 1, query: 'Action movies' },
-  { id: 2, query: 'IMAX shows' },
-  { id: 3, query: 'Weekend offers' },
-];
-
 export default function Header() {
+  // Get pathname first to check if we should hide the header
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Check if we're on a booking page (hide header during booking flow)
+  const isBookingPage = pathname?.startsWith('/booking/');
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const pathname = usePathname();
+  // Fetch all movies for search
+  const { movies, isLoading: moviesLoading } = useMovies();
+
+  // Filter movies based on search query
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const query = searchQuery.toLowerCase().trim();
+    return movies.filter(movie =>
+      movie.title.toLowerCase().includes(query) ||
+      movie.language.toLowerCase().includes(query) ||
+      movie.genres.some(genre => genre.toLowerCase().includes(query))
+    ).slice(0, 6); // Limit to 6 results
+  }, [searchQuery, movies]);
+
+  // Get trending movies (now showing, sorted by rating)
+  const trendingMovies = useMemo(() => {
+    return movies
+      .filter(movie => movie.status === 'now_showing')
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 4);
+  }, [movies]);
+
+  // Get the list of movies to display (either search results or trending)
+  const displayedMovies = useMemo(() => {
+    return searchQuery.trim() ? searchResults : trendingMovies;
+  }, [searchQuery, searchResults, trendingMovies]);
+
+  // Reset selected index when search query or displayed movies change
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [searchQuery, displayedMovies.length]);
+
   const { selectedCity } = useBookingStore();
   const { profile, isAuthenticated, signOut, isLoading: authLoading } = useAuth();
   const { setIsCityModalOpen, setIsAuthModalOpen, isCityModalOpen, isAuthModalOpen } = useUIStore();
@@ -51,11 +78,12 @@ export default function Header() {
   // Get display name from profile or email
   const displayName = profile?.name || profile?.email?.split('@')[0] || 'User';
 
-  // Handle ESC key to close search
+  // Handle keyboard navigation for search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isSearchFocused) {
         setIsSearchFocused(false);
+        setSelectedIndex(-1);
         searchInputRef.current?.blur();
         mobileSearchInputRef.current?.blur();
       }
@@ -70,6 +98,38 @@ export default function Header() {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isSearchFocused]);
+
+  // Handle arrow key navigation in search results
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isSearchFocused || displayedMovies.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex(prev =>
+          prev < displayedMovies.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex(prev =>
+          prev > 0 ? prev - 1 : displayedMovies.length - 1
+        );
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < displayedMovies.length) {
+          const selectedMovie = displayedMovies[selectedIndex];
+          router.push(`/movie/${selectedMovie.id}`);
+          setIsSearchFocused(false);
+          setSearchQuery('');
+          setSelectedIndex(-1);
+          searchInputRef.current?.blur();
+          mobileSearchInputRef.current?.blur();
+        }
+        break;
+    }
+  };
 
   // Handle click outside to close profile dropdown
   useEffect(() => {
@@ -106,19 +166,15 @@ export default function Header() {
 
   const handleOverlayClick = () => {
     setIsSearchFocused(false);
+    setSearchQuery('');
     searchInputRef.current?.blur();
     mobileSearchInputRef.current?.blur();
   };
 
-  const handleSuggestionClick = (query: string) => {
-    setSearchQuery(query);
-    setIsSearchFocused(false);
-  };
-
-  const clearRecentSearches = () => {
-    // In a real app, this would clear from localStorage/state
-    console.log('Clear recent searches');
-  };
+  // Don't render header on booking pages (must be after all hooks)
+  if (isBookingPage) {
+    return null;
+  }
 
   return (
     <>
@@ -133,13 +189,8 @@ export default function Header() {
           <div className="header-content">
             {/* Logo */}
             <Link href="/" className="logo-link">
-              {/* <div className="logo-icon-wrapper">
-                <svg className="logo-icon" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z" />
-                </svg>
-              </div> */}
-              {/* <span className="logo-text">Shindhu Cinemas</span> */}
-              <Image src="/images/logo.jpg" alt="Shindhu Cinemas" width={120} height={48} priority />
+              <Image src="/images/logo.jpg" alt="Sai Sindhu Cinemas" width={120} height={48} priority />
+              <span className="logo-text">Sai Sindhu Cinemas</span>
             </Link>
 
             {/* Search Bar - Desktop */}
@@ -153,6 +204,7 @@ export default function Header() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={handleSearchFocus}
                   onBlur={handleSearchBlur}
+                  onKeyDown={handleSearchKeyDown}
                   className="search-input"
                 />
                 <svg
@@ -173,46 +225,40 @@ export default function Header() {
                 <div className={`search-suggestions ${isSearchFocused ? 'visible' : ''}`}>
                   {searchQuery.length === 0 ? (
                     <>
-                      {/* Recent Searches */}
-                      <div className="search-suggestions-header">
-                        <span className="search-suggestions-title">Recent Searches</span>
-                        <button className="search-suggestions-clear" onClick={clearRecentSearches}>
-                          Clear
-                        </button>
-                      </div>
-                      {recentSearches.map((item) => (
-                        <div
-                          key={item.id}
-                          className="search-suggestion-item"
-                          onClick={() => handleSuggestionClick(item.query)}
-                        >
-                          <svg className="search-suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span className="search-suggestion-title">{item.query}</span>
-                        </div>
-                      ))}
-
-                      {/* Trending */}
+                      {/* Trending Movies */}
                       <div className="search-suggestions-header">
                         <span className="search-suggestions-title">Trending Now</span>
                       </div>
-                      {trendingSearches.map((item) => (
-                        <Link
-                          key={item.id}
-                          href={`/movie/${item.id}`}
-                          className="search-suggestion-item"
-                          onClick={() => setIsSearchFocused(false)}
-                        >
-                          <svg className="search-suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                          </svg>
-                          <div className="search-suggestion-content">
-                            <span className="search-suggestion-title">{item.title}</span>
-                          </div>
-                          <span className="search-suggestion-badge">Trending</span>
-                        </Link>
-                      ))}
+                      {moviesLoading ? (
+                        <div className="search-loading">Loading movies...</div>
+                      ) : trendingMovies.length > 0 ? (
+                        trendingMovies.map((movie, index) => (
+                          <Link
+                            key={movie.id}
+                            href={`/movie/${movie.id}`}
+                            className={`search-suggestion-item ${selectedIndex === index ? 'search-suggestion-item-selected' : ''}`}
+                            onClick={() => {
+                              setIsSearchFocused(false);
+                              setSearchQuery('');
+                              setSelectedIndex(-1);
+                            }}
+                            onMouseEnter={() => setSelectedIndex(index)}
+                          >
+                            <svg className="search-suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                            <div className="search-suggestion-content">
+                              <span className="search-suggestion-title">{movie.title}</span>
+                              <span className="search-suggestion-meta">{movie.language} • {movie.genres.slice(0, 2).join(', ')}</span>
+                            </div>
+                            <span className="search-suggestion-badge">Trending</span>
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="search-no-results">
+                          <p className="search-no-results-text">No trending movies available</p>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <>
@@ -220,25 +266,31 @@ export default function Header() {
                       <div className="search-suggestions-header">
                         <span className="search-suggestions-title">Results for &quot;{searchQuery}&quot;</span>
                       </div>
-                      {trendingSearches
-                        .filter((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase()))
-                        .map((item) => (
+                      {moviesLoading ? (
+                        <div className="search-loading">Searching...</div>
+                      ) : searchResults.length > 0 ? (
+                        searchResults.map((movie, index) => (
                           <Link
-                            key={item.id}
-                            href={`/movie/${item.id}`}
-                            className="search-suggestion-item"
-                            onClick={() => setIsSearchFocused(false)}
+                            key={movie.id}
+                            href={`/movie/${movie.id}`}
+                            className={`search-suggestion-item ${selectedIndex === index ? 'search-suggestion-item-selected' : ''}`}
+                            onClick={() => {
+                              setIsSearchFocused(false);
+                              setSearchQuery('');
+                              setSelectedIndex(-1);
+                            }}
+                            onMouseEnter={() => setSelectedIndex(index)}
                           >
                             <svg className="search-suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
                             </svg>
                             <div className="search-suggestion-content">
-                              <span className="search-suggestion-title">{item.title}</span>
-                              <span className="search-suggestion-meta">Movie • Now Showing</span>
+                              <span className="search-suggestion-title">{movie.title}</span>
+                              <span className="search-suggestion-meta">{movie.language} • {movie.status === 'now_showing' ? 'Now Showing' : 'Coming Soon'}</span>
                             </div>
                           </Link>
-                        ))}
-                      {trendingSearches.filter((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                        ))
+                      ) : (
                         <div className="search-no-results">
                           <svg className="search-no-results-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -376,6 +428,7 @@ export default function Header() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={handleSearchFocus}
                 onBlur={handleSearchBlur}
+                onKeyDown={handleSearchKeyDown}
                 className="search-input"
               />
               <svg
@@ -399,41 +452,65 @@ export default function Header() {
                     <div className="search-suggestions-header">
                       <span className="search-suggestions-title">Trending Now</span>
                     </div>
-                    {trendingSearches.map((item) => (
-                      <Link
-                        key={item.id}
-                        href={`/movie/${item.id}`}
-                        className="search-suggestion-item"
-                        onClick={() => setIsSearchFocused(false)}
-                      >
-                        <svg className="search-suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                        <span className="search-suggestion-title">{item.title}</span>
-                        <span className="search-suggestion-badge">Trending</span>
-                      </Link>
-                    ))}
+                    {moviesLoading ? (
+                      <div className="search-loading">Loading...</div>
+                    ) : trendingMovies.length > 0 ? (
+                      trendingMovies.map((movie, index) => (
+                        <Link
+                          key={movie.id}
+                          href={`/movie/${movie.id}`}
+                          className={`search-suggestion-item ${selectedIndex === index ? 'search-suggestion-item-selected' : ''}`}
+                          onClick={() => {
+                            setIsSearchFocused(false);
+                            setSearchQuery('');
+                            setSelectedIndex(-1);
+                          }}
+                          onMouseEnter={() => setSelectedIndex(index)}
+                        >
+                          <svg className="search-suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                          </svg>
+                          <span className="search-suggestion-title">{movie.title}</span>
+                          <span className="search-suggestion-badge">Trending</span>
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="search-no-results">
+                        <p className="search-no-results-text">No trending movies</p>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <>
                     <div className="search-suggestions-header">
                       <span className="search-suggestions-title">Results</span>
                     </div>
-                    {trendingSearches
-                      .filter((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase()))
-                      .map((item) => (
+                    {moviesLoading ? (
+                      <div className="search-loading">Searching...</div>
+                    ) : searchResults.length > 0 ? (
+                      searchResults.map((movie, index) => (
                         <Link
-                          key={item.id}
-                          href={`/movie/${item.id}`}
-                          className="search-suggestion-item"
-                          onClick={() => setIsSearchFocused(false)}
+                          key={movie.id}
+                          href={`/movie/${movie.id}`}
+                          className={`search-suggestion-item ${selectedIndex === index ? 'search-suggestion-item-selected' : ''}`}
+                          onClick={() => {
+                            setIsSearchFocused(false);
+                            setSearchQuery('');
+                            setSelectedIndex(-1);
+                          }}
+                          onMouseEnter={() => setSelectedIndex(index)}
                         >
                           <svg className="search-suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
                           </svg>
-                          <span className="search-suggestion-title">{item.title}</span>
+                          <span className="search-suggestion-title">{movie.title}</span>
                         </Link>
-                      ))}
+                      ))
+                    ) : (
+                      <div className="search-no-results">
+                        <p className="search-no-results-text">No results for &quot;{searchQuery}&quot;</p>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -447,6 +524,9 @@ export default function Header() {
             <div className="nav-links">
               <Link href="/" className={`nav-link ${isActiveLink('/') ? 'nav-link-active' : ''}`}>
                 Movies
+              </Link>
+              <Link href="/show-timings" className={`nav-link ${isActiveLink('/show-timings') ? 'nav-link-active' : ''}`}>
+                Show Timings
               </Link>
               <Link href="/coming-soon" className={`nav-link ${isActiveLink('/coming-soon') ? 'nav-link-active' : ''}`}>
                 Coming Soon
@@ -499,6 +579,12 @@ export default function Header() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
                 </svg>
                 Movies
+              </Link>
+              <Link href="/show-timings" className={`offcanvas-nav-link ${isActiveLink('/show-timings') ? 'offcanvas-nav-link-active' : ''}`} onClick={() => setIsOffCanvasOpen(false)}>
+                <svg className="offcanvas-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Show Timings
               </Link>
               <Link href="/coming-soon" className={`offcanvas-nav-link ${isActiveLink('/coming-soon') ? 'offcanvas-nav-link-active' : ''}`} onClick={() => setIsOffCanvasOpen(false)}>
                 <svg className="offcanvas-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">

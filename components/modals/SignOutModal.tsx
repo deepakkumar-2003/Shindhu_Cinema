@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { toast } from '@/lib/hooks/useToast';
 import './SignOutModal.css';
 
@@ -12,6 +12,14 @@ interface SignOutModalProps {
 
 export default function SignOutModal({ isOpen, onClose, onConfirm }: SignOutModalProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Scroll modal to top when it opens
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      modalRef.current.scrollTop = 0;
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -42,7 +50,7 @@ export default function SignOutModal({ isOpen, onClose, onConfirm }: SignOutModa
 
   return (
     <div className="signout-modal-overlay" onClick={handleOverlayClick}>
-      <div className="signout-modal">
+      <div className="signout-modal" ref={modalRef}>
         <div className="signout-modal-icon">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path

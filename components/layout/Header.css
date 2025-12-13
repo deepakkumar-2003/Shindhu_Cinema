@@ -84,15 +84,27 @@
 }
 
 .logo-text {
-  font-size: 0.8rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: white;
-  display: block;
+  display: none;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
-@media (min-width: 640px) {
+/* Show logo text on medium screens and above */
+@media (min-width: 768px) {
   .logo-text {
+    display: block;
     font-size: 1.25rem;
+  }
+}
+
+/* Larger text on desktop */
+@media (min-width: 1024px) {
+  .logo-text {
+    font-size: 1.375rem;
   }
 }
 
@@ -103,6 +115,7 @@
   max-width: 36rem;
   margin-left: 2rem;
   margin-right: 2rem;
+  transition: flex 0.3s ease, max-width 0.3s ease;
 }
 
 @media (min-width: 768px) {
@@ -152,9 +165,9 @@
 .search-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 45;
   opacity: 0;
   visibility: hidden;
@@ -162,21 +175,13 @@
 }
 
 .search-overlay.active {
-  opacity: 0.7;
+  opacity: 1;
   visibility: visible;
 }
 
 /* Search Focused State */
 .search-container-desktop.focused {
-  position: relative;
   z-index: 55;
-  max-width: 42rem;
-  transition: max-width 0.3s ease;
-}
-
-.search-container-desktop.focused .search-wrapper {
-  transform: scale(1.02);
-  transition: transform 0.3s ease;
 }
 
 .search-container-desktop.focused .search-input {
@@ -187,6 +192,14 @@
 
 .search-container-desktop.focused .search-icon {
   color: var(--color-primary, #e50914);
+}
+
+/* Expand search box only between 768px and 1024px */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .search-container-desktop.focused {
+    flex: 2.5;
+    max-width: 60%;
+  }
 }
 
 /* Mobile Search Focused */
@@ -215,7 +228,9 @@
   position: absolute;
   top: 100%;
   left: 0;
-  right: 0;
+  min-width: 320px;
+  width: max-content;
+  max-width: 450px;
   margin-top: 0.5rem;
   background-color: var(--color-card, #141414);
   border: 1px solid var(--color-border, #2a2a2a);
@@ -228,10 +243,38 @@
   transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
 }
 
+/* On medium screens (768px - 1024px), center dropdown relative to search box */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .search-suggestions {
+    width: 450px;
+    min-width: unset;
+    max-width: unset;
+    left: 50%;
+    transform: translateX(-50%) translateY(-0.5rem);
+  }
+}
+
+/* On larger screens (above 1024px), match search box width */
+@media (min-width: 1025px) {
+  .search-suggestions {
+    width: 100%;
+    min-width: unset;
+    max-width: unset;
+    right: 0;
+  }
+}
+
 .search-suggestions.visible {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+}
+
+/* Override for medium screens - must be after .visible rule for specificity */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .search-suggestions.visible {
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .search-suggestions-header {
@@ -269,13 +312,20 @@
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s, border-left 0.15s;
   text-decoration: none;
   color: var(--color-foreground, #ffffff);
+  border-left: 3px solid transparent;
 }
 
 .search-suggestion-item:hover {
   background-color: var(--color-secondary, #1a1a1a);
+}
+
+.search-suggestion-item-selected,
+.search-suggestion-item-selected:hover {
+  background-color: rgba(229, 9, 20, 0.15);
+  border-left: 3px solid var(--color-primary, #e50914);
 }
 
 .search-suggestion-icon {
@@ -296,6 +346,8 @@
 .search-suggestion-content {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .search-suggestion-title {
@@ -304,12 +356,16 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: block;
 }
 
 .search-suggestion-meta {
   font-size: 0.75rem;
   color: var(--color-muted, #888888);
   margin-top: 0.125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .search-suggestion-badge {
@@ -325,6 +381,13 @@
 .search-no-results {
   padding: 2rem 1rem;
   text-align: center;
+}
+
+.search-loading {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-muted, #888888);
 }
 
 .search-no-results-icon {
@@ -596,6 +659,7 @@
 /* Navigation */
 .nav {
   border-top: 1px solid var(--color-border, #2a2a2a);
+  
 }
 
 .nav-container {
@@ -604,6 +668,7 @@
   margin-right: auto;
   padding-left: 1rem;
   padding-right: 1rem;
+
 }
 
 @media (min-width: 640px) {
