@@ -192,19 +192,31 @@ export interface CreateBookingData {
 }
 
 export async function createBooking(data: CreateBookingData): Promise<{ id: string } | null> {
-  const response = await fetch('/api/bookings', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
+  try {
+    console.log('Creating booking with data:', data);
 
-  if (!response.ok) {
-    const error = await response.json();
-    console.error('Error creating booking:', error);
-    return null;
+    const response = await fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+      credentials: 'include', // Include cookies for authentication
+    });
+
+    console.log('Response status:', response.status, response.statusText);
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Error creating booking - Response:', error);
+      throw new Error(error.error || `HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    console.log('Booking created successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('Error in createBooking:', error);
+    throw error;
   }
-
-  return response.json();
 }
 
 // Confirm a booking

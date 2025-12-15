@@ -99,6 +99,43 @@ export default function ShowTimingsPage() {
 
   const getScreenById = (id: number) => screens.find((s) => s.id === id);
 
+  // Check if a showtime has already passed
+  const isShowtimePassed = (showtimeDate: string, showtimeTime: string): boolean => {
+    const now = new Date();
+
+    // Parse the time string
+    let hours = 0;
+    let minutes = 0;
+
+    // Check if time is in 12-hour format (contains AM/PM)
+    if (showtimeTime.includes('AM') || showtimeTime.includes('PM')) {
+      const isPM = showtimeTime.includes('PM');
+      const timeWithoutPeriod = showtimeTime.replace(/AM|PM/g, '').trim();
+      const [hourStr, minuteStr] = timeWithoutPeriod.split(':');
+      hours = parseInt(hourStr);
+      minutes = parseInt(minuteStr);
+
+      // Convert to 24-hour format
+      if (isPM && hours !== 12) {
+        hours += 12;
+      } else if (!isPM && hours === 12) {
+        hours = 0;
+      }
+    } else {
+      // Assume 24-hour format
+      const [hourStr, minuteStr] = showtimeTime.split(':');
+      hours = parseInt(hourStr);
+      minutes = parseInt(minuteStr);
+    }
+
+    // Create a date object for the showtime
+    const showDateTime = new Date(showtimeDate);
+    showDateTime.setHours(hours, minutes, 0, 0);
+
+    // Compare with current time
+    return showDateTime < now;
+  };
+
   // Handle showtime selection - navigate directly to seat selection
   const handleShowtimeClick = (movieId: string, screenId: number, time: string, price: { standard: number; premium: number }) => {
     // Get movie data from lib/data.ts
@@ -290,15 +327,17 @@ export default function ShowTimingsPage() {
                             <span className="screen-showtime-price">From Rs.{show.price.standard}</span>
                           </div>
                           <div className="showtime-buttons">
-                            {show.times.map((time, index) => (
-                              <button
-                                key={index}
-                                onClick={() => handleShowtimeClick(movie.movieId, show.screenId, time, show.price)}
-                                className={`showtime-btn ${screen?.type === 'premium' ? 'showtime-btn-premium' : screen?.type === 'dolby' ? 'showtime-btn-dolby' : ''}`}
-                              >
-                                {time}
-                              </button>
-                            ))}
+                            {show.times
+                              .filter(time => !isShowtimePassed(dates[selectedDate].date.toISOString().split('T')[0], time))
+                              .map((time, index) => (
+                                <button
+                                  key={index}
+                                  onClick={() => handleShowtimeClick(movie.movieId, show.screenId, time, show.price)}
+                                  className={`showtime-btn ${screen?.type === 'premium' ? 'showtime-btn-premium' : screen?.type === 'dolby' ? 'showtime-btn-dolby' : ''}`}
+                                >
+                                  {time}
+                                </button>
+                              ))}
                           </div>
                         </div>
                       );

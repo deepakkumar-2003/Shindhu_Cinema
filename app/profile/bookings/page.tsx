@@ -1,77 +1,146 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUserStore } from '@/lib/store';
-import { movies } from '@/lib/data';
 import './page.css';
 
-// Sample booking history
-const sampleBookings = [
-  {
-    id: 'SHC001',
-    movie: movies[0],
-    theater: 'PVR Cinemas - Phoenix Mall',
-    date: '2024-12-10',
-    time: '19:15',
-    seats: ['H5', 'H6'],
-    format: '3D',
-    total: 980,
-    status: 'upcoming',
-  },
-  {
-    id: 'SHC002',
-    movie: movies[1],
-    theater: 'INOX - Nariman Point',
-    date: '2024-11-25',
-    time: '16:00',
-    seats: ['J8', 'J9', 'J10'],
-    format: 'Dolby Atmos',
-    total: 1650,
-    status: 'completed',
-  },
-  {
-    id: 'SHC003',
-    movie: movies[4],
-    theater: 'Cinepolis - Andheri',
-    date: '2024-11-15',
-    time: '21:30',
-    seats: ['E3', 'E4'],
-    format: '2D',
-    total: 520,
-    status: 'cancelled',
-  },
-];
+interface LocalBooking {
+  orderId: string;
+  movie: {
+    title: string;
+    poster: string;
+    certification: string;
+    language: string;
+  };
+  theater: {
+    name: string;
+    location: string;
+  };
+  showtime: {
+    date: string;
+    time: string;
+    format: string;
+  };
+  seats: Array<{
+    id: string;
+    row: string;
+    number: number;
+  }>;
+  totalAmount: number;
+  status: string;
+  bookingDate: string;
+}
 
 export default function BookingsPage() {
   const router = useRouter();
   const { isAuthenticated } = useUserStore();
+  const [bookings, setBookings] = useState<LocalBooking[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/');
+      return;
     }
+
+    const loadBookings = () => {
+      setIsLoading(true);
+
+      // Load bookings from localStorage
+      const allBookings: LocalBooking[] = [];
+
+      // Get the last booking
+      const lastBookingStr = localStorage.getItem('lastBooking');
+      if (lastBookingStr) {
+        try {
+          const lastBooking = JSON.parse(lastBookingStr);
+          allBookings.push(lastBooking);
+        } catch (error) {
+          console.error('Error parsing last booking:', error);
+        }
+      }
+
+      // Get all bookings history
+      const bookingsHistoryStr = localStorage.getItem('bookingsHistory');
+      if (bookingsHistoryStr) {
+        try {
+          const bookingsHistory = JSON.parse(bookingsHistoryStr);
+          if (Array.isArray(bookingsHistory)) {
+            allBookings.push(...bookingsHistory);
+          }
+        } catch (error) {
+          console.error('Error parsing bookings history:', error);
+        }
+      }
+
+      // Remove duplicates based on orderId
+      const uniqueBookings = allBookings.filter((booking, index, self) =>
+        index === self.findIndex((b) => b.orderId === booking.orderId)
+      );
+
+      // Sort by booking date (newest first)
+      uniqueBookings.sort((a, b) =>
+        new Date(b.bookingDate).getTime() - new Date(a.bookingDate).getTime()
+      );
+
+      setBookings(uniqueBookings);
+      setIsLoading(false);
+    };
+
+    loadBookings();
   }, [isAuthenticated, router]);
 
   if (!isAuthenticated) {
     return null;
   }
 
-  const upcomingBookings = sampleBookings.filter((b) => b.status === 'upcoming');
-  const pastBookings = sampleBookings.filter((b) => b.status !== 'upcoming');
+  // Filter bookings based on status and date
+  const now = new Date();
+  now.setHours(0, 0, 0, 0); // Set to start of today for accurate date comparison
+
+  const upcomingBookings = bookings.filter((b) => {
+    if (b.status === 'cancelled') return false;
+    if (!b.showtime?.date) return false;
+
+    const showDate = new Date(b.showtime.date);
+    showDate.setHours(0, 0, 0, 0); // Set to start of day
+
+    // Show is upcoming if it's today or in the future
+    return showDate >= now;
+  });
+
+  const pastBookings = bookings.filter((b) => {
+    if (b.status === 'cancelled') return true;
+    if (!b.showtime?.date) return false;
+
+    const showDate = new Date(b.showtime.date);
+    showDate.setHours(0, 0, 0, 0); // Set to start of day
+
+    // Show is past if it was before today
+    return showDate < now;
+  });
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'upcoming':
-        return <span className="bookings-badge bookings-badge-upcoming">Upcoming</span>;
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return <span className="bookings-badge bookings-badge-upcoming">Pending</span>;
+      case 'confirmed':
+        return <span className="bookings-badge bookings-badge-upcoming">Confirmed</span>;
       case 'completed':
         return <span className="bookings-badge bookings-badge-completed">Completed</span>;
       case 'cancelled':
         return <span className="bookings-badge bookings-badge-cancelled">Cancelled</span>;
       default:
-        return null;
+        return <span className="bookings-badge bookings-badge-upcoming">{status}</span>;
     }
+  };
+
+  // Format seat labels
+  const formatSeats = (seats?: Array<{ id?: string; row?: string; number?: number }>) => {
+    if (!seats || seats.length === 0) return 'N/A';
+    return seats.map(s => s.id || `${s.row}${s.number}`).join(', ');
   };
 
   return (
@@ -88,21 +157,25 @@ export default function BookingsPage() {
       {/* Upcoming Bookings */}
       <section className="bookings-section">
         <h2 className="bookings-section-title">Upcoming</h2>
-        {upcomingBookings.length > 0 ? (
+        {isLoading ? (
+          <div className="bookings-empty">
+            <p className="bookings-empty-text">Loading bookings...</p>
+          </div>
+        ) : upcomingBookings.length > 0 ? (
           <div className="bookings-list">
             {upcomingBookings.map((booking) => (
-              <div key={booking.id} className="bookings-card">
+              <div key={booking.orderId} className="bookings-card">
                 <div className="bookings-card-content">
                   <img
-                    src={booking.movie.poster}
-                    alt={booking.movie.title}
+                    src={booking.movie?.poster || '/placeholder-poster.jpg'}
+                    alt={booking.movie?.title || 'Movie'}
                     className="bookings-poster"
                   />
                   <div className="bookings-card-details">
                     <div className="bookings-card-header">
                       <div>
-                        <h3 className="bookings-movie-title">{booking.movie.title}</h3>
-                        <p className="bookings-theater">{booking.theater}</p>
+                        <h3 className="bookings-movie-title">{booking.movie?.title || 'Unknown Movie'}</h3>
+                        <p className="bookings-theater">{booking.theater?.name || 'Unknown Theater'}</p>
                       </div>
                       {getStatusBadge(booking.status)}
                     </div>
@@ -110,30 +183,32 @@ export default function BookingsPage() {
                       <div>
                         <p className="bookings-info-label">Date</p>
                         <p className="bookings-info-value">
-                          {new Date(booking.date).toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            day: 'numeric',
-                            month: 'short',
-                          })}
+                          {booking.showtime?.date
+                            ? new Date(booking.showtime.date).toLocaleDateString('en-US', {
+                                weekday: 'short',
+                                day: 'numeric',
+                                month: 'short',
+                              })
+                            : 'N/A'}
                         </p>
                       </div>
                       <div>
                         <p className="bookings-info-label">Time</p>
-                        <p className="bookings-info-value">{booking.time}</p>
+                        <p className="bookings-info-value">{booking.showtime?.time || 'N/A'}</p>
                       </div>
                       <div>
                         <p className="bookings-info-label">Seats</p>
-                        <p className="bookings-info-value">{booking.seats.join(', ')}</p>
+                        <p className="bookings-info-value">{formatSeats(booking.seats)}</p>
                       </div>
                       <div>
                         <p className="bookings-info-label">Format</p>
-                        <p className="bookings-info-value">{booking.format}</p>
+                        <p className="bookings-info-value">{booking.showtime?.format || 'N/A'}</p>
                       </div>
                     </div>
                     <div className="bookings-card-footer">
                       <div>
-                        <p className="bookings-order-id">Order #{booking.id}</p>
-                        <p className="bookings-total primary">₹{booking.total}</p>
+                        <p className="bookings-order-id">Order #{booking.orderId}</p>
+                        <p className="bookings-total primary">₹{booking.totalAmount.toFixed(2)}</p>
                       </div>
                       <div className="bookings-actions">
                         <button className="bookings-view-btn">
@@ -165,21 +240,25 @@ export default function BookingsPage() {
       {/* Past Bookings */}
       <section className="bookings-section">
         <h2 className="bookings-section-title">Past Bookings</h2>
-        {pastBookings.length > 0 ? (
+        {isLoading ? (
+          <div className="bookings-empty">
+            <p className="bookings-empty-text">Loading bookings...</p>
+          </div>
+        ) : pastBookings.length > 0 ? (
           <div className="bookings-list">
             {pastBookings.map((booking) => (
-              <div key={booking.id} className="bookings-card past">
+              <div key={booking.orderId} className="bookings-card past">
                 <div className="bookings-card-content">
                   <img
-                    src={booking.movie.poster}
-                    alt={booking.movie.title}
+                    src={booking.movie?.poster || '/placeholder-poster.jpg'}
+                    alt={booking.movie?.title || 'Movie'}
                     className="bookings-poster grayscale"
                   />
                   <div className="bookings-card-details">
                     <div className="bookings-card-header">
                       <div>
-                        <h3 className="bookings-movie-title">{booking.movie.title}</h3>
-                        <p className="bookings-theater">{booking.theater}</p>
+                        <h3 className="bookings-movie-title">{booking.movie?.title || 'Unknown Movie'}</h3>
+                        <p className="bookings-theater">{booking.theater?.name || 'Unknown Theater'}</p>
                       </div>
                       {getStatusBadge(booking.status)}
                     </div>
@@ -187,30 +266,32 @@ export default function BookingsPage() {
                       <div>
                         <p className="bookings-info-label">Date</p>
                         <p className="bookings-info-value">
-                          {new Date(booking.date).toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            day: 'numeric',
-                            month: 'short',
-                          })}
+                          {booking.showtime?.date
+                            ? new Date(booking.showtime.date).toLocaleDateString('en-US', {
+                                weekday: 'short',
+                                day: 'numeric',
+                                month: 'short',
+                              })
+                            : 'N/A'}
                         </p>
                       </div>
                       <div>
                         <p className="bookings-info-label">Time</p>
-                        <p className="bookings-info-value">{booking.time}</p>
+                        <p className="bookings-info-value">{booking.showtime?.time || 'N/A'}</p>
                       </div>
                       <div>
                         <p className="bookings-info-label">Seats</p>
-                        <p className="bookings-info-value">{booking.seats.join(', ')}</p>
+                        <p className="bookings-info-value">{formatSeats(booking.seats)}</p>
                       </div>
                       <div>
                         <p className="bookings-info-label">Format</p>
-                        <p className="bookings-info-value">{booking.format}</p>
+                        <p className="bookings-info-value">{booking.showtime?.format || 'N/A'}</p>
                       </div>
                     </div>
                     <div className="bookings-card-footer">
                       <div>
-                        <p className="bookings-order-id">Order #{booking.id}</p>
-                        <p className="bookings-total">₹{booking.total}</p>
+                        <p className="bookings-order-id">Order #{booking.orderId}</p>
+                        <p className="bookings-total">₹{booking.totalAmount.toFixed(2)}</p>
                       </div>
                       {booking.status === 'completed' && (
                         <button className="bookings-again-btn">

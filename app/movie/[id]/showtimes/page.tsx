@@ -98,13 +98,49 @@ export default function ShowtimesPage({ params }: ShowtimesPageProps) {
     );
   }
 
+  // Helper function to check if a showtime has passed
+  const isShowtimePassed = (showtimeDate: string, showtimeTime: string): boolean => {
+    const now = new Date();
+
+    // Parse time - handle both 24-hour (09:00) and 12-hour (09:00 AM) formats
+    let hours = 0;
+    let minutes = 0;
+
+    if (showtimeTime.includes('AM') || showtimeTime.includes('PM')) {
+      // 12-hour format with AM/PM
+      const isPM = showtimeTime.includes('PM');
+      const timeWithoutPeriod = showtimeTime.replace(/AM|PM/g, '').trim();
+      const [hourStr, minuteStr] = timeWithoutPeriod.split(':');
+      hours = parseInt(hourStr);
+      minutes = parseInt(minuteStr);
+
+      // Convert to 24-hour format
+      if (isPM && hours !== 12) {
+        hours += 12;
+      } else if (!isPM && hours === 12) {
+        hours = 0;
+      }
+    } else {
+      // 24-hour format
+      const [hourStr, minuteStr] = showtimeTime.split(':');
+      hours = parseInt(hourStr);
+      minutes = parseInt(minuteStr);
+    }
+
+    const showDateTime = new Date(showtimeDate);
+    showDateTime.setHours(hours, minutes, 0, 0);
+
+    return showDateTime < now;
+  };
+
   // Group showtimes by screen for the selected location
   const groupedShowtimes = locationScreens.map((screen) => ({
     theater: screen,
     shows: showtimes.filter(
       (s) =>
         s.theaterId === screen.id &&
-        (selectedFormat === 'All' || s.format === selectedFormat)
+        (selectedFormat === 'All' || s.format === selectedFormat) &&
+        !isShowtimePassed(s.date, s.time) // Filter out past showtimes
     ),
   })).filter((g) => g.shows.length > 0);
 

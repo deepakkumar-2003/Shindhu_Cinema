@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBookingStore, useUserStore, useUIStore } from '@/lib/store';
+import { createBooking } from '@/lib/supabase/services/bookings';
 import './page.css';
 
 const paymentMethods = [
@@ -93,16 +94,62 @@ export default function CheckoutPage() {
 
     setIsProcessing(true);
 
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      // Validate required data
+      if (!selectedMovie?.id || !selectedTheater?.id || !selectedShowtime?.id) {
+        throw new Error('Missing required booking information. Please start over.');
+      }
 
-    // Generate order ID
-    const orderId = 'SHC' + Date.now().toString(36).toUpperCase();
+      if (selectedSeats.length === 0) {
+        throw new Error('Please select at least one seat.');
+      }
 
-    setIsProcessing(false);
+      // Simulate payment processing delay
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Navigate to confirmation with order ID
-    router.push(`/booking/confirmation?orderId=${orderId}`);
+      // Generate a demo order ID
+      const orderId = 'DEMO-' + Date.now().toString(36).toUpperCase();
+
+      // Store booking data in localStorage for confirmation page
+      const bookingData = {
+        orderId,
+        movie: selectedMovie,
+        theater: selectedTheater,
+        showtime: selectedShowtime,
+        seats: selectedSeats,
+        snacks: cartSnacks,
+        snackPickupTime: snackPickupTime,
+        ticketAmount: getTicketTotal(),
+        snackAmount: getSnackTotal(),
+        convenienceFee: getConvenienceFee(),
+        taxAmount: getTax(),
+        discountAmount: promoDiscount,
+        promoCode: promoApplied ? promoCode : null,
+        paymentMethod: selectedPayment,
+        totalAmount: finalTotal,
+        status: 'confirmed',
+        bookingDate: new Date().toISOString(),
+      };
+
+      // Save as last booking
+      localStorage.setItem('lastBooking', JSON.stringify(bookingData));
+
+      // Add to bookings history
+      const existingHistory = localStorage.getItem('bookingsHistory');
+      const bookingsHistory = existingHistory ? JSON.parse(existingHistory) : [];
+      bookingsHistory.unshift(bookingData); // Add to beginning
+      localStorage.setItem('bookingsHistory', JSON.stringify(bookingsHistory));
+
+      setIsProcessing(false);
+
+      // Navigate to confirmation with order ID
+      router.push(`/booking/confirmation?orderId=${orderId}`);
+    } catch (error) {
+      setIsProcessing(false);
+      console.error('Payment error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process payment. Please try again.';
+      alert(`Payment Failed: ${errorMessage}`);
+    }
   };
 
   const finalTotal = getGrandTotal() - promoDiscount;

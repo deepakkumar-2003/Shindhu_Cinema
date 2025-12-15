@@ -1,31 +1,35 @@
--- Seed data for Shindhu Cinemas
+-- Seed data for Sai Sindhu Cinemas
 -- Run this after schema.sql to populate initial data
 
 -- ===========================================
--- CITIES
+-- CLEAR EXISTING DATA (in correct order due to foreign keys)
+-- ===========================================
+
+-- First delete from tables with foreign key dependencies
+DELETE FROM reviews;
+DELETE FROM booked_snacks;
+DELETE FROM booked_seats;
+DELETE FROM bookings;
+DELETE FROM seats;
+DELETE FROM showtimes;
+DELETE FROM snack_addons;
+DELETE FROM snack_variants;
+DELETE FROM snacks;
+DELETE FROM screens;
+DELETE FROM theaters;
+DELETE FROM crew_members;
+DELETE FROM cast_members;
+DELETE FROM movies;
+DELETE FROM promo_codes;
+DELETE FROM cities;
+
+-- ===========================================
+-- CITIES (Only Anthiyur and Komarapalayam)
 -- ===========================================
 
 INSERT INTO cities (id, name, state) VALUES
-  ('c0000001-0000-0000-0000-000000000001', 'Mumbai', 'Maharashtra'),
-  ('c0000002-0000-0000-0000-000000000002', 'Delhi', 'Delhi'),
-  ('c0000003-0000-0000-0000-000000000003', 'Bangalore', 'Karnataka'),
-  ('c0000004-0000-0000-0000-000000000004', 'Chennai', 'Tamil Nadu'),
-  ('c0000005-0000-0000-0000-000000000005', 'Hyderabad', 'Telangana'),
-  ('c0000006-0000-0000-0000-000000000006', 'Kolkata', 'West Bengal'),
-  ('c0000007-0000-0000-0000-000000000007', 'Pune', 'Maharashtra'),
-  ('c0000008-0000-0000-0000-000000000008', 'Ahmedabad', 'Gujarat'),
-  ('c0000009-0000-0000-0000-000000000009', 'Jaipur', 'Rajasthan'),
-  ('c0000010-0000-0000-0000-000000000010', 'Lucknow', 'Uttar Pradesh'),
-  ('c0000011-0000-0000-0000-000000000011', 'Kanpur', 'Uttar Pradesh'),
-  ('c0000012-0000-0000-0000-000000000012', 'Nagpur', 'Maharashtra'),
-  ('c0000013-0000-0000-0000-000000000013', 'Indore', 'Madhya Pradesh'),
-  ('c0000014-0000-0000-0000-000000000014', 'Thane', 'Maharashtra'),
-  ('c0000015-0000-0000-0000-000000000015', 'Bhopal', 'Madhya Pradesh'),
-  ('c0000016-0000-0000-0000-000000000016', 'Visakhapatnam', 'Andhra Pradesh'),
-  ('c0000017-0000-0000-0000-000000000017', 'Patna', 'Bihar'),
-  ('c0000018-0000-0000-0000-000000000018', 'Vadodara', 'Gujarat'),
-  ('c0000019-0000-0000-0000-000000000019', 'Ghaziabad', 'Uttar Pradesh'),
-  ('c0000020-0000-0000-0000-000000000020', 'Ludhiana', 'Punjab');
+  ('c0000001-0000-0000-0000-000000000001', 'Anthiyur', 'Tamil Nadu'),
+  ('c0000002-0000-0000-0000-000000000002', 'Komarapalayam', 'Tamil Nadu');
 
 -- ===========================================
 -- MOVIES
@@ -46,7 +50,7 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     125000,
     'Tamil',
     ARRAY['Action', 'Drama', 'Thriller'],
-    ARRAY['2D', '3D', 'Dolby Atmos'],
+    ARRAY['2D', 'Dolby Atmos'],
     'UA',
     'now_showing'
   ),
@@ -64,7 +68,7 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     250000,
     'English',
     ARRAY['Sci-Fi', 'Adventure', 'Drama'],
-    ARRAY['2D', '3D', 'Dolby Atmos'],
+    ARRAY['2D', 'Dolby Atmos'],
     'UA',
     'now_showing'
   ),
@@ -82,7 +86,7 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     180000,
     'Tamil',
     ARRAY['Sci-Fi', 'Action', 'Fantasy'],
-    ARRAY['2D', '3D', 'Dolby Atmos'],
+    ARRAY['2D', 'Dolby Atmos'],
     'UA',
     'now_showing'
   ),
@@ -100,7 +104,7 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     320000,
     'English',
     ARRAY['Action', 'Comedy', 'Superhero'],
-    ARRAY['2D', '3D', 'Dolby Atmos'],
+    ARRAY['2D', 'Dolby Atmos'],
     'A',
     'now_showing'
   ),
@@ -118,7 +122,7 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     95000,
     'Tamil',
     ARRAY['Horror', 'Comedy'],
-    ARRAY['2D'],
+    ARRAY['2D', 'Dolby Atmos'],
     'UA',
     'now_showing'
   ),
@@ -154,7 +158,7 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     0,
     'English',
     ARRAY['Sci-Fi', 'Adventure', 'Fantasy'],
-    ARRAY['3D', 'Dolby Atmos'],
+    ARRAY['2D', 'Dolby Atmos'],
     'UA',
     'coming_soon'
   ),
@@ -178,21 +182,21 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
   ),
   (
     'a0000009-0000-0000-0000-000000000009',
-    'The Deepakkumar',
+    'Dasara',
     'https://image.tmdb.org/t/p/w500/74xTEgt7R36Fvber3r2eGeBsEj1.jpg',
     'https://image.tmdb.org/t/p/original/b0PlSFdDwbyK0cf5RxwDpaOJQvQ.jpg',
     'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    'The Dark Knight returns to face new threats in Gotham City. As new villains emerge, Batman must confront his past while protecting the city he loves.',
-    175,
-    '2025-10-03',
-    0,
-    0,
-    0,
-    'English',
-    ARRAY['Action', 'Crime', 'Drama'],
+    'A powerful story of love, revenge, and redemption set against the backdrop of a small village during the Dasara festival.',
+    158,
+    '2024-12-10',
+    7.9,
+    4.1,
+    85000,
+    'Tamil',
+    ARRAY['Action', 'Drama', 'Romance'],
     ARRAY['2D', 'Dolby Atmos'],
     'UA',
-    'coming_soon'
+    'now_showing'
   );
 
 -- ===========================================
@@ -217,7 +221,9 @@ INSERT INTO cast_members (movie_id, name, role, image) VALUES
   ('a0000006-0000-0000-0000-000000000006', 'Kareena Kapoor Khan', 'Avni Singham', 'https://image.tmdb.org/t/p/w200/huV2CDrBrCm5hh2jxmWGZ91L7cL.jpg'),
   ('a0000007-0000-0000-0000-000000000007', 'Sam Worthington', 'Jake Sully', 'https://image.tmdb.org/t/p/w200/4SYTH5FdB0dAORV98Nwg3llgVnY.jpg'),
   ('a0000007-0000-0000-0000-000000000007', 'Zoe Saldana', 'Neytiri', 'https://image.tmdb.org/t/p/w200/huV2CDrBrCm5hh2jxmWGZ91L7cL.jpg'),
-  ('a0000008-0000-0000-0000-000000000008', 'Robert Pattinson', 'Bruce Wayne / Batman', 'https://image.tmdb.org/t/p/w200/4SYTH5FdB0dAORV98Nwg3llgVnY.jpg');
+  ('a0000008-0000-0000-0000-000000000008', 'Robert Pattinson', 'Bruce Wayne / Batman', 'https://image.tmdb.org/t/p/w200/4SYTH5FdB0dAORV98Nwg3llgVnY.jpg'),
+  ('a0000009-0000-0000-0000-000000000009', 'Nani', 'Dharani', 'https://image.tmdb.org/t/p/w200/4SYTH5FdB0dAORV98Nwg3llgVnY.jpg'),
+  ('a0000009-0000-0000-0000-000000000009', 'Keerthy Suresh', 'Vennela', 'https://image.tmdb.org/t/p/w200/huV2CDrBrCm5hh2jxmWGZ91L7cL.jpg');
 
 -- ===========================================
 -- CREW MEMBERS
@@ -234,29 +240,34 @@ INSERT INTO crew_members (movie_id, name, role, image) VALUES
   ('a0000005-0000-0000-0000-000000000005', 'Amar Kaushik', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg'),
   ('a0000006-0000-0000-0000-000000000006', 'Rohit Shetty', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg'),
   ('a0000007-0000-0000-0000-000000000007', 'James Cameron', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg'),
-  ('a0000008-0000-0000-0000-000000000008', 'Matt Reeves', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg');
+  ('a0000008-0000-0000-0000-000000000008', 'Matt Reeves', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg'),
+  ('a0000009-0000-0000-0000-000000000009', 'Srikanth Odela', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg');
 
 -- ===========================================
--- THEATERS
+-- THEATERS (Sai Sindhu Cinemas - 2 locations)
 -- ===========================================
 
 INSERT INTO theaters (id, name, location, city_id, address, amenities) VALUES
-  ('b0000001-0000-0000-0000-000000000001', 'PVR Cinemas - Phoenix Mall', 'Lower Parel', 'c0000001-0000-0000-0000-000000000001', 'Phoenix Mills, 462 Senapati Bapat Marg, Lower Parel', ARRAY['Dolby Atmos', 'Recliner Seats', 'F&B', 'Parking']),
-  ('b0000002-0000-0000-0000-000000000002', 'INOX - Nariman Point', 'Nariman Point', 'c0000001-0000-0000-0000-000000000001', 'NCPA Marg, Nariman Point', ARRAY['Dolby Atmos', '4DX', 'Premium Lounge', 'F&B', 'Valet Parking']),
-  ('b0000003-0000-0000-0000-000000000003', 'Cinepolis - Andheri', 'Andheri West', 'c0000001-0000-0000-0000-000000000001', 'Fun Republic Mall, Link Road, Andheri West', ARRAY['Dolby Atmos', 'VIP Seats', 'F&B', 'Parking']),
-  ('b0000004-0000-0000-0000-000000000004', 'PVR LUXE - Bandra', 'Bandra', 'c0000001-0000-0000-0000-000000000001', 'Linking Road, Bandra West', ARRAY['Dolby Atmos', 'Luxury Recliners', 'In-seat Service', 'Valet Parking']),
-  ('b0000005-0000-0000-0000-000000000005', 'Carnival Cinemas - Wadala', 'Wadala', 'c0000001-0000-0000-0000-000000000001', 'R City Mall, LBS Marg, Ghatkopar West', ARRAY['Dolby', 'F&B', 'Parking']);
+  -- Anthiyur Theater
+  ('b0000001-0000-0000-0000-000000000001', 'Sai Sindhu Cinemas - Anthiyur', 'Anthiyur', 'c0000001-0000-0000-0000-000000000001', 'Sai Sindhu Cinemas, Main Road, Anthiyur, Tamil Nadu 638501', ARRAY['Dolby Atmos', '4K Projection', 'AC', 'Parking', 'Food Court']),
+  -- Komarapalayam Theater
+  ('b0000002-0000-0000-0000-000000000002', 'Sai Sindhu Cinemas - Komarapalayam', 'Komarapalayam', 'c0000002-0000-0000-0000-000000000002', 'Sai Sindhu Cinemas, Bus Stand Road, Komarapalayam, Tamil Nadu 638183', ARRAY['Dolby Atmos', '4K Projection', 'AC', 'Parking', 'Food Court']);
 
 -- ===========================================
--- SCREENS
+-- SCREENS (4 screens per theater - all Dolby Atmos)
 -- ===========================================
 
 INSERT INTO screens (id, theater_id, name, total_seats, seat_layout) VALUES
-  ('d0000001-0000-0000-0000-000000000001', 'b0000001-0000-0000-0000-000000000001', 'Screen 1', 200, '{"rows": 12, "seatsPerRow": 16, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner", "K-L": "vip"}}'::JSONB),
-  ('d0000002-0000-0000-0000-000000000002', 'b0000001-0000-0000-0000-000000000001', 'Screen 2 - Dolby Atmos', 300, '{"rows": 15, "seatsPerRow": 20, "types": {"A-E": "standard", "F-J": "premium", "K-M": "recliner", "N-O": "vip"}}'::JSONB),
-  ('d0000003-0000-0000-0000-000000000003', 'b0000002-0000-0000-0000-000000000002', 'Screen 1', 180, '{"rows": 10, "seatsPerRow": 18, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner"}}'::JSONB),
-  ('d0000004-0000-0000-0000-000000000004', 'b0000003-0000-0000-0000-000000000003', 'Screen 1', 200, '{"rows": 12, "seatsPerRow": 16, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner", "K-L": "vip"}}'::JSONB),
-  ('d0000005-0000-0000-0000-000000000005', 'b0000004-0000-0000-0000-000000000004', 'LUXE Screen', 100, '{"rows": 8, "seatsPerRow": 12, "types": {"A-B": "premium", "C-E": "recliner", "F-H": "vip"}}'::JSONB);
+  -- Anthiyur Screens
+  ('d0000001-0000-0000-0000-000000000001', 'b0000001-0000-0000-0000-000000000001', 'Screen 1 - Dolby Atmos', 192, '{"rows": 12, "seatsPerRow": 16, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner", "K-L": "vip"}}'::JSONB),
+  ('d0000002-0000-0000-0000-000000000002', 'b0000001-0000-0000-0000-000000000001', 'Screen 2 - Dolby Atmos', 192, '{"rows": 12, "seatsPerRow": 16, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner", "K-L": "vip"}}'::JSONB),
+  ('d0000003-0000-0000-0000-000000000003', 'b0000001-0000-0000-0000-000000000001', 'Screen 3 - Dolby Atmos', 192, '{"rows": 12, "seatsPerRow": 16, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner", "K-L": "vip"}}'::JSONB),
+  ('d0000004-0000-0000-0000-000000000004', 'b0000001-0000-0000-0000-000000000001', 'Screen 4 - Dolby Atmos', 192, '{"rows": 12, "seatsPerRow": 16, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner", "K-L": "vip"}}'::JSONB),
+  -- Komarapalayam Screens
+  ('d0000005-0000-0000-0000-000000000005', 'b0000002-0000-0000-0000-000000000002', 'Screen 1 - Dolby Atmos', 192, '{"rows": 12, "seatsPerRow": 16, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner", "K-L": "vip"}}'::JSONB),
+  ('d0000006-0000-0000-0000-000000000006', 'b0000002-0000-0000-0000-000000000002', 'Screen 2 - Dolby Atmos', 192, '{"rows": 12, "seatsPerRow": 16, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner", "K-L": "vip"}}'::JSONB),
+  ('d0000007-0000-0000-0000-000000000007', 'b0000002-0000-0000-0000-000000000002', 'Screen 3 - Dolby Atmos', 192, '{"rows": 12, "seatsPerRow": 16, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner", "K-L": "vip"}}'::JSONB),
+  ('d0000008-0000-0000-0000-000000000008', 'b0000002-0000-0000-0000-000000000002', 'Screen 4 - Dolby Atmos', 192, '{"rows": 12, "seatsPerRow": 16, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner", "K-L": "vip"}}'::JSONB);
 
 -- ===========================================
 -- SNACKS
@@ -330,24 +341,19 @@ INSERT INTO promo_codes (code, description, discount_type, discount_value, min_o
 
 -- ===========================================
 -- SAMPLE SHOWTIMES (for today and next 7 days)
+-- All prices set to ₹190, format is Dolby Atmos or 2D
 -- ===========================================
 
 DO $$
 DECLARE
   v_movie RECORD;
   v_screen RECORD;
-  v_theater RECORD;
   v_date DATE;
   v_time TIME;
   v_times TIME[] := ARRAY['09:30:00'::TIME, '12:45:00'::TIME, '16:00:00'::TIME, '19:30:00'::TIME, '22:45:00'::TIME];
-  v_formats TEXT[] := ARRAY['2D', '3D', 'Dolby Atmos'];
-  v_languages TEXT[] := ARRAY['Tamil', 'English'];
+  v_formats TEXT[] := ARRAY['2D', 'Dolby Atmos'];
   v_format TEXT;
   v_language TEXT;
-  v_price_standard DECIMAL;
-  v_price_premium DECIMAL;
-  v_price_recliner DECIMAL;
-  v_price_vip DECIMAL;
 BEGIN
   -- Loop through dates (today + 7 days)
   FOR i IN 0..7 LOOP
@@ -357,22 +363,17 @@ BEGIN
     FOR v_movie IN SELECT id, language FROM movies WHERE status = 'now_showing' LOOP
       -- Loop through screens with theater info
       FOR v_screen IN
-        SELECT s.id as screen_id, s.theater_id, s.total_seats, t.id as tid
+        SELECT s.id as screen_id, s.theater_id, s.total_seats
         FROM screens s
         JOIN theaters t ON s.theater_id = t.id
       LOOP
         -- Loop through show times
         FOREACH v_time IN ARRAY v_times LOOP
-          -- Random format and language
-          v_format := v_formats[1 + floor(random() * 3)::int];
-          v_language := v_languages[1 + floor(random() * 3)::int];
+          -- Alternate between 2D and Dolby Atmos
+          v_format := v_formats[1 + (floor(random() * 2)::int)];
+          v_language := v_movie.language;
 
           -- All prices set to ₹190
-          v_price_standard := 190;
-          v_price_premium := 190;
-          v_price_recliner := 190;
-          v_price_vip := 190;
-
           INSERT INTO showtimes (
             movie_id, theater_id, screen_id, show_date, show_time,
             format, language,
@@ -386,10 +387,10 @@ BEGIN
             v_time,
             v_format,
             v_language,
-            v_price_standard,
-            v_price_premium,
-            v_price_recliner,
-            v_price_vip,
+            190, -- price_standard
+            190, -- price_premium
+            190, -- price_recliner
+            190, -- price_vip
             v_screen.total_seats,
             v_screen.total_seats,
             true
@@ -402,6 +403,7 @@ END $$;
 
 -- ===========================================
 -- GENERATE SEATS FOR EACH SHOWTIME
+-- All seat prices are ₹190
 -- ===========================================
 
 DO $$
@@ -411,27 +413,22 @@ DECLARE
   v_seat_num INT;
   v_row_label TEXT;
   v_seat_type seat_type;
-  v_price DECIMAL;
 BEGIN
   -- For each showtime
-  FOR v_showtime IN SELECT id, price_standard, price_premium, price_recliner, price_vip FROM showtimes LOOP
+  FOR v_showtime IN SELECT id FROM showtimes LOOP
     -- Generate seats (12 rows, 16 seats per row)
     FOR v_row_num IN 1..12 LOOP
       v_row_label := CHR(64 + v_row_num); -- A, B, C, etc.
 
-      -- Determine seat type and price based on row
+      -- Determine seat type based on row (all same price ₹190)
       IF v_row_num <= 3 THEN
         v_seat_type := 'standard';
-        v_price := v_showtime.price_standard;
       ELSIF v_row_num <= 7 THEN
         v_seat_type := 'premium';
-        v_price := v_showtime.price_premium;
       ELSIF v_row_num <= 10 THEN
         v_seat_type := 'recliner';
-        v_price := v_showtime.price_recliner;
       ELSE
         v_seat_type := 'vip';
-        v_price := v_showtime.price_vip;
       END IF;
 
       FOR v_seat_num IN 1..16 LOOP
@@ -447,7 +444,7 @@ BEGIN
             WHEN random() > 0.85 THEN 'booked'::seat_status
             ELSE 'available'::seat_status
           END,
-          v_price
+          190 -- All seats ₹190
         );
       END LOOP;
     END LOOP;
@@ -461,4 +458,6 @@ END $$;
 INSERT INTO reviews (movie_id, user_id, rating, comment, likes, created_at) VALUES
   ('a0000001-0000-0000-0000-000000000001', NULL, 5, 'Absolutely phenomenal! Allu Arjun delivers a performance of a lifetime. The action sequences are mind-blowing!', 1250, '2024-12-06'),
   ('a0000001-0000-0000-0000-000000000001', NULL, 4, 'Great movie with excellent cinematography. The interval block is absolutely stunning. A must-watch!', 890, '2024-12-05'),
-  ('a0000002-0000-0000-0000-000000000002', NULL, 5, 'Denis Villeneuve has created a masterpiece. The visuals in Dolby Atmos are breathtaking!', 2100, '2024-03-05');
+  ('a0000002-0000-0000-0000-000000000002', NULL, 5, 'Denis Villeneuve has created a masterpiece. The visuals in Dolby Atmos are breathtaking!', 2100, '2024-03-05'),
+  ('a0000003-0000-0000-0000-000000000003', NULL, 4, 'Prabhas shines in this epic sci-fi adventure. The visuals are stunning!', 1500, '2024-06-28'),
+  ('a0000009-0000-0000-0000-000000000009', NULL, 4, 'A beautiful village story with powerful performances. Nani at his best!', 950, '2024-12-11');
