@@ -243,6 +243,16 @@
   transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
 }
 
+/* On mobile screens (below 768px), match search box width */
+@media (max-width: 767px) {
+  .search-suggestions {
+    width: 100%;
+    min-width: unset;
+    max-width: unset;
+    right: 0;
+  }
+}
+
 /* On medium screens (768px - 1024px), center dropdown relative to search box */
 @media (min-width: 768px) and (max-width: 1024px) {
   .search-suggestions {

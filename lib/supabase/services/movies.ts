@@ -18,7 +18,7 @@ export interface TransformedMovie {
   totalRatings: number;
   language: string;
   genres: string[];
-  format: ('2D' | '3D' | 'IMAX')[];
+  format: ('2D' | '3D' | 'Dolby Atmos')[];
   cast: {
     id: string;
     name: string;
@@ -55,7 +55,7 @@ function transformMovie(movie: MovieWithRelations): TransformedMovie {
     totalRatings: movie.total_ratings,
     language: movie.language,
     genres: movie.genres,
-    format: movie.formats as ('2D' | '3D' | 'IMAX')[],
+    format: movie.formats as ('2D' | '3D' | 'Dolby Atmos')[],
     cast: (movie.cast_members || []).map((c) => ({
       id: c.id,
       name: c.name,

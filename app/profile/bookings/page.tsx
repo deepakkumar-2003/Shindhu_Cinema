@@ -27,7 +27,7 @@ const sampleBookings = [
     date: '2024-11-25',
     time: '16:00',
     seats: ['J8', 'J9', 'J10'],
-    format: 'IMAX',
+    format: 'Dolby Atmos',
     total: 1650,
     status: 'completed',
   },

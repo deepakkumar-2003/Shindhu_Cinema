@@ -44,9 +44,9 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     8.5,
     4.3,
     125000,
-    'Telugu',
+    'Tamil',
     ARRAY['Action', 'Drama', 'Thriller'],
-    ARRAY['2D', '3D', 'IMAX'],
+    ARRAY['2D', '3D', 'Dolby Atmos'],
     'UA',
     'now_showing'
   ),
@@ -64,7 +64,7 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     250000,
     'English',
     ARRAY['Sci-Fi', 'Adventure', 'Drama'],
-    ARRAY['2D', '3D', 'IMAX'],
+    ARRAY['2D', '3D', 'Dolby Atmos'],
     'UA',
     'now_showing'
   ),
@@ -80,9 +80,9 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     8.2,
     4.1,
     180000,
-    'Telugu',
+    'Tamil',
     ARRAY['Sci-Fi', 'Action', 'Fantasy'],
-    ARRAY['2D', '3D', 'IMAX'],
+    ARRAY['2D', '3D', 'Dolby Atmos'],
     'UA',
     'now_showing'
   ),
@@ -100,7 +100,7 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     320000,
     'English',
     ARRAY['Action', 'Comedy', 'Superhero'],
-    ARRAY['2D', '3D', 'IMAX'],
+    ARRAY['2D', '3D', 'Dolby Atmos'],
     'A',
     'now_showing'
   ),
@@ -116,7 +116,7 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     7.8,
     4.0,
     95000,
-    'Hindi',
+    'Tamil',
     ARRAY['Horror', 'Comedy'],
     ARRAY['2D'],
     'UA',
@@ -134,9 +134,9 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     7.5,
     3.9,
     75000,
-    'Hindi',
+    'Tamil',
     ARRAY['Action', 'Drama'],
-    ARRAY['2D', 'IMAX'],
+    ARRAY['2D', 'Dolby Atmos'],
     'UA',
     'now_showing'
   ),
@@ -154,7 +154,7 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     0,
     'English',
     ARRAY['Sci-Fi', 'Adventure', 'Fantasy'],
-    ARRAY['3D', 'IMAX'],
+    ARRAY['3D', 'Dolby Atmos'],
     'UA',
     'coming_soon'
   ),
@@ -172,7 +172,7 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     0,
     'English',
     ARRAY['Action', 'Crime', 'Drama'],
-    ARRAY['2D', 'IMAX'],
+    ARRAY['2D', 'Dolby Atmos'],
     'UA',
     'coming_soon'
   ),
@@ -190,7 +190,7 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     0,
     'English',
     ARRAY['Action', 'Crime', 'Drama'],
-    ARRAY['2D', 'IMAX'],
+    ARRAY['2D', 'Dolby Atmos'],
     'UA',
     'coming_soon'
   );
@@ -241,10 +241,10 @@ INSERT INTO crew_members (movie_id, name, role, image) VALUES
 -- ===========================================
 
 INSERT INTO theaters (id, name, location, city_id, address, amenities) VALUES
-  ('b0000001-0000-0000-0000-000000000001', 'PVR Cinemas - Phoenix Mall', 'Lower Parel', 'c0000001-0000-0000-0000-000000000001', 'Phoenix Mills, 462 Senapati Bapat Marg, Lower Parel', ARRAY['Dolby Atmos', 'IMAX', 'Recliner Seats', 'F&B', 'Parking']),
+  ('b0000001-0000-0000-0000-000000000001', 'PVR Cinemas - Phoenix Mall', 'Lower Parel', 'c0000001-0000-0000-0000-000000000001', 'Phoenix Mills, 462 Senapati Bapat Marg, Lower Parel', ARRAY['Dolby Atmos', 'Recliner Seats', 'F&B', 'Parking']),
   ('b0000002-0000-0000-0000-000000000002', 'INOX - Nariman Point', 'Nariman Point', 'c0000001-0000-0000-0000-000000000001', 'NCPA Marg, Nariman Point', ARRAY['Dolby Atmos', '4DX', 'Premium Lounge', 'F&B', 'Valet Parking']),
   ('b0000003-0000-0000-0000-000000000003', 'Cinepolis - Andheri', 'Andheri West', 'c0000001-0000-0000-0000-000000000001', 'Fun Republic Mall, Link Road, Andheri West', ARRAY['Dolby Atmos', 'VIP Seats', 'F&B', 'Parking']),
-  ('b0000004-0000-0000-0000-000000000004', 'PVR LUXE - Bandra', 'Bandra', 'c0000001-0000-0000-0000-000000000001', 'Linking Road, Bandra West', ARRAY['Dolby Atmos', 'IMAX', 'Luxury Recliners', 'In-seat Service', 'Valet Parking']),
+  ('b0000004-0000-0000-0000-000000000004', 'PVR LUXE - Bandra', 'Bandra', 'c0000001-0000-0000-0000-000000000001', 'Linking Road, Bandra West', ARRAY['Dolby Atmos', 'Luxury Recliners', 'In-seat Service', 'Valet Parking']),
   ('b0000005-0000-0000-0000-000000000005', 'Carnival Cinemas - Wadala', 'Wadala', 'c0000001-0000-0000-0000-000000000001', 'R City Mall, LBS Marg, Ghatkopar West', ARRAY['Dolby', 'F&B', 'Parking']);
 
 -- ===========================================
@@ -253,7 +253,7 @@ INSERT INTO theaters (id, name, location, city_id, address, amenities) VALUES
 
 INSERT INTO screens (id, theater_id, name, total_seats, seat_layout) VALUES
   ('d0000001-0000-0000-0000-000000000001', 'b0000001-0000-0000-0000-000000000001', 'Screen 1', 200, '{"rows": 12, "seatsPerRow": 16, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner", "K-L": "vip"}}'::JSONB),
-  ('d0000002-0000-0000-0000-000000000002', 'b0000001-0000-0000-0000-000000000001', 'Screen 2 - IMAX', 300, '{"rows": 15, "seatsPerRow": 20, "types": {"A-E": "standard", "F-J": "premium", "K-M": "recliner", "N-O": "vip"}}'::JSONB),
+  ('d0000002-0000-0000-0000-000000000002', 'b0000001-0000-0000-0000-000000000001', 'Screen 2 - Dolby Atmos', 300, '{"rows": 15, "seatsPerRow": 20, "types": {"A-E": "standard", "F-J": "premium", "K-M": "recliner", "N-O": "vip"}}'::JSONB),
   ('d0000003-0000-0000-0000-000000000003', 'b0000002-0000-0000-0000-000000000002', 'Screen 1', 180, '{"rows": 10, "seatsPerRow": 18, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner"}}'::JSONB),
   ('d0000004-0000-0000-0000-000000000004', 'b0000003-0000-0000-0000-000000000003', 'Screen 1', 200, '{"rows": 12, "seatsPerRow": 16, "types": {"A-C": "standard", "D-G": "premium", "H-J": "recliner", "K-L": "vip"}}'::JSONB),
   ('d0000005-0000-0000-0000-000000000005', 'b0000004-0000-0000-0000-000000000004', 'LUXE Screen', 100, '{"rows": 8, "seatsPerRow": 12, "types": {"A-B": "premium", "C-E": "recliner", "F-H": "vip"}}'::JSONB);
@@ -326,7 +326,7 @@ INSERT INTO promo_codes (code, description, discount_type, discount_value, min_o
   ('FIRST20', 'Get 20% off on your first booking', 'percentage', 20, 200, 150, '2024-01-01', '2025-12-31'),
   ('WEEKEND50', 'Flat Rs.50 off on weekend bookings', 'fixed', 50, 300, NULL, '2024-01-01', '2025-12-31'),
   ('SNACKS25', '25% off on snacks', 'percentage', 25, 100, 100, '2024-01-01', '2025-12-31'),
-  ('IMAX100', 'Rs.100 off on IMAX shows', 'fixed', 100, 500, NULL, '2024-01-01', '2025-12-31');
+  ('DOLBY100', 'Rs.100 off on Dolby Atmos shows', 'fixed', 100, 500, NULL, '2024-01-01', '2025-12-31');
 
 -- ===========================================
 -- SAMPLE SHOWTIMES (for today and next 7 days)
@@ -340,8 +340,8 @@ DECLARE
   v_date DATE;
   v_time TIME;
   v_times TIME[] := ARRAY['09:30:00'::TIME, '12:45:00'::TIME, '16:00:00'::TIME, '19:30:00'::TIME, '22:45:00'::TIME];
-  v_formats TEXT[] := ARRAY['2D', '3D', 'IMAX'];
-  v_languages TEXT[] := ARRAY['Hindi', 'English', 'Telugu'];
+  v_formats TEXT[] := ARRAY['2D', '3D', 'Dolby Atmos'];
+  v_languages TEXT[] := ARRAY['Tamil', 'English'];
   v_format TEXT;
   v_language TEXT;
   v_price_standard DECIMAL;
@@ -367,23 +367,11 @@ BEGIN
           v_format := v_formats[1 + floor(random() * 3)::int];
           v_language := v_languages[1 + floor(random() * 3)::int];
 
-          -- Generate prices based on format
-          IF v_format = 'IMAX' THEN
-            v_price_standard := 250 + floor(random() * 50);
-            v_price_premium := 350 + floor(random() * 50);
-            v_price_recliner := 550 + floor(random() * 100);
-            v_price_vip := 750 + floor(random() * 150);
-          ELSIF v_format = '3D' THEN
-            v_price_standard := 200 + floor(random() * 50);
-            v_price_premium := 300 + floor(random() * 50);
-            v_price_recliner := 450 + floor(random() * 100);
-            v_price_vip := 650 + floor(random() * 150);
-          ELSE
-            v_price_standard := 150 + floor(random() * 50);
-            v_price_premium := 250 + floor(random() * 50);
-            v_price_recliner := 400 + floor(random() * 100);
-            v_price_vip := 600 + floor(random() * 150);
-          END IF;
+          -- All prices set to ₹190
+          v_price_standard := 190;
+          v_price_premium := 190;
+          v_price_recliner := 190;
+          v_price_vip := 190;
 
           INSERT INTO showtimes (
             movie_id, theater_id, screen_id, show_date, show_time,
@@ -473,4 +461,4 @@ END $$;
 INSERT INTO reviews (movie_id, user_id, rating, comment, likes, created_at) VALUES
   ('a0000001-0000-0000-0000-000000000001', NULL, 5, 'Absolutely phenomenal! Allu Arjun delivers a performance of a lifetime. The action sequences are mind-blowing!', 1250, '2024-12-06'),
   ('a0000001-0000-0000-0000-000000000001', NULL, 4, 'Great movie with excellent cinematography. The interval block is absolutely stunning. A must-watch!', 890, '2024-12-05'),
-  ('a0000002-0000-0000-0000-000000000002', NULL, 5, 'Denis Villeneuve has created a masterpiece. The visuals in IMAX are breathtaking!', 2100, '2024-03-05');
+  ('a0000002-0000-0000-0000-000000000002', NULL, 5, 'Denis Villeneuve has created a masterpiece. The visuals in Dolby Atmos are breathtaking!', 2100, '2024-03-05');

@@ -13,7 +13,7 @@ export interface Movie {
   totalRatings: number;
   language: string;
   genres: string[];
-  format: ('2D' | '3D' | 'IMAX')[];
+  format: ('2D' | '3D' | 'Dolby Atmos')[];
   cast: CastMember[];
   crew: CrewMember[];
   certification: string;
@@ -52,7 +52,7 @@ export interface Showtime {
   theaterId: string;
   time: string;
   date: string;
-  format: '2D' | '3D' | 'IMAX';
+  format: '2D' | '3D' | 'Dolby Atmos';
   language: string;
   price: {
     standard: number;

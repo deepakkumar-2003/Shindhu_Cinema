@@ -312,7 +312,7 @@ return () => {
 - `status`: `now_showing` or `coming_soon`
 - `language`: Filter by language
 - `genre`: Filter by genre
-- `format`: `2D`, `3D`, or `IMAX`
+- `format`: `2D`, `3D`, or `Dolby Atmos`
 
 **Showtimes**:
 - `movieId`: Required

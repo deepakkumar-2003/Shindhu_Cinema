@@ -6,7 +6,7 @@ export default function AboutPage() {
   const milestones = [
     { year: '2010', title: 'Founded', description: 'Shindhu Cinemas was established with a vision to revolutionize the movie-going experience.' },
     { year: '2015', title: 'Expansion', description: 'Opened our flagship multiplex with 6 screens and premium seating.' },
-    { year: '2018', title: 'Technology Upgrade', description: 'Introduced Dolby Atmos and IMAX screens for immersive viewing.' },
+    { year: '2018', title: 'Technology Upgrade', description: 'Introduced Dolby Atmos screens for immersive viewing.' },
     { year: '2022', title: 'Digital Innovation', description: 'Launched our mobile app and online booking platform.' },
     { year: '2024', title: 'Premium Experience', description: 'Introduced luxury recliners and gourmet food options.' },
   ];

@@ -19,9 +19,9 @@ export const movies: Movie[] = [
     rating: 8.5,
     userRating: 4.3,
     totalRatings: 125000,
-    language: 'Telugu',
+    language: 'Tamil',
     genres: ['Action', 'Drama', 'Thriller'],
-    format: ['2D', '3D', 'IMAX'],
+    format: ['2D', '3D', 'Dolby Atmos'],
     certification: 'UA',
     status: 'now_showing',
     cast: [
@@ -48,7 +48,7 @@ export const movies: Movie[] = [
     totalRatings: 250000,
     language: 'English',
     genres: ['Sci-Fi', 'Adventure', 'Drama'],
-    format: ['2D', '3D', 'IMAX'],
+    format: ['2D', '3D', 'Dolby Atmos'],
     certification: 'UA',
     status: 'now_showing',
     cast: [
@@ -73,9 +73,9 @@ export const movies: Movie[] = [
     rating: 8.2,
     userRating: 4.1,
     totalRatings: 180000,
-    language: 'Telugu',
+    language: 'Tamil',
     genres: ['Sci-Fi', 'Action', 'Fantasy'],
-    format: ['2D', '3D', 'IMAX'],
+    format: ['2D', '3D', 'Dolby Atmos'],
     certification: 'UA',
     status: 'now_showing',
     cast: [
@@ -102,7 +102,7 @@ export const movies: Movie[] = [
     totalRatings: 320000,
     language: 'English',
     genres: ['Action', 'Comedy', 'Superhero'],
-    format: ['2D', '3D', 'IMAX'],
+    format: ['2D', '3D', 'Dolby Atmos'],
     certification: 'A',
     status: 'now_showing',
     cast: [
@@ -125,7 +125,7 @@ export const movies: Movie[] = [
     rating: 7.8,
     userRating: 4.0,
     totalRatings: 95000,
-    language: 'Hindi',
+    language: 'Tamil',
     genres: ['Horror', 'Comedy'],
     format: ['2D'],
     certification: 'UA',
@@ -150,9 +150,9 @@ export const movies: Movie[] = [
     rating: 7.5,
     userRating: 3.9,
     totalRatings: 75000,
-    language: 'Hindi',
+    language: 'Tamil',
     genres: ['Action', 'Drama'],
-    format: ['2D', 'IMAX'],
+    format: ['2D', 'Dolby Atmos'],
     certification: 'UA',
     status: 'now_showing',
     cast: [
@@ -177,7 +177,7 @@ export const movies: Movie[] = [
     totalRatings: 0,
     language: 'English',
     genres: ['Sci-Fi', 'Adventure', 'Fantasy'],
-    format: ['3D', 'IMAX'],
+    format: ['3D', 'Dolby Atmos'],
     certification: 'UA',
     status: 'coming_soon',
     cast: [
@@ -202,7 +202,7 @@ export const movies: Movie[] = [
     totalRatings: 0,
     language: 'English',
     genres: ['Action', 'Crime', 'Drama'],
-    format: ['2D', 'IMAX'],
+    format: ['2D', 'Dolby Atmos'],
     certification: 'UA',
     status: 'coming_soon',
     cast: [
@@ -210,6 +210,30 @@ export const movies: Movie[] = [
     ],
     crew: [
       { id: '11', name: 'Matt Reeves', role: 'Director', image: 'https://picsum.photos/seed/matt/200/200' },
+    ],
+  },
+  {
+    id: '7',  // or next available ID
+    title: 'Dasara',
+    poster: 'https://picsum.photos/seed/dasara/400/600',
+    backdrop: 'https://picsum.photos/seed/dasarabg/1920/1080',
+    trailerUrl: 'https://www.youtube.com/embed/your-trailer-id',
+    synopsis: 'A powerful story set in a village near Singareni coal mines.',
+    duration: 165,
+    releaseDate: '2024-03-30',
+    rating: 7.8,
+    userRating: 4.0,
+    totalRatings: 85000,
+    language: 'Tamil',
+    genres: ['Action', 'Drama'],
+    format: ['2D', 'Dolby Atmos'],
+    certification: 'UA',
+    status: 'now_showing',  // Must be 'now_showing' to appear in Show Timings
+    cast: [
+      { id: '20', name: 'Nani', role: 'Dharani', image: 'https://picsum.photos/seed/nani/200/200' },
+    ],
+    crew: [
+      { id: '12', name: 'Srikanth Odela', role: 'Director', image: 'https://picsum.photos/seed/srikanth/200/200' },
     ],
   },
 ];
@@ -300,36 +324,153 @@ export const theaters: Theater[] = [
   },
 ];
 
-export const generateShowtimes = (movieId: string, date: string): Showtime[] => {
-  const times = ['09:30', '12:45', '16:00', '19:15', '22:30'];
-  const formats: ('2D' | '3D' | 'IMAX')[] = ['2D', '3D', 'IMAX'];
+// Show timings data - defines which movies run on which screens with specific times
+// Using movie titles as keys for consistency between local and Supabase data
+export interface ShowTimingData {
+  movieTitle: string;
+  shows: {
+    screenId: number;
+    times: string[];
+    price: { standard: number; premium: number };
+  }[];
+}
+
+export const showTimingsData: ShowTimingData[] = [
+  {
+    movieTitle: 'Dasara',
+    shows: [
+      { screenId: 2, times: ['09:00 AM', '01:00 PM', '05:00 PM', '09:00 PM'], price: { standard: 190, premium: 190 } },
+      { screenId: 3, times: ['10:30 AM', '02:30 PM', '06:30 PM', '10:30 PM'], price: { standard: 190, premium: 190 } },
+      { screenId: 4, times: ['12:00 PM', '04:00 PM', '08:00 PM'], price: { standard: 190, premium: 190 } },
+    ],
+  },
+  {
+    movieTitle: 'Pushpa 2: The Rule',
+    shows: [
+      { screenId: 1, times: ['09:00 AM', '01:00 PM', '05:00 PM', '09:00 PM'], price: { standard: 190, premium: 190 } },
+      { screenId: 3, times: ['10:30 AM', '02:30 PM', '06:30 PM', '10:30 PM'], price: { standard: 190, premium: 190 } },
+      { screenId: 4, times: ['12:00 PM', '04:00 PM', '08:00 PM'], price: { standard: 190, premium: 190 } },
+    ],
+  },
+  {
+    movieTitle: 'Dune: Part Two',
+    shows: [
+      { screenId: 1, times: ['10:00 AM', '02:00 PM', '06:00 PM', '10:00 PM'], price: { standard: 190, premium: 190 } },
+      { screenId: 2, times: ['11:30 AM', '03:30 PM', '07:30 PM'], price: { standard: 190, premium: 190 } },
+    ],
+  },
+  {
+    movieTitle: 'Kalki 2898 AD',
+    shows: [
+      { screenId: 2, times: ['10:00 AM', '02:00 PM', '06:00 PM', '10:00 PM'], price: { standard: 190, premium: 190 } },
+      { screenId: 3, times: ['09:00 AM', '01:00 PM', '05:00 PM', '09:00 PM'], price: { standard: 190, premium: 190 } },
+    ],
+  },
+  {
+    movieTitle: 'Deadpool & Wolverine',
+    shows: [
+      { screenId: 3, times: ['11:00 AM', '03:00 PM', '07:00 PM', '11:00 PM'], price: { standard: 190, premium: 190 } },
+      { screenId: 4, times: ['09:30 AM', '01:30 PM', '05:30 PM', '09:30 PM'], price: { standard: 190, premium: 190 } },
+    ],
+  },
+  {
+    movieTitle: 'Stree 2',
+    shows: [
+      { screenId: 2, times: ['09:00 AM', '01:00 PM', '05:00 PM', '09:00 PM'], price: { standard: 190, premium: 190 } },
+      { screenId: 4, times: ['10:00 AM', '02:00 PM', '06:00 PM', '10:00 PM'], price: { standard: 190, premium: 190 } },
+    ],
+  },
+  {
+    movieTitle: 'Singham Again',
+    shows: [
+      { screenId: 4, times: ['11:30 AM', '03:30 PM', '07:30 PM'], price: { standard: 190, premium: 190 } },
+    ],
+  },
+];
+
+// Generate showtimes - accepts movieId, date, and optionally movie title and language
+export const generateShowtimes = (movieId: string, date: string, movieTitle?: string, movieLanguage?: string): Showtime[] => {
   const showtimes: Showtime[] = [];
 
-  theaters.forEach((theater) => {
-    times.forEach((time, index) => {
-      const format = formats[index % formats.length];
-      showtimes.push({
-        id: `${movieId}-${theater.id}-${date}-${time}`,
-        movieId,
-        theaterId: theater.id,
-        time,
-        date,
-        format,
-        language: 'Hindi',
-        price: {
-          standard: format === 'IMAX' ? 450 : format === '3D' ? 350 : 250,
-          premium: format === 'IMAX' ? 550 : format === '3D' ? 450 : 350,
-          recliner: format === 'IMAX' ? 750 : format === '3D' ? 650 : 550,
-          vip: format === 'IMAX' ? 1200 : format === '3D' ? 1000 : 850,
-        },
-        availableSeats: Math.floor(Math.random() * 100) + 50,
-        totalSeats: 200,
-      });
+  // Try to find show timing data by movie title first (works for Supabase UUIDs)
+  // Fall back to finding by local movie ID
+  let movieShowData: ShowTimingData | undefined;
+  let language = movieLanguage || 'Tamil';
+
+  if (movieTitle) {
+    // Match by title (case-insensitive for flexibility)
+    movieShowData = showTimingsData.find(s =>
+      s.movieTitle.toLowerCase() === movieTitle.toLowerCase()
+    );
+  }
+
+  if (!movieShowData) {
+    // Fallback: try to find local movie by ID and then match by title
+    const localMovie = movies.find(m => m.id === movieId);
+    if (localMovie) {
+      movieShowData = showTimingsData.find(s =>
+        s.movieTitle.toLowerCase() === localMovie.title.toLowerCase()
+      );
+      language = localMovie.language;
+    }
+  }
+
+  if (!movieShowData) {
+    // No show timing data found for this movie
+    return showtimes;
+  }
+
+  // Generate showtimes for each location (Anthiyur and Komarapalayam)
+  const locations = ['anthiyur', 'komarapalayam'];
+
+  locations.forEach(location => {
+    movieShowData!.shows.forEach(show => {
+      const theaterId = `${location}-screen-${show.screenId}`;
+      const theater = theaters.find(t => t.id === theaterId);
+
+      if (theater) {
+        show.times.forEach(time => {
+          // Convert 12-hour format to 24-hour for sorting
+          const time24 = convertTo24Hour(time);
+
+          showtimes.push({
+            id: `${movieId}-${theaterId}-${date}-${time24}`,
+            movieId,
+            theaterId,
+            time: time,
+            date,
+            format: 'Dolby Atmos',
+            language,
+            price: {
+              standard: show.price.standard,
+              premium: show.price.premium,
+              recliner: Math.round(show.price.premium * 1.3),
+              vip: Math.round(show.price.premium * 1.8),
+            },
+            availableSeats: Math.floor(Math.random() * 100) + 50,
+            totalSeats: 200,
+          });
+        });
+      }
     });
   });
 
   return showtimes;
 };
+
+// Helper function to convert 12-hour time to 24-hour format
+function convertTo24Hour(time12: string): string {
+  const [time, modifier] = time12.split(' ');
+  let [hours, minutes] = time.split(':');
+
+  if (hours === '12') {
+    hours = modifier === 'AM' ? '00' : '12';
+  } else if (modifier === 'PM') {
+    hours = String(parseInt(hours, 10) + 12);
+  }
+
+  return `${hours.padStart(2, '0')}:${minutes}`;
+}
 
 export const generateSeatLayout = (showtimeId: string, prices: { standard: number; premium: number; recliner: number; vip: number }): SeatLayout => {
   const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M'];
@@ -558,7 +699,7 @@ export const reviews: Review[] = [
     userName: 'Amit Kumar',
     movieId: '2',
     rating: 5,
-    comment: 'Denis Villeneuve has created a masterpiece. The visuals in IMAX are breathtaking!',
+    comment: 'Denis Villeneuve has created a masterpiece. The visuals in Dolby Atmos are breathtaking!',
     createdAt: '2024-03-05',
     likes: 2100,
   },
@@ -584,7 +725,7 @@ export const filterMovies = (
   return movies.filter(movie => {
     if (language && movie.language !== language) return false;
     if (genre && !movie.genres.includes(genre)) return false;
-    if (format && !movie.format.includes(format as '2D' | '3D' | 'IMAX')) return false;
+    if (format && !movie.format.includes(format as '2D' | '3D' | 'Dolby Atmos')) return false;
     return true;
   });
 };

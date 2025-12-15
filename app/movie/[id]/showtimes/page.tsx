@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, useMemo, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { theaters, generateShowtimes } from '@/lib/data';
 import { useMovie } from '@/lib/hooks/useMovies';
@@ -12,45 +12,53 @@ interface ShowtimesPageProps {
   params: Promise<{ id: string }>;
 }
 
+// Generate initial date (today) - stable function
+function getInitialDate(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
 export default function ShowtimesPage({ params }: ShowtimesPageProps) {
   const { id } = use(params);
   const router = useRouter();
   const { movie, isLoading: movieLoading } = useMovie(id);
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [showtimes, setShowtimes] = useState<Showtime[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>(getInitialDate);
   const [selectedFormat, setSelectedFormat] = useState<string>('All');
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const { selectedCity, setSelectedMovie, setSelectedTheater, setSelectedShowtime, setSelectedDate: setBookingDate } = useBookingStore();
 
-  // Filter screens based on selected city (location)
-  const locationScreens = theaters.filter(
-    (theater) => theater.city === selectedCity?.name || theater.location === selectedCity?.name
-  );
-
-  // Generate dates for next 7 days
-  const dates = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() + i);
-    return {
-      date: date.toISOString().split('T')[0],
-      day: date.toLocaleDateString('en-US', { weekday: 'short' }),
-      dayNum: date.getDate(),
-      month: date.toLocaleDateString('en-US', { month: 'short' }),
-    };
-  });
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Wait for hydration to complete (for persisted store values)
   useEffect(() => {
-    if (dates.length > 0 && !selectedDate) {
-      setSelectedDate(dates[0].date);
-    }
+    setIsHydrated(true);
   }, []);
 
-  useEffect(() => {
-    if (selectedDate && movie) {
-      const generated = generateShowtimes(movie.id, selectedDate);
-      setShowtimes(generated);
-    }
+  // Generate dates for next 7 days
+  const dates = useMemo(() => {
+    return Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      return {
+        date: date.toISOString().split('T')[0],
+        day: date.toLocaleDateString('en-US', { weekday: 'short' }),
+        dayNum: date.getDate(),
+        month: date.toLocaleDateString('en-US', { month: 'short' }),
+      };
+    });
+  }, []);
+
+  // Filter screens based on selected city (location)
+  const locationScreens = useMemo(() => {
+    if (!isHydrated || !selectedCity) return [];
+    return theaters.filter(
+      (theater) => theater.city === selectedCity.name || theater.location === selectedCity.name
+    );
+  }, [isHydrated, selectedCity]);
+
+  // Generate showtimes using useMemo for efficiency
+  // Pass movie title and language to support both local IDs and Supabase UUIDs
+  const showtimes = useMemo(() => {
+    if (!selectedDate || !movie) return [];
+    return generateShowtimes(movie.id, selectedDate, movie.title, movie.language);
   }, [selectedDate, movie]);
 
   if (movieLoading) {
@@ -159,7 +167,7 @@ export default function ShowtimesPage({ params }: ShowtimesPageProps) {
       {/* Format Filter */}
       <div className="format-section">
         <div className="format-buttons">
-          {['All', ...movie.format].map((fmt) => (
+          {['All', '2D', 'Dolby Atmos'].map((fmt) => (
             <button
               key={fmt}
               onClick={() => setSelectedFormat(fmt)}
@@ -219,7 +227,13 @@ export default function ShowtimesPage({ params }: ShowtimesPageProps) {
             </div>
           ))}
 
-          {!selectedCity && (
+          {!isHydrated && (
+            <div className="empty-state">
+              <p className="empty-title">Loading...</p>
+            </div>
+          )}
+
+          {isHydrated && !selectedCity && (
             <div className="empty-state">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -230,7 +244,7 @@ export default function ShowtimesPage({ params }: ShowtimesPageProps) {
             </div>
           )}
 
-          {selectedCity && groupedShowtimes.length === 0 && (
+          {isHydrated && selectedCity && groupedShowtimes.length === 0 && (
             <div className="empty-state">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

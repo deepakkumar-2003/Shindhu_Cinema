@@ -12,7 +12,7 @@ export interface TransformedShowtime {
   theaterId: string;
   time: string;
   date: string;
-  format: '2D' | '3D' | 'IMAX';
+  format: '2D' | '3D' | 'Dolby Atmos';
   language: string;
   price: {
     standard: number;
@@ -31,7 +31,7 @@ function transformShowtime(showtime: SupabaseShowtime): TransformedShowtime {
     theaterId: showtime.theater_id,
     time: showtime.show_time,
     date: showtime.show_date,
-    format: showtime.format as '2D' | '3D' | 'IMAX',
+    format: showtime.format as '2D' | '3D' | 'Dolby Atmos',
     language: showtime.language,
     price: {
       standard: showtime.price_standard,
@@ -131,7 +131,7 @@ export function generateShowtimes(
   theaters: { id: string }[]
 ): TransformedShowtime[] {
   const times = ['09:30', '12:45', '16:00', '19:15', '22:30'];
-  const formats: ('2D' | '3D' | 'IMAX')[] = ['2D', '3D', 'IMAX'];
+  const formats: ('2D' | '3D' | 'Dolby Atmos')[] = ['2D', '3D', 'Dolby Atmos'];
   const showtimes: TransformedShowtime[] = [];
 
   theaters.forEach((theater) => {
@@ -144,12 +144,12 @@ export function generateShowtimes(
         time,
         date,
         format,
-        language: 'Hindi',
+        language: 'Tamil',
         price: {
-          standard: format === 'IMAX' ? 450 : format === '3D' ? 350 : 250,
-          premium: format === 'IMAX' ? 550 : format === '3D' ? 450 : 350,
-          recliner: format === 'IMAX' ? 750 : format === '3D' ? 650 : 550,
-          vip: format === 'IMAX' ? 1200 : format === '3D' ? 1000 : 850,
+          standard: 190,
+          premium: 190,
+          recliner: 190,
+          vip: 190,
         },
         availableSeats: Math.floor(Math.random() * 100) + 50,
         totalSeats: 200,

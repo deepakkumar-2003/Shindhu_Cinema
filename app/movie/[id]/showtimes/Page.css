@@ -4,17 +4,29 @@
   min-height: 100vh;
   background-color: var(--background);
   padding-bottom: 60px; /* Space for fixed legend bar */
-  padding-top: 0rem;
+  padding-top: 0;
 }
 
 /* Header Styles */
 .showtimes-header {
   background-color: var(--card);
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: calc(4rem + 3rem); /* Stick below main header (4rem) + nav bar (3rem) */
-  z-index: 49; /* Just below main header (z-index: 50) */
+  position: relative; /* Changed from sticky to relative on mobile */
+  z-index: 40;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+  .showtimes-header {
+    position: sticky;
+    top: calc(4rem + 3rem); /* Stick below main header (4rem) + nav bar (3rem) */
+    z-index: 49; /* Just below main header (z-index: 50) */
+  }
+}
+@media (max-width: 768px) {
+  .showtimes-container {
+    padding-top: 4rem;
+  }
 }
 
 .header-content {
@@ -154,14 +166,14 @@
 .date-section {
   background-color: var(--card);
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: calc(4rem + 3rem + 60px); /* Below main header + showtimes header (~60px) */
+  position: relative; /* Non-sticky on mobile to prevent overlap issues */
   z-index: 38;
 }
 
 @media (min-width: 768px) {
   .date-section {
-    top: calc(4rem + 3rem + 70px); /* Larger showtimes header on desktop */
+    position: sticky;
+    top: calc(4rem + 3rem + 70px); /* Below main header (4rem) + nav (3rem) + showtimes header (~70px) */
   }
 }
 

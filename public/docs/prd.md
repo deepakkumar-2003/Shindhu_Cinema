@@ -147,7 +147,7 @@ Theater
 
 Rating
 
-Format (2D, 3D, IMAX)
+Format (2D, 3D, Dolby Atmos)
 
 Details Page Must Include:
 

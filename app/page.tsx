@@ -6,9 +6,9 @@ import MovieCard from '@/components/movies/MovieCard';
 import { useMoviesByStatus } from '@/lib/hooks/useMovies';
 import './Page.css';
 
-const languages = ['All', 'Hindi', 'English', 'Telugu', 'Tamil', 'Malayalam'];
+const languages = ['All', 'Tamil', 'English'];
 const genres = ['All', 'Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Romance', 'Thriller'];
-const formats = ['All', '2D', '3D', 'IMAX'];
+const formats = ['All', '2D', '3D', 'Dolby Atmos'];
 
 const AUTO_SLIDE_INTERVAL = 5000; // 5 seconds
 
@@ -35,7 +35,7 @@ export default function Home() {
     return nowShowingMovies.filter((movie) => {
       if (selectedLanguage !== 'All' && movie.language !== selectedLanguage) return false;
       if (selectedGenre !== 'All' && !movie.genres.includes(selectedGenre)) return false;
-      if (selectedFormat !== 'All' && !movie.format.includes(selectedFormat as '2D' | '3D' | 'IMAX')) return false;
+      if (selectedFormat !== 'All' && !movie.format.includes(selectedFormat as '2D' | '3D' | 'Dolby Atmos')) return false;
       return true;
     });
   }, [nowShowingMovies, selectedLanguage, selectedGenre, selectedFormat]);

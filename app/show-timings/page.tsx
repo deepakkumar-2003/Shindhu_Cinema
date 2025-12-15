@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBookingStore } from '@/lib/store';
-import { movies as moviesData, theaters } from '@/lib/data';
+import { movies as moviesData, theaters, showTimingsData } from '@/lib/data';
 import { Showtime } from '@/lib/types';
 import './page.css';
 
@@ -11,115 +11,53 @@ import './page.css';
 const screens = [
   {
     id: 1,
-    name: 'Screen 1 - IMAX',
+    name: 'Screen 1 - Dolby Atmos',
     capacity: 280,
-    features: ['IMAX', 'Dolby Atmos', 'Recliner Seats'],
-    type: 'premium',
+    features: ['Dolby Atmos', '4K Laser', 'Recliner Seats'],
+    type: 'dolby',
   },
   {
     id: 2,
-    name: 'Screen 2 - Dolby',
+    name: 'Screen 2 - Dolby Atmos',
     capacity: 220,
     features: ['Dolby Atmos', '4K Projection', 'Premium Sound'],
     type: 'dolby',
   },
   {
     id: 3,
-    name: 'Screen 3 - Standard',
+    name: 'Screen 3 - Dolby Atmos',
     capacity: 180,
-    features: ['Digital Projection', 'Surround Sound'],
-    type: 'standard',
+    features: ['Dolby Atmos', 'Digital Projection', 'Surround Sound'],
+    type: 'dolby',
   },
   {
     id: 4,
-    name: 'Screen 4 - Standard',
+    name: 'Screen 4 - Dolby Atmos',
     capacity: 150,
-    features: ['Digital Projection', 'Surround Sound'],
-    type: 'standard',
+    features: ['Dolby Atmos', 'Digital Projection', 'Surround Sound'],
+    type: 'dolby',
   },
 ];
 
-// Demo movies with show timings (using IDs that match lib/data.ts)
-const showTimings = [
-  {
-    movieId: '1',
-    title: 'Pushpa 2: The Rule',
-    language: 'Telugu',
-    genre: 'Action, Drama, Thriller',
-    duration: '3h 0min',
-    rating: 'UA',
-    poster: 'https://picsum.photos/seed/pushpa2/400/600',
-    shows: [
-      { screenId: 1, times: ['09:00 AM', '01:00 PM', '05:00 PM', '09:00 PM'], price: { standard: 350, premium: 550 } },
-      { screenId: 3, times: ['10:30 AM', '02:30 PM', '06:30 PM', '10:30 PM'], price: { standard: 200, premium: 320 } },
-      { screenId: 4, times: ['12:00 PM', '04:00 PM', '08:00 PM'], price: { standard: 180, premium: 280 } },
-    ],
-  },
-  {
-    movieId: '2',
-    title: 'Dune: Part Two',
-    language: 'English',
-    genre: 'Sci-Fi, Adventure',
-    duration: '2h 46min',
-    rating: 'UA',
-    poster: 'https://picsum.photos/seed/dune2/400/600',
-    shows: [
-      { screenId: 1, times: ['10:00 AM', '02:00 PM', '06:00 PM', '10:00 PM'], price: { standard: 350, premium: 550 } },
-      { screenId: 2, times: ['11:30 AM', '03:30 PM', '07:30 PM'], price: { standard: 280, premium: 450 } },
-    ],
-  },
-  {
-    movieId: '3',
-    title: 'Kalki 2898 AD',
-    language: 'Telugu',
-    genre: 'Sci-Fi, Action',
-    duration: '2h 55min',
-    rating: 'UA',
-    poster: 'https://picsum.photos/seed/kalki/400/600',
-    shows: [
-      { screenId: 2, times: ['10:00 AM', '02:00 PM', '06:00 PM', '10:00 PM'], price: { standard: 280, premium: 450 } },
-      { screenId: 3, times: ['09:00 AM', '01:00 PM', '05:00 PM', '09:00 PM'], price: { standard: 200, premium: 320 } },
-    ],
-  },
-  {
-    movieId: '4',
-    title: 'Fighter',
-    language: 'Hindi',
-    genre: 'Action, Drama',
-    duration: '2h 46min',
-    rating: 'UA',
-    poster: 'https://picsum.photos/seed/fighter/400/600',
-    shows: [
-      { screenId: 3, times: ['11:00 AM', '03:00 PM', '07:00 PM', '11:00 PM'], price: { standard: 200, premium: 320 } },
-      { screenId: 4, times: ['09:30 AM', '01:30 PM', '05:30 PM', '09:30 PM'], price: { standard: 180, premium: 280 } },
-    ],
-  },
-  {
-    movieId: '5',
-    title: 'Stree 2',
-    language: 'Hindi',
-    genre: 'Horror, Comedy',
-    duration: '2h 30min',
-    rating: 'UA',
-    poster: 'https://picsum.photos/seed/stree2/400/600',
-    shows: [
-      { screenId: 2, times: ['09:00 AM', '01:00 PM', '05:00 PM', '09:00 PM'], price: { standard: 280, premium: 450 } },
-      { screenId: 4, times: ['10:00 AM', '02:00 PM', '06:00 PM', '10:00 PM'], price: { standard: 180, premium: 280 } },
-    ],
-  },
-  {
-    movieId: '6',
-    title: 'Deadpool & Wolverine',
-    language: 'English',
-    genre: 'Action, Comedy',
-    duration: '2h 7min',
-    rating: 'A',
-    poster: 'https://picsum.photos/seed/deadpool3/400/600',
-    shows: [
-      { screenId: 4, times: ['11:30 AM', '03:30 PM', '07:30 PM'], price: { standard: 180, premium: 280 } },
-    ],
-  },
-];
+// Build showTimings from shared data, enriching with movie details
+const showTimings = showTimingsData.map(timing => {
+  // Find movie by title (case-insensitive)
+  const movie = moviesData.find(m => m.title.toLowerCase() === timing.movieTitle.toLowerCase());
+  return {
+    movieId: movie?.id || '',
+    title: timing.movieTitle,
+    language: movie?.language || 'Tamil',
+    genre: movie?.genres.join(', ') || '',
+    duration: movie ? `${Math.floor(movie.duration / 60)}h ${movie.duration % 60}min` : '',
+    rating: movie?.certification || 'UA',
+    poster: movie?.poster || '',
+    shows: timing.shows,
+  };
+}).filter(timing => {
+  // Only include movies that exist and are now_showing
+  const movie = moviesData.find(m => m.title.toLowerCase() === timing.title.toLowerCase());
+  return movie && movie.status === 'now_showing';
+});
 
 // Generate dates for the next 7 days
 const generateDates = () => {
@@ -150,7 +88,7 @@ export default function ShowTimingsPage() {
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
 
   const dates = generateDates();
-  const languages = ['All', 'English', 'Hindi', 'Telugu'];
+  const languages = ['All', 'Tamil', 'English'];
 
   // Filter movies based on selected screen and language
   const filteredMovies = showTimings.filter((movie) => {
@@ -184,7 +122,7 @@ export default function ShowTimingsPage() {
       theaterId: theaterScreen.id,
       time,
       date: dateStr,
-      format: screenId === 1 ? 'IMAX' : '2D',
+      format: 'Dolby Atmos',
       language: movie.language,
       price: {
         standard: price.standard,
@@ -378,7 +316,7 @@ export default function ShowTimingsPage() {
         <div className="legend-items">
           <div className="legend-item">
             <span className="legend-color legend-color-premium"></span>
-            <span>IMAX Premium</span>
+            <span>Dolby Atmos Premium</span>
           </div>
           <div className="legend-item">
             <span className="legend-color legend-color-dolby"></span>

@@ -143,36 +143,38 @@
   color: var(--color-foreground, #ffffff);
 }
 
-/* Zoom Toggle */
+/* Zoom Controls */
 .seats-zoom-wrapper {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
   margin-bottom: 1rem;
-}
-
-@media (min-width: 640px) {
-  .seats-zoom-wrapper {
-    display: none;
-  }
 }
 
 .seats-zoom-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
   background-color: rgba(255, 255, 255, 0.1);
   color: white;
-  font-size: 0.875rem;
-  font-weight: 600;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 0.5rem;
+  border-radius: 50%;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
-.seats-zoom-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+.seats-zoom-btn:hover:not(:disabled) {
+  background-color: var(--color-primary, #e50914);
+  border-color: var(--color-primary, #e50914);
+}
+
+.seats-zoom-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .seats-zoom-icon {
@@ -180,21 +182,158 @@
   height: 1.25rem;
 }
 
+.seats-zoom-level {
+  min-width: 3rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-foreground, #ffffff);
+}
+
+/* Touch hint for mobile */
+.seats-touch-hint {
+  display: none;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-muted, #888888);
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 767px) {
+  .seats-touch-hint {
+    display: block;
+  }
+}
+
+/* Keyboard hint for desktop */
+.seats-keyboard-hint {
+  display: block;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-muted, #888888);
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 767px) {
+  .seats-keyboard-hint {
+    display: none;
+  }
+}
+
+/* Seat Map Wrapper - Contains fixed labels and scrollable seat area */
+.seats-map-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Fixed Row Labels */
+.seats-fixed-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 10;
+  flex-shrink: 0;
+  will-change: transform;
+}
+
+.seats-fixed-labels-spacer {
+  /* Space for screen area - matches .seats-screen-wrapper margin-bottom */
+  height: 3.5rem;
+  flex-shrink: 0;
+}
+
+.seats-fixed-label {
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary, #e50914);
+  background-color: var(--color-secondary, #1a1a1a);
+  border-radius: 0.25rem;
+  min-width: 1.5rem;
+  padding: 0 0.25rem;
+}
+
+@media (min-width: 640px) {
+  .seats-fixed-label {
+    height: 2rem;
+  }
+}
+
+.seats-fixed-labels-left {
+  padding-right: 0.25rem;
+}
+
+.seats-fixed-labels-right {
+  padding-left: 0.25rem;
+}
+
 /* Seat Map */
 .seats-map-container {
   overflow-x: auto;
+  overflow-y: hidden;
   padding-bottom: 1rem;
+  position: relative;
+  outline: none;
+  flex: 0 1 auto;
 }
 
-.seats-map-container.zoomed {
-  transform: scale(1.25);
-  transform-origin: top center;
+/* When zoomed in, disable scroll and use pan instead */
+.seats-map-container.zoomed-in {
+  overflow: hidden;
+}
+
+/* Enable touch gestures on mobile when zoomed */
+@media (max-width: 767px) {
+  .seats-map-container.zoomed-in {
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Allow horizontal scroll when not zoomed */
+  .seats-map-container:not(.zoomed-in) {
+    touch-action: pan-x;
+  }
 }
 
 .seats-map-inner {
   min-width: fit-content;
   margin-left: auto;
   margin-right: auto;
+  will-change: transform;
+}
+
+/* Disable transition during touch gestures for smoother performance */
+@media (max-width: 767px) {
+  .seats-map-inner {
+    transition: none;
+  }
+
+  .seats-fixed-labels {
+    transition: none;
+  }
+}
+
+/* Enable smooth transition on desktop for button zoom */
+@media (min-width: 768px) {
+  .seats-map-inner {
+    transition: transform 0.3s ease;
+  }
+
+  .seats-fixed-labels {
+    transition: transform 0.3s ease;
+  }
 }
 
 /* Screen */
@@ -233,13 +372,7 @@
   gap: 0.25rem;
 }
 
-.seats-row-label {
-  width: 1.5rem;
-  text-align: center;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-muted, #888888);
-}
+/* Row labels are now fixed outside the scrollable area */
 
 .seats-row-section {
   display: flex;

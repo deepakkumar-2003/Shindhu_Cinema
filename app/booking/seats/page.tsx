@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useBookingStore, useUIStore } from '@/lib/store';
 import { useAuth } from '@/lib/supabase/auth';
@@ -9,14 +9,28 @@ import { Seat, SeatLayout } from '@/lib/types';
 import AuthModal from '@/components/modals/AuthModal';
 import './page.css';
 
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 2.5;
+const ZOOM_STEP = 0.25;
+
 function SeatSelectionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [seatLayout, setSeatLayout] = useState<SeatLayout | null>(null);
   const [timeLeft, setTimeLeft] = useState(480); // 8 minutes in seconds
-  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
   const [isHydrated, setIsHydrated] = useState(false);
   const initializedRef = useRef(false);
+
+  // Touch gesture refs
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lastTouchDistance = useRef<number | null>(null);
+  const lastTouchCenter = useRef<{ x: number; y: number } | null>(null);
+  const isPinching = useRef(false);
+  const isDragging = useRef(false);
+  const lastPanPosition = useRef<{ x: number; y: number } | null>(null);
 
   const {
     selectedMovie,
@@ -136,6 +150,170 @@ function SeatSelectionContent() {
     router.push('/booking/snacks');
   };
 
+  const handleZoomIn = () => {
+    setZoomLevel((prev) => Math.min(prev + ZOOM_STEP, MAX_ZOOM));
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel((prev) => Math.max(prev - ZOOM_STEP, MIN_ZOOM));
+  };
+
+  // Reset pan when zoom returns to 1
+  useEffect(() => {
+    if (zoomLevel <= 1) {
+      setPanX(0);
+      setPanY(0);
+    }
+  }, [zoomLevel]);
+
+  // Calculate distance between two touch points
+  const getDistance = (touch1: React.Touch, touch2: React.Touch) => {
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  // Calculate center point between two touches
+  const getCenter = (touch1: React.Touch, touch2: React.Touch) => {
+    return {
+      x: (touch1.clientX + touch2.clientX) / 2,
+      y: (touch1.clientY + touch2.clientY) / 2,
+    };
+  };
+
+  // Constrain pan within bounds
+  const constrainPan = useCallback((x: number, y: number, zoom: number) => {
+    if (!containerRef.current) return { x, y };
+
+    const container = containerRef.current;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    // Calculate max pan based on zoom level
+    const maxPanX = Math.max(0, (containerWidth * (zoom - 1)) / 2);
+    const maxPanY = Math.max(0, (containerHeight * (zoom - 1)) / 2);
+
+    return {
+      x: Math.max(-maxPanX, Math.min(maxPanX, x)),
+      y: Math.max(-maxPanY, Math.min(maxPanY, y)),
+    };
+  }, []);
+
+  // Touch start handler
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      // Pinch gesture started
+      isPinching.current = true;
+      isDragging.current = false;
+      lastTouchDistance.current = getDistance(e.touches[0], e.touches[1]);
+      lastTouchCenter.current = getCenter(e.touches[0], e.touches[1]);
+    } else if (e.touches.length === 1 && zoomLevel > 1) {
+      // Single finger drag (only when zoomed in)
+      isDragging.current = true;
+      isPinching.current = false;
+      lastPanPosition.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      };
+    }
+  }, [zoomLevel]);
+
+  // Touch move handler
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2 && isPinching.current && lastTouchDistance.current !== null) {
+      // Pinch zoom
+      e.preventDefault();
+
+      const currentDistance = getDistance(e.touches[0], e.touches[1]);
+      const scale = currentDistance / lastTouchDistance.current;
+
+      setZoomLevel((prev) => {
+        const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, prev * scale));
+        return newZoom;
+      });
+
+      // Update pan to follow pinch center
+      const currentCenter = getCenter(e.touches[0], e.touches[1]);
+      if (lastTouchCenter.current) {
+        const dx = currentCenter.x - lastTouchCenter.current.x;
+        const dy = currentCenter.y - lastTouchCenter.current.y;
+
+        setPanX((prev) => {
+          const newX = prev + dx;
+          return constrainPan(newX, panY, zoomLevel).x;
+        });
+        setPanY((prev) => {
+          const newY = prev + dy;
+          return constrainPan(panX, newY, zoomLevel).y;
+        });
+      }
+
+      lastTouchDistance.current = currentDistance;
+      lastTouchCenter.current = currentCenter;
+    } else if (e.touches.length === 1 && isDragging.current && lastPanPosition.current && zoomLevel > 1) {
+      // Single finger pan (only when zoomed in)
+      e.preventDefault();
+
+      const dx = e.touches[0].clientX - lastPanPosition.current.x;
+      const dy = e.touches[0].clientY - lastPanPosition.current.y;
+
+      const constrained = constrainPan(panX + dx, panY + dy, zoomLevel);
+      setPanX(constrained.x);
+      setPanY(constrained.y);
+
+      lastPanPosition.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      };
+    }
+    // When zoomLevel === 1 and single finger, allow default scroll behavior (don't preventDefault)
+  }, [zoomLevel, panX, panY, constrainPan]);
+
+  // Touch end handler
+  const handleTouchEnd = useCallback(() => {
+    isPinching.current = false;
+    isDragging.current = false;
+    lastTouchDistance.current = null;
+    lastTouchCenter.current = null;
+    lastPanPosition.current = null;
+  }, []);
+
+  // Keyboard navigation for zoom
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === '+' || e.key === '=') {
+      e.preventDefault();
+      handleZoomIn();
+    } else if (e.key === '-' || e.key === '_') {
+      e.preventDefault();
+      handleZoomOut();
+    } else if (e.key === '0') {
+      e.preventDefault();
+      setZoomLevel(1);
+      setPanX(0);
+      setPanY(0);
+    } else if (zoomLevel > 1) {
+      // Arrow keys for panning when zoomed
+      const PAN_STEP = 50;
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const constrained = constrainPan(panX + PAN_STEP, panY, zoomLevel);
+        setPanX(constrained.x);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        const constrained = constrainPan(panX - PAN_STEP, panY, zoomLevel);
+        setPanX(constrained.x);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const constrained = constrainPan(panX, panY + PAN_STEP, zoomLevel);
+        setPanY(constrained.y);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const constrained = constrainPan(panX, panY - PAN_STEP, zoomLevel);
+        setPanY(constrained.y);
+      }
+    }
+  }, [zoomLevel, panX, panY, constrainPan, handleZoomIn, handleZoomOut]);
+
   if (!isHydrated || !selectedMovie || !selectedTheater || !selectedShowtime || !seatLayout) {
     return (
       <div className="seats-loading">
@@ -209,93 +387,149 @@ function SeatSelectionContent() {
         </div>
       </div>
 
-      {/* Zoom Toggle (Mobile) */}
+      {/* Zoom Controls */}
       <div className="seats-zoom-wrapper">
         <button
-          onClick={() => setIsZoomed(!isZoomed)}
+          onClick={handleZoomOut}
+          disabled={zoomLevel <= MIN_ZOOM}
           className="seats-zoom-btn"
+          aria-label="Zoom Out"
         >
           <svg className="seats-zoom-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {isZoomed ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-            )}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
           </svg>
-          {isZoomed ? 'Zoom Out' : 'Zoom In'}
+        </button>
+        <span className="seats-zoom-level">{Math.round(zoomLevel * 100)}%</span>
+        <button
+          onClick={handleZoomIn}
+          disabled={zoomLevel >= MAX_ZOOM}
+          className="seats-zoom-btn"
+          aria-label="Zoom In"
+        >
+          <svg className="seats-zoom-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+          </svg>
         </button>
       </div>
+      <p className="seats-touch-hint">Pinch to zoom • Drag to pan when zoomed • Scroll to view all seats</p>
+      <p className="seats-keyboard-hint">Keyboard: +/- to zoom • Arrow keys to pan • 0 to reset</p>
 
-      {/* Seat Map */}
-      <div className={`seats-map-container ${isZoomed ? 'zoomed' : ''}`}>
-        <div className="seats-map-inner">
-          {/* Screen */}
-          <div className="seats-screen-wrapper">
-            <div className="seats-screen"></div>
-            <p className="seats-screen-text">Screen this way</p>
-          </div>
+      {/* Seat Map Wrapper */}
+      <div className="seats-map-wrapper">
+        {/* Fixed Left Row Labels */}
+        <div
+          className="seats-fixed-labels seats-fixed-labels-left"
+          style={{
+            transform: `translateY(${panY}px) scaleY(${zoomLevel})`,
+            transformOrigin: 'top center',
+          }}
+        >
+          <div className="seats-fixed-labels-spacer"></div>
+          {seatLayout.rows.map((row) => (
+            <div key={`left-${row.label}`} className="seats-fixed-label">
+              {row.label}
+            </div>
+          ))}
+        </div>
 
-          {/* Seats */}
-          <div className="seats-rows">
-            {seatLayout.rows.map((row) => (
-              <div key={row.label} className="seats-row">
-                <span className="seats-row-label">
-                  {row.label}
-                </span>
-                <div className="seats-row-section">
-                  {row.seats.slice(0, 8).map((seat) => (
-                    <button
-                      key={seat.id}
-                      onClick={() => handleSeatClick(seat)}
-                      disabled={seat.status === 'booked' || seat.status === 'locked'}
-                      className={`seats-seat ${getSeatClass(seat)}`}
-                      title={`${seat.id} - ₹${seat.price}`}
-                    >
-                      {seat.number}
-                    </button>
-                  ))}
+        {/* Seat Map */}
+        <div
+          ref={containerRef}
+          className={`seats-map-container ${zoomLevel > 1 ? 'zoomed-in' : ''}`}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchEnd}
+          onKeyDown={handleKeyDown}
+          tabIndex={0}
+          role="application"
+          aria-label="Seat map. Use + and - keys to zoom, arrow keys to pan when zoomed, 0 to reset."
+        >
+          <div
+            className="seats-map-inner"
+            style={{
+              transform: `translate(${panX}px, ${panY}px) scale(${zoomLevel})`,
+              transformOrigin: 'top center',
+            }}
+          >
+            {/* Screen */}
+            <div className="seats-screen-wrapper">
+              <div className="seats-screen"></div>
+              <p className="seats-screen-text">Screen this way</p>
+            </div>
+
+            {/* Seats */}
+            <div className="seats-rows">
+              {seatLayout.rows.map((row) => (
+                <div key={row.label} className="seats-row">
+                  <div className="seats-row-section">
+                    {row.seats.slice(0, 8).map((seat) => (
+                      <button
+                        key={seat.id}
+                        onClick={() => handleSeatClick(seat)}
+                        disabled={seat.status === 'booked' || seat.status === 'locked'}
+                        className={`seats-seat ${getSeatClass(seat)}`}
+                        title={`${seat.id} - ₹${seat.price}`}
+                      >
+                        {seat.number}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Aisle */}
+                  <div className="seats-aisle"></div>
+                  <div className="seats-row-section">
+                    {row.seats.slice(8).map((seat) => (
+                      <button
+                        key={seat.id}
+                        onClick={() => handleSeatClick(seat)}
+                        disabled={seat.status === 'booked' || seat.status === 'locked'}
+                        className={`seats-seat ${getSeatClass(seat)}`}
+                        title={`${seat.id} - ₹${seat.price}`}
+                      >
+                        {seat.number}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                {/* Aisle */}
-                <div className="seats-aisle"></div>
-                <div className="seats-row-section">
-                  {row.seats.slice(8).map((seat) => (
-                    <button
-                      key={seat.id}
-                      onClick={() => handleSeatClick(seat)}
-                      disabled={seat.status === 'booked' || seat.status === 'locked'}
-                      className={`seats-seat ${getSeatClass(seat)}`}
-                      title={`${seat.id} - ₹${seat.price}`}
-                    >
-                      {seat.number}
-                    </button>
-                  ))}
-                </div>
-                <span className="seats-row-label">
-                  {row.label}
-                </span>
+              ))}
+            </div>
+
+            {/* Section Labels */}
+            <div className="seats-section-labels">
+              <div className="seats-section-item">
+                <p className="seats-section-name">STANDARD</p>
+                <p className="seats-section-price">₹{selectedShowtime.price.standard}</p>
               </div>
-            ))}
+              <div className="seats-section-item">
+                <p className="seats-section-name">PREMIUM</p>
+                <p className="seats-section-price">₹{selectedShowtime.price.premium}</p>
+              </div>
+              <div className="seats-section-item">
+                <p className="seats-section-name">RECLINER</p>
+                <p className="seats-section-price">₹{selectedShowtime.price.recliner}</p>
+              </div>
+              <div className="seats-section-item">
+                <p className="seats-section-name">VIP</p>
+                <p className="seats-section-price">₹{selectedShowtime.price.vip}</p>
+              </div>
+            </div>
           </div>
+        </div>
 
-          {/* Section Labels */}
-          <div className="seats-section-labels">
-            <div className="seats-section-item">
-              <p className="seats-section-name">STANDARD</p>
-              <p className="seats-section-price">₹{selectedShowtime.price.standard}</p>
+        {/* Fixed Right Row Labels */}
+        <div
+          className="seats-fixed-labels seats-fixed-labels-right"
+          style={{
+            transform: `translateY(${panY}px) scaleY(${zoomLevel})`,
+            transformOrigin: 'top center',
+          }}
+        >
+          <div className="seats-fixed-labels-spacer"></div>
+          {seatLayout.rows.map((row) => (
+            <div key={`right-${row.label}`} className="seats-fixed-label">
+              {row.label}
             </div>
-            <div className="seats-section-item">
-              <p className="seats-section-name">PREMIUM</p>
-              <p className="seats-section-price">₹{selectedShowtime.price.premium}</p>
-            </div>
-            <div className="seats-section-item">
-              <p className="seats-section-name">RECLINER</p>
-              <p className="seats-section-price">₹{selectedShowtime.price.recliner}</p>
-            </div>
-            <div className="seats-section-item">
-              <p className="seats-section-name">VIP</p>
-              <p className="seats-section-price">₹{selectedShowtime.price.vip}</p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 

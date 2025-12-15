@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getSupabaseClient, isSupabaseConfigured } from '@/lib/supabase/client';
+import { getSupabaseClient, getIsSupabaseConfigured } from '@/lib/supabase/client';
 import { movies as localMovies, getMovieById as getLocalMovieById } from '@/lib/data';
 import type { Movie } from '@/lib/types';
 import type { Tables } from '@/lib/supabase/database.types';
@@ -32,29 +32,31 @@ function filterLocalMovies(filters?: MovieFilters): Movie[] {
     filtered = filtered.filter(m => m.genres.includes(filters.genre!));
   }
   if (filters?.format) {
-    filtered = filtered.filter(m => m.format.includes(filters.format as '2D' | '3D' | 'IMAX'));
+    filtered = filtered.filter(m => m.format.includes(filters.format as '2D' | '3D' | 'Dolby Atmos'));
   }
 
   return filtered;
 }
 
 export function useMovies(filters?: MovieFilters) {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Initialize with local data immediately to prevent loading state
+  const [movies, setMovies] = useState<Movie[]>(() => filterLocalMovies(filters));
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchMovies() {
-      setIsLoading(true);
-      setError(null);
+      // Check Supabase configuration at runtime
+      const isConfigured = getIsSupabaseConfigured();
 
-      // If Supabase is not configured, use local mock data
-      if (!isSupabaseConfigured) {
-        const filtered = filterLocalMovies(filters);
-        setMovies(filtered);
-        setIsLoading(false);
+      // If Supabase is not configured, use local mock data (already set)
+      if (!isConfigured) {
+        setMovies(filterLocalMovies(filters));
         return;
       }
+
+      setIsLoading(true);
+      setError(null);
 
       try {
         const supabase = getSupabaseClient();
@@ -137,7 +139,7 @@ export function useMovies(filters?: MovieFilters) {
           totalRatings: movie.total_ratings,
           language: movie.language,
           genres: movie.genres,
-          format: movie.formats as ('2D' | '3D' | 'IMAX')[],
+          format: movie.formats as ('2D' | '3D' | 'Dolby Atmos')[],
           certification: movie.certification,
           status: movie.status,
           cast: (castByMovie.get(movie.id) || []).map((c) => ({
@@ -175,27 +177,29 @@ export function useMoviesByStatus(status: 'now_showing' | 'coming_soon') {
 }
 
 export function useMovie(id: string) {
-  const [movie, setMovie] = useState<Movie | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // Initialize with local data immediately to prevent loading state
+  const [movie, setMovie] = useState<Movie | null>(() => id ? getLocalMovieById(id) || null : null);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchMovie() {
       if (!id) {
-        setIsLoading(false);
+        setMovie(null);
+        return;
+      }
+
+      // Check Supabase configuration at runtime
+      const isConfigured = getIsSupabaseConfigured();
+
+      // If Supabase is not configured, use local mock data (already set)
+      if (!isConfigured) {
+        setMovie(getLocalMovieById(id) || null);
         return;
       }
 
       setIsLoading(true);
       setError(null);
-
-      // If Supabase is not configured, use local mock data
-      if (!isSupabaseConfigured) {
-        const localMovie = getLocalMovieById(id);
-        setMovie(localMovie || null);
-        setIsLoading(false);
-        return;
-      }
 
       try {
         const supabase = getSupabaseClient();
@@ -244,7 +248,7 @@ export function useMovie(id: string) {
           totalRatings: movie.total_ratings,
           language: movie.language,
           genres: movie.genres,
-          format: movie.formats as ('2D' | '3D' | 'IMAX')[],
+          format: movie.formats as ('2D' | '3D' | 'Dolby Atmos')[],
           certification: movie.certification,
           status: movie.status,
           cast: castData.map((c) => ({
