@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useBookingStore, useUIStore } from '@/lib/store';
 import { useAuth } from '@/lib/supabase/auth';
 import { useMovies } from '@/lib/hooks/useMovies';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import CityModal from '../modals/CityModal';
 import AuthModal from '../modals/AuthModal';
 import SignOutModal from '../modals/SignOutModal';
@@ -65,6 +66,7 @@ export default function Header() {
   const { selectedCity } = useBookingStore();
   const { profile, isAuthenticated, signOut, isLoading: authLoading } = useAuth();
   const { setIsCityModalOpen, setIsAuthModalOpen, isCityModalOpen, isAuthModalOpen } = useUIStore();
+  const { theme, toggleTheme } = useTheme();
 
   // Helper function to check if a nav link is active
   const isActiveLink = (href: string) => {
@@ -723,6 +725,29 @@ export default function Header() {
                 <span className="quick-action-label">Food Menu</span>
               </Link>
             </div>
+          </div>
+
+          {/* Theme Toggle */}
+          <div className="offcanvas-section">
+            <div className="offcanvas-section-title">Theme</div>
+            <button className="theme-toggle-container" onClick={toggleTheme}>
+              <div className="theme-toggle-info">
+                <svg className="theme-toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {theme === 'dark' ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  )}
+                </svg>
+                <div className="theme-toggle-text">
+                  <span className="theme-toggle-label">{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
+                  <span className="theme-toggle-description">Tap to switch to {theme === 'dark' ? 'light' : 'dark'} mode</span>
+                </div>
+              </div>
+              <div className={`theme-toggle-switch ${theme === 'light' ? 'light' : ''}`}>
+                <div className="theme-toggle-slider"></div>
+              </div>
+            </button>
           </div>
 
           {/* More Options */}

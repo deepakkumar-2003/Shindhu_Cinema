@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
-:root {
+/* Dark Theme (Default) */
+:root,
+[data-theme="dark"] {
   --background: #0f0f0f;
   --foreground: #ededed;
   --primary: #e50914;
@@ -14,6 +16,29 @@
   --success: #22c55e;
   --warning: #eab308;
   --error: #ef4444;
+  --text-primary: #ededed;
+  --text-secondary: #a1a1a1;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #0a1931;
+  --primary: #e50914;
+  --primary-hover: #f40612;
+  --secondary: #f5f9ff;
+  --accent: #ffd700;
+  --muted: #5a6e8a;
+  --border: #b3cfe5;
+  --card: #f5f9ff;
+  --card-hover: #e8f1fa;
+  --success: #22c55e;
+  --warning: #eab308;
+  --error: #ef4444;
+  --text-primary: #0a1931;
+  --text-secondary: #3a5a7c;
+  --shadow-color: rgba(10, 25, 49, 0.1);
 }
 
 @theme inline {
@@ -157,6 +182,11 @@ body {
   background: rgba(26, 26, 26, 0.8);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .glass {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(179, 207, 229, 0.5);
 }
 
 /* Button styles */

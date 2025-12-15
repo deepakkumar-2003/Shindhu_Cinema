@@ -1118,3 +1118,105 @@
     transform: rotate(360deg);
   }
 }
+
+/* Theme Toggle Styles */
+.theme-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--color-secondary, #1a1a1a);
+  border: 1px solid var(--color-border, #2a2a2a);
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.theme-toggle-container:hover {
+  border-color: var(--color-primary, #e50914);
+  background-color: rgba(229, 9, 20, 0.05);
+}
+
+.theme-toggle-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-toggle-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-primary, #e50914);
+  flex-shrink: 0;
+}
+
+.theme-toggle-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.theme-toggle-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-foreground, #ffffff);
+}
+
+.theme-toggle-description {
+  font-size: 0.75rem;
+  color: var(--color-muted, #888888);
+  margin-top: 0.125rem;
+}
+
+.theme-toggle-switch {
+  position: relative;
+  width: 2.75rem;
+  height: 1.5rem;
+  background-color: var(--color-border, #2a2a2a);
+  border-radius: 9999px;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.theme-toggle-switch.light {
+  background-color: var(--color-primary, #e50914);
+}
+
+.theme-toggle-slider {
+  position: absolute;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle-switch.light .theme-toggle-slider {
+  transform: translateX(1.25rem);
+}
+
+/* Light Theme Header Overrides */
+[data-theme="light"] .header {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid var(--color-border, #b3cfe5);
+}
+
+[data-theme="light"] .logo-text {
+  color: var(--color-foreground, #0a1931);
+}
+
+[data-theme="light"] .search-overlay {
+  background-color: rgba(10, 25, 49, 0.5);
+}
+
+[data-theme="light"] .nav {
+  border-top: 1px solid var(--color-border, #b3cfe5);
+}
+
+[data-theme="light"] .offcanvas-overlay {
+  background-color: rgba(10, 25, 49, 0.4);
+}
