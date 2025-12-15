@@ -128,22 +128,54 @@
 
 /* Cart Dropdown */
 .bsnacks-cart-dropdown {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  right: 0;
-  width: 20rem;
+  position: fixed;
+  top: auto;
+  bottom: 5rem;
+  left: 1rem;
+  right: 1rem;
+  width: auto;
+  max-width: calc(100vw - 2rem);
+  max-height: 70vh;
+  overflow-y: auto;
   background-color: var(--color-card, #141414);
   border: 1px solid var(--color-border, #2a2a2a);
   border-radius: 0.75rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
   z-index: 50;
-  animation: dropdownSlide 0.2s ease-out;
+  animation: dropdownSlideUp 0.2s ease-out;
+}
+
+@media (min-width: 768px) {
+  .bsnacks-cart-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    bottom: auto;
+    left: auto;
+    right: 0;
+    width: 20rem;
+    max-width: 20rem;
+    max-height: none;
+    overflow-y: visible;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    animation: dropdownSlide 0.2s ease-out;
+  }
 }
 
 @keyframes dropdownSlide {
   from {
     opacity: 0;
     transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dropdownSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
