@@ -11,7 +11,7 @@ export const movies: Movie[] = [
     id: '1',
     title: 'Pushpa 2: The Rule',
     poster: 'https://image.tmdb.org/t/p/w500/oJhljnWJJx7oZ1F5zrJ0STvIRV9.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/tElnmtQ6yz1PjN1kePNl8yMSb59.jpg',
+    backdrop: '/images/movies/pushpa-2-bg.jpg',
     trailerUrl: 'https://www.youtube.com/embed/Q1NKMPhP8PY',
     synopsis: 'Pushpa Raj returns with even more power and intensity as he continues his rise in the world of red sandalwood smuggling. Facing new enemies and bigger challenges, Pushpa must prove that he truly rules.',
     duration: 180,
