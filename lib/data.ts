@@ -191,8 +191,8 @@ export const movies: Movie[] = [
   {
     id: '8',
     title: 'The Batman 2',
-    poster: 'https://image.tmdb.org/t/p/w500/b0PlSFdDwbyK0cf5RxwDpaOJQvQ.jpg',
-    backdrop: 'https://image.tmdb.org/t/p/original/lH1wPNPKjOTWRaQcjHNiOt6jQRe.jpg',
+    poster: '/images/movies/batman-2-ps.jpg',
+    backdrop: '/images/movies/batman-2-bg.jpg',
     trailerUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     synopsis: 'The Dark Knight returns to face new threats in Gotham City. As new villains emerge, Batman must confront his past while protecting the city he loves.',
     duration: 175,
