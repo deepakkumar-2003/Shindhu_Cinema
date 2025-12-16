@@ -131,6 +131,16 @@ export default function CheckoutPage() {
         bookingDate: new Date().toISOString(),
       };
 
+      // Save booked seats to localStorage for this showtime
+      const showtimeKey = `booked_seats_${selectedShowtime.id}`;
+      const existingBookedSeatsStr = localStorage.getItem(showtimeKey);
+      const existingBookedSeats: string[] = existingBookedSeatsStr ? JSON.parse(existingBookedSeatsStr) : [];
+
+      // Add newly booked seat IDs
+      const newSeatIds = selectedSeats.map(seat => seat.id);
+      const updatedBookedSeats = [...new Set([...existingBookedSeats, ...newSeatIds])]; // Remove duplicates
+      localStorage.setItem(showtimeKey, JSON.stringify(updatedBookedSeats));
+
       // Save as last booking
       localStorage.setItem('lastBooking', JSON.stringify(bookingData));
 

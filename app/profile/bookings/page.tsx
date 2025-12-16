@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUserStore } from '@/lib/store';
+import ConfirmationModal from '@/components/modals/ConfirmationModal';
 import './page.css';
 
 interface LocalBooking {
@@ -17,11 +18,13 @@ interface LocalBooking {
   theater: {
     name: string;
     location: string;
+    id?: string;
   };
   showtime: {
     date: string;
     time: string;
     format: string;
+    id?: string;
   };
   seats: Array<{
     id: string;
@@ -38,6 +41,8 @@ export default function BookingsPage() {
   const { isAuthenticated } = useUserStore();
   const [bookings, setBookings] = useState<LocalBooking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [bookingToCancel, setBookingToCancel] = useState<LocalBooking | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -91,6 +96,75 @@ export default function BookingsPage() {
 
     loadBookings();
   }, [isAuthenticated, router]);
+
+  const handleCancelClick = (booking: LocalBooking) => {
+    setBookingToCancel(booking);
+    setIsCancelModalOpen(true);
+  };
+
+  const handleCancelConfirm = () => {
+    if (!bookingToCancel) return;
+
+    // Free up the seats in localStorage
+    const showtimeKey = `booked_seats_${bookingToCancel.showtime.id || 'unknown'}`;
+    const bookedSeatsStr = localStorage.getItem(showtimeKey);
+
+    if (bookedSeatsStr) {
+      try {
+        const bookedSeats: string[] = JSON.parse(bookedSeatsStr);
+        // Remove the canceled booking's seats
+        const seatIdsToRemove = bookingToCancel.seats.map(s => s.id);
+        const updatedSeats = bookedSeats.filter(seatId => !seatIdsToRemove.includes(seatId));
+
+        if (updatedSeats.length > 0) {
+          localStorage.setItem(showtimeKey, JSON.stringify(updatedSeats));
+        } else {
+          localStorage.removeItem(showtimeKey);
+        }
+      } catch (error) {
+        console.error('Error updating booked seats:', error);
+      }
+    }
+
+    // Update booking status to cancelled
+    const updatedBooking = { ...bookingToCancel, status: 'cancelled' };
+
+    // Update lastBooking if it matches
+    const lastBookingStr = localStorage.getItem('lastBooking');
+    if (lastBookingStr) {
+      try {
+        const lastBooking = JSON.parse(lastBookingStr);
+        if (lastBooking.orderId === bookingToCancel.orderId) {
+          localStorage.setItem('lastBooking', JSON.stringify(updatedBooking));
+        }
+      } catch (error) {
+        console.error('Error updating last booking:', error);
+      }
+    }
+
+    // Update bookings history
+    const bookingsHistoryStr = localStorage.getItem('bookingsHistory');
+    if (bookingsHistoryStr) {
+      try {
+        const bookingsHistory = JSON.parse(bookingsHistoryStr);
+        const updatedHistory = bookingsHistory.map((b: LocalBooking) =>
+          b.orderId === bookingToCancel.orderId ? updatedBooking : b
+        );
+        localStorage.setItem('bookingsHistory', JSON.stringify(updatedHistory));
+      } catch (error) {
+        console.error('Error updating bookings history:', error);
+      }
+    }
+
+    // Update UI
+    setBookings(prevBookings =>
+      prevBookings.map(b =>
+        b.orderId === bookingToCancel.orderId ? updatedBooking : b
+      )
+    );
+
+    setBookingToCancel(null);
+  };
 
   if (!isAuthenticated) {
     return null;
@@ -214,7 +288,10 @@ export default function BookingsPage() {
                         <button className="bookings-view-btn">
                           View Ticket
                         </button>
-                        <button className="bookings-cancel-btn">
+                        <button
+                          className="bookings-cancel-btn"
+                          onClick={() => handleCancelClick(booking)}
+                        >
                           Cancel
                         </button>
                       </div>
@@ -310,6 +387,17 @@ export default function BookingsPage() {
           </div>
         )}
       </section>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirm={handleCancelConfirm}
+        title="Cancel Booking"
+        message={`Are you sure you want to cancel this booking? Your seats ${bookingToCancel?.seats.map(s => s.id).join(', ')} will become available for others to book.`}
+        confirmText="Yes"
+        cancelText="No"
+      />
     </div>
   );
 }

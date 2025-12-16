@@ -110,8 +110,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: false,
   });
 
+  const [isHydrated, setIsHydrated] = useState(false);
+
   const supabase = getSupabaseClient();
   const { setUser: setStoreUser, logout: storeLogout } = useUserStore();
+
+  // Handle client-side hydration
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Sync auth state to useUserStore
   useEffect(() => {
@@ -151,11 +158,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Initialize auth state
   useEffect(() => {
+    // Wait for client-side hydration before checking localStorage
+    if (!isHydrated) {
+      console.log('[Auth] Waiting for hydration...');
+      return;
+    }
+
+    console.log('[Auth] Initializing auth state...');
+
     // If Supabase is not configured, check for demo user
     if (!isSupabaseConfigured || !supabase) {
       const demoUserEmail = getDemoCurrentUser();
+      console.log('[Auth] Demo mode - checking for stored user:', demoUserEmail);
+
       if (demoUserEmail) {
         const demoUser = getDemoUser(demoUserEmail);
+        console.log('[Auth] Restoring demo user session:', { email: demoUserEmail, user: demoUser });
+
         // Restore session even if no demoUser data exists (use defaults)
         setState({
           user: { id: 'demo-user', email: demoUserEmail } as User,
@@ -179,6 +198,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         return;
       }
+
+      console.log('[Auth] No stored user found, setting not authenticated');
       setState(prev => ({ ...prev, isLoading: false }));
       return;
     }
@@ -245,7 +266,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase, fetchProfile]);
+  }, [isHydrated, supabase, fetchProfile]);
 
   // Sign up with email/password
   const signUp = async (credentials: SignUpCredentials): Promise<AuthResult> => {
@@ -413,6 +434,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Demo mode - sign in as demo Google user (always use demo for now)
     const demoEmail = 'demo.google@example.com';
 
+    console.log('[Auth] Google sign-in started with email:', demoEmail);
+
     // Save demo user
     saveDemoUser({
       email: demoEmail,
@@ -422,6 +445,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Set demo current user
     setDemoCurrentUser(demoEmail);
+
+    // Verify it was saved
+    const savedEmail = getDemoCurrentUser();
+    console.log('[Auth] Verified saved email in localStorage:', savedEmail);
+    console.log('[Auth] localStorage demo_current_user:', localStorage.getItem('demo_current_user'));
 
     // Update state
     setState({
@@ -445,13 +473,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: true,
     });
 
+    console.log('[Auth] Google sign-in completed, state updated');
+
     return { success: true };
   };
 
   // Sign out
   const signOut = async (): Promise<AuthResult> => {
+    console.log('[Auth] Sign out initiated');
+
     // Clear demo user session
     setDemoCurrentUser(null);
+
+    console.log('[Auth] Cleared demo_current_user from localStorage');
 
     // Immediately clear local state for instant UI feedback
     setState({
@@ -461,6 +495,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading: false,
       isAuthenticated: false,
     });
+
+    console.log('[Auth] Auth state cleared');
 
     if (!isSupabaseConfigured || !supabase) {
       return { success: true };

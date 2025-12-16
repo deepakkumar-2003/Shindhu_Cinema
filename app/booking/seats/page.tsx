@@ -60,7 +60,25 @@ function SeatSelectionContent() {
       return;
     }
 
+    // Get booked seats from localStorage for this showtime
+    const showtimeKey = `booked_seats_${selectedShowtime.id}`;
+    const bookedSeatsStr = localStorage.getItem(showtimeKey);
+    const bookedSeatsFromStorage: string[] = bookedSeatsStr ? JSON.parse(bookedSeatsStr) : [];
+
+    // Generate seat layout with booked seats
     const layout = generateSeatLayout(selectedShowtime.id, selectedShowtime.price);
+
+    // Mark seats as booked based on localStorage
+    if (bookedSeatsFromStorage.length > 0) {
+      layout.rows = layout.rows.map(row => ({
+        ...row,
+        seats: row.seats.map(seat => ({
+          ...seat,
+          status: bookedSeatsFromStorage.includes(seat.id) ? 'booked' as const : seat.status,
+        })),
+      }));
+    }
+
     setSeatLayout(layout);
 
     // Only clear seats on first visit, not when navigating back
