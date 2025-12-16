@@ -89,7 +89,7 @@ export default function Footer() {
           {/* Connect */}
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-4">Connect With Us</h3>
-            <div className="flex gap-4 mb-4">
+            <div className="flex gap-2 sm:gap-3 md:gap-4 mb-4 flex-wrap">
               <a
                 href="https://facebook.com"
                 target="_blank"

@@ -73,11 +73,15 @@
 }
 
 .about-mission-card {
-  background: linear-gradient(135deg, rgba(229, 9, 20, 0.1) 0%, rgba(20, 20, 20, 1) 100%);
+  background: linear-gradient(135deg, rgba(229, 9, 20, 0.1) 0%, var(--color-card, #141414) 100%);
   border: 1px solid var(--color-border, #2a2a2a);
   border-radius: 1rem;
   padding: 2rem;
   text-align: center;
+}
+
+[data-theme="light"] .about-mission-card {
+  background: linear-gradient(135deg, rgba(229, 9, 20, 0.08) 0%, var(--color-secondary, #f0f2f5) 100%);
 }
 
 @media (min-width: 640px) {

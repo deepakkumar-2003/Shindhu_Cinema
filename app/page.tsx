@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import MovieCard from '@/components/movies/MovieCard';
 import { useMoviesByStatus } from '@/lib/hooks/useMovies';
-import './Page.css';
+import './page.css';
 
 const languages = ['All', 'Tamil', 'English'];
 const genres = ['All', 'Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Romance', 'Thriller'];

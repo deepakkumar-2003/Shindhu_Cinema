@@ -129,10 +129,14 @@
   padding: 1.5rem 1rem;
   border-radius: 0.75rem;
   border: 2px solid var(--color-border, #2a2a2a);
-  background: linear-gradient(145deg, rgba(26, 26, 26, 0.8), rgba(20, 20, 20, 0.9));
+  background: var(--color-secondary, #1a1a1a);
   cursor: pointer;
   text-align: center;
   transition: all 0.3s ease;
+}
+
+[data-theme="light"] .city-modal-location-btn {
+  background: var(--color-card, #ffffff);
 }
 
 .city-modal-location-btn:hover {
