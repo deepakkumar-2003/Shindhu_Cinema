@@ -286,33 +286,3 @@
   font-size: 0.75rem;
   color: var(--color-muted, #888888);
 }
-
-/* Light Theme Overrides */
-[data-theme="light"] .movie-card {
-  background-color: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .movie-card-link:hover .movie-card {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-[data-theme="light"] .movie-card-title {
-  color: #1a1a1a;
-}
-
-[data-theme="light"] .movie-card-link:hover .movie-card-title {
-  color: var(--color-primary, #e50914);
-}
-
-[data-theme="light"] .movie-card-genres {
-  color: #6b7280;
-}
-
-[data-theme="light"] .movie-card-meta {
-  color: #6b7280;
-}
-
-[data-theme="light"] .movie-card-info {
-  background-color: #ffffff;
-}

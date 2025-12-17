@@ -2,7 +2,7 @@
 
 .movie-page {
   padding-bottom: 4rem;
-  padding-top: 0;
+  padding-top: 0rem;
 }
 
 /* Not Found State */
@@ -11,8 +11,32 @@
   margin-left: auto;
   margin-right: auto;
   padding: 4rem 1rem;
-  padding-top: 2rem;
+  padding-top: 7rem;
   text-align: center;
+}
+
+@media (min-width: 640px) {
+  .movie-not-found {
+    padding-top: 6rem;
+  }
+  .movie-page {
+    padding-top: 3rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .movie-not-found {
+    padding-top: 5rem;
+  }
+  .movie-page {
+    padding-top: 0rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .movie-page {
+    padding-top: 3rem;
+  }
 }
 
 @media (max-width: 336px) {
@@ -588,91 +612,4 @@
   width: 100%;
   height: 100%;
   border: none;
-}
-
-/* Light Theme Overrides */
-[data-theme="light"] .movie-hero-gradient {
-  background: linear-gradient(to top, var(--color-background, #f8f9fa), rgba(248, 249, 250, 0.6), transparent);
-}
-
-[data-theme="light"] .movie-not-found-title {
-  color: #1a1a1a;
-}
-
-[data-theme="light"] .movie-badge-secondary {
-  background-color: rgba(100, 116, 139, 0.2);
-  color: #374151;
-}
-
-[data-theme="light"] .movie-title {
-  color: #1a1a1a;
-}
-
-[data-theme="light"] .movie-meta {
-  color: #6b7280;
-}
-
-[data-theme="light"] .movie-rating-value {
-  color: #1a1a1a;
-}
-
-[data-theme="light"] .movie-genre-tag {
-  background-color: #f3f4f6;
-  color: #374151;
-}
-
-[data-theme="light"] .movie-btn-secondary {
-  background-color: #f3f4f6;
-  border-color: #d1d5db;
-  color: #374151;
-}
-
-[data-theme="light"] .movie-btn-secondary:hover {
-  background-color: #e5e7eb;
-}
-
-[data-theme="light"] .movie-section-title {
-  color: #1a1a1a;
-}
-
-[data-theme="light"] .movie-synopsis {
-  color: #6b7280;
-}
-
-[data-theme="light"] .movie-person-image-wrapper {
-  background-color: #f3f4f6;
-}
-
-[data-theme="light"] .movie-person-name {
-  color: #1a1a1a;
-}
-
-[data-theme="light"] .movie-person-role {
-  color: #6b7280;
-}
-
-[data-theme="light"] .movie-review-card {
-  background-color: #ffffff;
-  border-color: #d1d5db;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .movie-review-username {
-  color: #1a1a1a;
-}
-
-[data-theme="light"] .movie-review-date {
-  color: #6b7280;
-}
-
-[data-theme="light"] .movie-review-comment {
-  color: #6b7280;
-}
-
-[data-theme="light"] .movie-review-like-btn {
-  color: #6b7280;
-}
-
-[data-theme="light"] .movie-no-reviews {
-  color: #6b7280;
 }

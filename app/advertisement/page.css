@@ -4,7 +4,7 @@
   max-width: 80rem;
   margin-left: auto;
   margin-right: auto;
-  padding: 4.5rem 1rem 4rem;
+  padding: 4.5rem 1rem 4rem; /* 6rem top padding = 4rem header + 2rem spacing */
 }
 
 @media (min-width: 640px) {
@@ -297,74 +297,4 @@
 
 .ad-contact-btn:hover {
   background-color: #c2070f;
-}
-
-/* Light Theme Overrides */
-[data-theme="light"] .ad-hero-title {
-  color: #1a1a1a;
-}
-
-[data-theme="light"] .ad-hero-subtitle {
-  color: #6b7280;
-}
-
-[data-theme="light"] .ad-stat-card {
-  background-color: #ffffff;
-  border-color: #d1d5db;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .ad-stat-label {
-  color: #6b7280;
-}
-
-[data-theme="light"] .ad-section-title {
-  color: #1a1a1a;
-}
-
-[data-theme="light"] .ad-section-subtitle {
-  color: #6b7280;
-}
-
-[data-theme="light"] .ad-package-card {
-  background-color: #ffffff;
-  border-color: #d1d5db;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .ad-package-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-[data-theme="light"] .ad-package-name {
-  color: #1a1a1a;
-}
-
-[data-theme="light"] .ad-package-description {
-  color: #6b7280;
-}
-
-[data-theme="light"] .ad-package-feature {
-  color: #374151;
-}
-
-[data-theme="light"] .ad-package-price {
-  border-top-color: #e5e7eb;
-}
-
-[data-theme="light"] .ad-contact-card {
-  background: linear-gradient(135deg, rgba(229, 9, 20, 0.06) 0%, #ffffff 100%);
-  border-color: #d1d5db;
-}
-
-[data-theme="light"] .ad-contact-title {
-  color: #1a1a1a;
-}
-
-[data-theme="light"] .ad-contact-description {
-  color: #6b7280;
-}
-
-[data-theme="light"] .ad-contact-item {
-  color: #374151;
 }

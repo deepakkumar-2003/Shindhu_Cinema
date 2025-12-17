@@ -29,7 +29,7 @@
 
 @media (min-width: 768px) {
   .checkout-container {
-    padding-top: 1rem;
+    padding-top: 1rem; /* Smaller padding on larger screens */
   }
 }
 

@@ -17,27 +17,10 @@ export default function MoviePage({ params }: MoviePageProps) {
   const [showTrailer, setShowTrailer] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Force page refresh on client-side navigation for correct alignment
+  // Wait for hydration to complete before rendering content
   useEffect(() => {
-    const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    const isClientNavigation = navigationEntry?.type === 'navigate' && document.referrer.includes(window.location.origin);
-
-    // Check if this is a client-side navigation (not initial load or refresh)
-    if (isClientNavigation && !sessionStorage.getItem(`movie-page-${id}-refreshed`)) {
-      sessionStorage.setItem(`movie-page-${id}-refreshed`, 'true');
-      window.location.reload();
-      return;
-    }
-
-    // Clear the refresh flag after a short delay to allow future refreshes
-    const timeout = setTimeout(() => {
-      sessionStorage.removeItem(`movie-page-${id}-refreshed`);
-    }, 1000);
-
     setIsHydrated(true);
-
-    return () => clearTimeout(timeout);
-  }, [id]);
+  }, []);
 
   // Show loading state until hydration is complete
   if (!isHydrated || isLoading) {
