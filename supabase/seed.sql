@@ -39,8 +39,8 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
   (
     'a0000001-0000-0000-0000-000000000001',
     'Pushpa 2: The Rule',
-    'https://image.tmdb.org/t/p/w500/bGLvMPSRsVTLP4vUvtSwUvN1AK9.jpg',
-    'https://image.tmdb.org/t/p/original/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg',
+    '/images/movies/pushpa-2-ps.jpg',
+    '/images/movies/pushpa-2-bg.jpg',
     'https://www.youtube.com/embed/Q1NKMPhP8PY',
     'Pushpa Raj returns with even more power and intensity as he continues his rise in the world of red sandalwood smuggling. Facing new enemies and bigger challenges, Pushpa must prove that he truly rules.',
     180,
@@ -50,15 +50,15 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     125000,
     'Tamil',
     ARRAY['Action', 'Drama', 'Thriller'],
-    ARRAY['2D', 'Dolby Atmos'],
+    ARRAY['2D', '3D', 'Dolby Atmos'],
     'UA',
     'now_showing'
   ),
   (
     'a0000002-0000-0000-0000-000000000002',
     'Dune: Part Two',
-    'https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg',
-    'https://image.tmdb.org/t/p/original/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg',
+    '/images/movies/dune-ps.webp',
+    '/images/movies/dune-bg.webp',
     'https://www.youtube.com/embed/Way9Dexny3w',
     'Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the universe.',
     166,
@@ -68,15 +68,15 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     250000,
     'English',
     ARRAY['Sci-Fi', 'Adventure', 'Drama'],
-    ARRAY['2D', 'Dolby Atmos'],
+    ARRAY['2D', '3D', 'Dolby Atmos'],
     'UA',
     'now_showing'
   ),
   (
     'a0000003-0000-0000-0000-000000000003',
     'Kalki 2898 AD',
-    'https://image.tmdb.org/t/p/w500/kLj8UkMBqvP0hhuKbXq2G3wZHDH.jpg',
-    'https://image.tmdb.org/t/p/original/stKGOm8UyhuLPR9sZLjs5AkmncA.jpg',
+    '/images/movies/kalki-2898-ps.jpg',
+    '/images/movies/kalki-2898-bg.jpg',
     'https://www.youtube.com/embed/pmddGTuVwLI',
     'Set in a dystopian future in the year 2898 AD, the epic mythological sci-fi film follows the story of a mysterious warrior who embarks on a journey to save the world.',
     181,
@@ -86,15 +86,15 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     180000,
     'Tamil',
     ARRAY['Sci-Fi', 'Action', 'Fantasy'],
-    ARRAY['2D', 'Dolby Atmos'],
+    ARRAY['2D', '3D', 'Dolby Atmos'],
     'UA',
     'now_showing'
   ),
   (
     'a0000004-0000-0000-0000-000000000004',
     'Deadpool & Wolverine',
-    'https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
-    'https://image.tmdb.org/t/p/original/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg',
+    '/images/movies/deadpool-ps.webp',
+    '/images/movies/deadpool-bg.webp',
     'https://www.youtube.com/embed/73_1biulkYk',
     'Deadpool is offered a place in the Marvel Cinematic Universe by the TVA. But instead, he recruits a variant of Wolverine to save his universe from extinction.',
     127,
@@ -104,15 +104,15 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     320000,
     'English',
     ARRAY['Action', 'Comedy', 'Superhero'],
-    ARRAY['2D', 'Dolby Atmos'],
+    ARRAY['2D', '3D', 'Dolby Atmos'],
     'A',
     'now_showing'
   ),
   (
     'a0000005-0000-0000-0000-000000000005',
-    'Stree 2',
-    'https://image.tmdb.org/t/p/w500/pHHQBTsP6LlcgF5D92PYCCHdnG8.jpg',
-    'https://image.tmdb.org/t/p/original/stKGOm8UyhuLPR9sZLjs5AkmncA.jpg',
+    'Leo',
+    '/images/movies/leo-ps.jpg',
+    '/images/movies/leo-bg.jpg',
     'https://www.youtube.com/embed/KxB25_1O7Hs',
     'The residents of Chanderi face a new threat when a headless entity called Sarkata begins terrorizing the town. Vicky and his friends must once again seek Stree''s help.',
     150,
@@ -122,15 +122,15 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     95000,
     'Tamil',
     ARRAY['Horror', 'Comedy'],
-    ARRAY['2D', 'Dolby Atmos'],
+    ARRAY['2D'],
     'UA',
     'now_showing'
   ),
   (
     'a0000006-0000-0000-0000-000000000006',
-    'Singham Again',
-    'https://image.tmdb.org/t/p/w500/uFS0JJwMYfBHHdMU1mMJyB3ADAe.jpg',
-    'https://image.tmdb.org/t/p/original/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg',
+    'Good Bad Ugly',
+    '/images/movies/gbu-ps.jpg',
+    '/images/movies/gbu-bg.jpg',
     'https://www.youtube.com/embed/dQw4w9WgXcQ',
     'Bajirao Singham returns for another action-packed adventure. When his wife is kidnapped, Singham must face his biggest challenge yet in a battle against an international crime syndicate.',
     165,
@@ -147,8 +147,8 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
   (
     'a0000007-0000-0000-0000-000000000007',
     'Avatar 3',
-    'https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg',
-    'https://image.tmdb.org/t/p/original/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg',
+    '/images/movies/avatar-ps.jpg',
+    '/images/movies/avatar-bg.jpg',
     'https://www.youtube.com/embed/dQw4w9WgXcQ',
     'Jake Sully and Neytiri return in the next chapter of the Avatar saga. The Sully family faces new challenges as they explore uncharted territories of Pandora.',
     190,
@@ -158,15 +158,15 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
     0,
     'English',
     ARRAY['Sci-Fi', 'Adventure', 'Fantasy'],
-    ARRAY['2D', 'Dolby Atmos'],
+    ARRAY['3D', 'Dolby Atmos'],
     'UA',
     'coming_soon'
   ),
   (
     'a0000008-0000-0000-0000-000000000008',
     'The Batman 2',
-    'https://image.tmdb.org/t/p/w500/74xTEgt7R36Fvber3r2eGeBsEj1.jpg',
-    'https://image.tmdb.org/t/p/original/b0PlSFdDwbyK0cf5RxwDpaOJQvQ.jpg',
+    '/images/movies/batman-2-ps.jpg',
+    '/images/movies/batman-2-bg.jpg',
     'https://www.youtube.com/embed/dQw4w9WgXcQ',
     'The Dark Knight returns to face new threats in Gotham City. As new villains emerge, Batman must confront his past while protecting the city he loves.',
     175,
@@ -183,17 +183,17 @@ INSERT INTO movies (id, title, poster, backdrop, trailer_url, synopsis, duration
   (
     'a0000009-0000-0000-0000-000000000009',
     'Dasara',
-    'https://image.tmdb.org/t/p/w500/74xTEgt7R36Fvber3r2eGeBsEj1.jpg',
-    'https://image.tmdb.org/t/p/original/b0PlSFdDwbyK0cf5RxwDpaOJQvQ.jpg',
-    'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    'A powerful story of love, revenge, and redemption set against the backdrop of a small village during the Dasara festival.',
-    158,
-    '2024-12-10',
-    7.9,
-    4.1,
+    '/images/movies/dasara-ps.avif',
+    '/images/movies/dasara-bg.avif',
+    'https://www.youtube.com/embed/your-trailer-id',
+    'A powerful story set in a village near Singareni coal mines.',
+    165,
+    '2024-03-30',
+    7.8,
+    4.0,
     85000,
     'Tamil',
-    ARRAY['Action', 'Drama', 'Romance'],
+    ARRAY['Action', 'Drama'],
     ARRAY['2D', 'Dolby Atmos'],
     'UA',
     'now_showing'
@@ -215,10 +215,10 @@ INSERT INTO cast_members (movie_id, name, role, image) VALUES
   ('a0000003-0000-0000-0000-000000000003', 'Amitabh Bachchan', 'Ashwatthama', 'https://image.tmdb.org/t/p/w200/sfhfkRHRsZkLRRhMmgywNMkfPfX.jpg'),
   ('a0000004-0000-0000-0000-000000000004', 'Ryan Reynolds', 'Deadpool', 'https://image.tmdb.org/t/p/w200/4SYTH5FdB0dAORV98Nwg3llgVnY.jpg'),
   ('a0000004-0000-0000-0000-000000000004', 'Hugh Jackman', 'Wolverine', 'https://image.tmdb.org/t/p/w200/oX6pNtGsGWGHe18fTH0jGMhMi5X.jpg'),
-  ('a0000005-0000-0000-0000-000000000005', 'Rajkummar Rao', 'Vicky', 'https://image.tmdb.org/t/p/w200/4SYTH5FdB0dAORV98Nwg3llgVnY.jpg'),
-  ('a0000005-0000-0000-0000-000000000005', 'Shraddha Kapoor', 'Stree', 'https://image.tmdb.org/t/p/w200/huV2CDrBrCm5hh2jxmWGZ91L7cL.jpg'),
-  ('a0000006-0000-0000-0000-000000000006', 'Ajay Devgn', 'Bajirao Singham', 'https://image.tmdb.org/t/p/w200/4SYTH5FdB0dAORV98Nwg3llgVnY.jpg'),
-  ('a0000006-0000-0000-0000-000000000006', 'Kareena Kapoor Khan', 'Avni Singham', 'https://image.tmdb.org/t/p/w200/huV2CDrBrCm5hh2jxmWGZ91L7cL.jpg'),
+  ('a0000005-0000-0000-0000-000000000005', 'Rajkummar Rao', 'Vicky', 'https://image.tmdb.org/t/p/w185/7P5F0dS3eHb2ZWvFO8bWkUALiNp.jpg'),
+  ('a0000005-0000-0000-0000-000000000005', 'Shraddha Kapoor', 'Stree', 'https://image.tmdb.org/t/p/w185/kXztdxNIiAWbLvLCnPr6TvUWd0z.jpg'),
+  ('a0000006-0000-0000-0000-000000000006', 'Ajay Devgn', 'Bajirao Singham', 'https://image.tmdb.org/t/p/w185/3oRRShMSAWPMUt2VkZVrfJwKi11.jpg'),
+  ('a0000006-0000-0000-0000-000000000006', 'Kareena Kapoor Khan', 'Avni Singham', 'https://image.tmdb.org/t/p/w185/mZWAPAIp4UdJXqgLgqwH6qC6Rp.jpg'),
   ('a0000007-0000-0000-0000-000000000007', 'Sam Worthington', 'Jake Sully', 'https://image.tmdb.org/t/p/w200/4SYTH5FdB0dAORV98Nwg3llgVnY.jpg'),
   ('a0000007-0000-0000-0000-000000000007', 'Zoe Saldana', 'Neytiri', 'https://image.tmdb.org/t/p/w200/huV2CDrBrCm5hh2jxmWGZ91L7cL.jpg'),
   ('a0000008-0000-0000-0000-000000000008', 'Robert Pattinson', 'Bruce Wayne / Batman', 'https://image.tmdb.org/t/p/w200/4SYTH5FdB0dAORV98Nwg3llgVnY.jpg'),
@@ -237,8 +237,8 @@ INSERT INTO crew_members (movie_id, name, role, image) VALUES
   ('a0000003-0000-0000-0000-000000000003', 'Nag Ashwin', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg'),
   ('a0000003-0000-0000-0000-000000000003', 'Santhosh Narayanan', 'Music Director', 'https://image.tmdb.org/t/p/w200/6DJhzOdMzWl5XZjRkJ7XQq2lYK.jpg'),
   ('a0000004-0000-0000-0000-000000000004', 'Shawn Levy', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg'),
-  ('a0000005-0000-0000-0000-000000000005', 'Amar Kaushik', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg'),
-  ('a0000006-0000-0000-0000-000000000006', 'Rohit Shetty', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg'),
+  ('a0000005-0000-0000-0000-000000000005', 'Amar Kaushik', 'Director', 'https://image.tmdb.org/t/p/w185/8W1dchZhQz1BrSaRj4bNMXMgBOy.jpg'),
+  ('a0000006-0000-0000-0000-000000000006', 'Rohit Shetty', 'Director', 'https://image.tmdb.org/t/p/w185/ziV2BdXWAFo3TcKUcG4ZN0HaG7r.jpg'),
   ('a0000007-0000-0000-0000-000000000007', 'James Cameron', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg'),
   ('a0000008-0000-0000-0000-000000000008', 'Matt Reeves', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg'),
   ('a0000009-0000-0000-0000-000000000009', 'Srikanth Odela', 'Director', 'https://image.tmdb.org/t/p/w200/qsQqYj0a6t2QwqB2dLJvHLxhUH.jpg');
@@ -452,12 +452,43 @@ BEGIN
 END $$;
 
 -- ===========================================
--- SAMPLE REVIEWS (anonymous - no user_id)
+-- SAMPLE REVIEWS (comprehensive reviews for all movies)
 -- ===========================================
 
 INSERT INTO reviews (movie_id, user_id, rating, comment, likes, created_at) VALUES
+  -- Pushpa 2: The Rule
   ('a0000001-0000-0000-0000-000000000001', NULL, 5, 'Absolutely phenomenal! Allu Arjun delivers a performance of a lifetime. The action sequences are mind-blowing!', 1250, '2024-12-06'),
   ('a0000001-0000-0000-0000-000000000001', NULL, 4, 'Great movie with excellent cinematography. The interval block is absolutely stunning. A must-watch!', 890, '2024-12-05'),
+  ('a0000001-0000-0000-0000-000000000001', NULL, 5, 'Sukumar''s direction is top-notch. The BGM by DSP elevates every scene. Pushpa Raj is back and how!', 1420, '2024-12-07'),
+  -- Dune: Part Two
   ('a0000002-0000-0000-0000-000000000002', NULL, 5, 'Denis Villeneuve has created a masterpiece. The visuals in Dolby Atmos are breathtaking!', 2100, '2024-03-05'),
-  ('a0000003-0000-0000-0000-000000000003', NULL, 4, 'Prabhas shines in this epic sci-fi adventure. The visuals are stunning!', 1500, '2024-06-28'),
-  ('a0000009-0000-0000-0000-000000000009', NULL, 4, 'A beautiful village story with powerful performances. Nani at his best!', 950, '2024-12-11');
+  ('a0000002-0000-0000-0000-000000000002', NULL, 5, 'Best sci-fi movie in years! Timothée and Zendaya''s chemistry is amazing. Hans Zimmer''s score is haunting.', 1850, '2024-03-03'),
+  ('a0000002-0000-0000-0000-000000000002', NULL, 4, 'Epic scale filmmaking at its finest. The desert sequences are stunning. Worth watching in IMAX!', 1560, '2024-03-02'),
+  -- Kalki 2898 AD
+  ('a0000003-0000-0000-0000-000000000003', NULL, 5, 'Indian cinema at its best! The VFX are world-class. Prabhas and Amitabh sir are phenomenal!', 1980, '2024-06-28'),
+  ('a0000003-0000-0000-0000-000000000003', NULL, 4, 'Nag Ashwin''s vision is extraordinary. The blend of mythology and sci-fi is unique. Must watch in 3D!', 1670, '2024-06-29'),
+  ('a0000003-0000-0000-0000-000000000003', NULL, 5, 'Absolutely mind-blowing! The future world-building is incredible. Deepika''s performance is powerful.', 1920, '2024-06-30'),
+  -- Deadpool & Wolverine
+  ('a0000004-0000-0000-0000-000000000004', NULL, 5, 'Hilarious and action-packed! Ryan Reynolds and Hugh Jackman together is pure gold. Best MCU movie in years!', 2240, '2024-07-27'),
+  ('a0000004-0000-0000-0000-000000000004', NULL, 4, 'Non-stop entertainment! The cameos are fantastic. Deadpool''s humor is on point as always.', 1890, '2024-07-28'),
+  ('a0000004-0000-0000-0000-000000000004', NULL, 5, 'The duo we didn''t know we needed! Action sequences are brutal and satisfying. Loved every minute!', 2010, '2024-07-29'),
+  -- Leo
+  ('a0000005-0000-0000-0000-000000000005', NULL, 5, 'Thalapathy Vijay in his element! Lokesh Kanagaraj delivers another masterpiece. The LCU connection is thrilling!', 2450, '2024-10-20'),
+  ('a0000005-0000-0000-0000-000000000005', NULL, 4, 'Intense action thriller! The interval block is goosebumps. Anirudh''s BGM is fire!', 2180, '2024-10-19'),
+  ('a0000005-0000-0000-0000-000000000005', NULL, 5, 'Thalapathy at his best! The emotional depth combined with action is perfect. Trisha is excellent too.', 2320, '2024-10-21'),
+  -- Good Bad Ugly
+  ('a0000006-0000-0000-0000-000000000006', NULL, 5, 'Ajith Kumar is back with a bang! The multi-layered story keeps you hooked. Adhik Ravichandran nailed it!', 1750, '2025-04-12'),
+  ('a0000006-0000-0000-0000-000000000006', NULL, 4, 'Stylish and engaging! The twists are unexpected. Thala''s screen presence is unmatched.', 1620, '2025-04-13'),
+  ('a0000006-0000-0000-0000-000000000006', NULL, 5, 'Entertainment packed! The three different shades of the character are brilliantly portrayed. Must watch!', 1890, '2025-04-14'),
+  -- Avatar 3
+  ('a0000007-0000-0000-0000-000000000007', NULL, 5, 'James Cameron does it again! The underwater sequences are breathtaking. Pandora looks more beautiful than ever!', 3120, '2025-12-20'),
+  ('a0000007-0000-0000-0000-000000000007', NULL, 5, 'Visual spectacle beyond imagination! The 3D experience is unparalleled. Worth every penny!', 2890, '2025-12-19'),
+  ('a0000007-0000-0000-0000-000000000007', NULL, 4, 'Absolutely stunning! The new Na''vi clans are fascinating. A worthy continuation of the saga.', 2670, '2025-12-21'),
+  -- The Batman 2
+  ('a0000008-0000-0000-0000-000000000008', NULL, 5, 'Dark, gritty, and absolutely brilliant! Robert Pattinson proves again he''s the perfect Batman.', 2540, '2026-10-04'),
+  ('a0000008-0000-0000-0000-000000000008', NULL, 5, 'Matt Reeves has raised the bar! The detective storyline is gripping. Michael Giacchino''s score is phenomenal.', 2310, '2026-10-03'),
+  ('a0000008-0000-0000-0000-000000000008', NULL, 4, 'Intense and atmospheric! The cinematography is gorgeous. Best Batman movie since The Dark Knight!', 2180, '2026-10-05'),
+  -- Dasara
+  ('a0000009-0000-0000-0000-000000000009', NULL, 5, 'Raw and powerful! Nani delivers a career-best performance. The rustic setting feels authentic.', 1540, '2024-03-31'),
+  ('a0000009-0000-0000-0000-000000000009', NULL, 4, 'Gritty and intense drama! Keerthy Suresh is equally brilliant. The second half is explosive!', 1420, '2024-03-30'),
+  ('a0000009-0000-0000-0000-000000000009', NULL, 5, 'Srikanth Odela''s direction is fantastic! The coal mine backdrop adds a unique flavor. Highly recommended!', 1680, '2024-04-01');

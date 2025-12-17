@@ -599,9 +599,9 @@
 .sign-in-button {
   background-color: var(--color-primary, #e50914);
   color: white;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  padding: 0.5rem 1rem;
+  padding: 0.35rem 0.55rem;
   border-radius: 0.5rem;
   border: none;
   cursor: pointer;
@@ -613,20 +613,11 @@
   transform: scale(1.02);
 }
 
-@media (max-width: 368px) {
-  .sign-in-button{
-    font-size: 0.75rem;
-    padding: 0.3rem 0.6rem;
-    width: 60px;
-  }
-  
-}
-
-@media (max-width: 375px) {
-  .sign-in-button{
+@media (min-width: 768px) {
+  .sign-in-button {
     font-size: 0.80rem;
-    padding: 0.3rem 0.6rem;
-    width: 60px;
+    padding: 0.5rem 0.7rem;
+    width: 70px;
   }
   
 }
