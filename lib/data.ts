@@ -374,14 +374,14 @@ export const showTimingsData: ShowTimingData[] = [
     ],
   },
   {
-    movieTitle: 'Stree 2',
+    movieTitle: 'Leo',
     shows: [
       { screenId: 2, times: ['09:00 AM', '01:00 PM', '05:00 PM', '09:00 PM'], price: { standard: 190, premium: 190 } },
       { screenId: 4, times: ['10:00 AM', '02:00 PM', '06:00 PM', '10:00 PM'], price: { standard: 190, premium: 190 } },
     ],
   },
   {
-    movieTitle: 'Singham Again',
+    movieTitle: 'Good Bad Ugly',
     shows: [
       { screenId: 4, times: ['11:30 AM', '03:30 PM', '07:30 PM'], price: { standard: 190, premium: 190 } },
     ],

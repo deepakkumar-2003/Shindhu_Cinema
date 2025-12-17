@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, use } from 'react';
+import { useState, useMemo, use, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { theaters, generateShowtimes } from '@/lib/data';
 import { useMovie } from '@/lib/hooks/useMovies';
@@ -17,20 +17,24 @@ function getInitialDate(): string {
   return new Date().toISOString().split('T')[0];
 }
 
+// Custom hook to check if component is mounted (hydrated)
+function useIsHydrated() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
+
 export default function ShowtimesPage({ params }: ShowtimesPageProps) {
   const { id } = use(params);
   const router = useRouter();
   const { movie, isLoading: movieLoading } = useMovie(id);
   const [selectedDate, setSelectedDate] = useState<string>(getInitialDate);
   const [selectedFormat, setSelectedFormat] = useState<string>('All');
-  const [isHydrated, setIsHydrated] = useState(false);
+  const isHydrated = useIsHydrated();
 
   const { selectedCity, setSelectedMovie, setSelectedTheater, setSelectedShowtime, setSelectedDate: setBookingDate } = useBookingStore();
-
-  // Wait for hydration to complete (for persisted store values)
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
 
   // Generate dates for next 7 days
   const dates = useMemo(() => {

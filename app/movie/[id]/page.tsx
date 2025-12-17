@@ -15,15 +15,9 @@ export default function MoviePage({ params }: MoviePageProps) {
   const router = useRouter();
   const { movie, isLoading, error } = useMovie(id);
   const [showTrailer, setShowTrailer] = useState(false);
-  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Wait for hydration to complete before rendering content
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-
-  // Show loading state until hydration is complete
-  if (!isHydrated || isLoading) {
+  // Show loading state
+  if (isLoading) {
     return (
       <div className="movie-not-found">
         <div className="movie-loading-spinner"></div>
