@@ -27,10 +27,27 @@ export default function ShowtimesPage({ params }: ShowtimesPageProps) {
 
   const { selectedCity, setSelectedMovie, setSelectedTheater, setSelectedShowtime, setSelectedDate: setBookingDate } = useBookingStore();
 
-  // Wait for hydration to complete (for persisted store values)
+  // Force page refresh on client-side navigation for correct alignment
   useEffect(() => {
+    const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    const isClientNavigation = navigationEntry?.type === 'navigate' && document.referrer.includes(window.location.origin);
+
+    // Check if this is a client-side navigation (not initial load or refresh)
+    if (isClientNavigation && !sessionStorage.getItem(`showtimes-page-${id}-refreshed`)) {
+      sessionStorage.setItem(`showtimes-page-${id}-refreshed`, 'true');
+      window.location.reload();
+      return;
+    }
+
+    // Clear the refresh flag after a short delay to allow future refreshes
+    const timeout = setTimeout(() => {
+      sessionStorage.removeItem(`showtimes-page-${id}-refreshed`);
+    }, 1000);
+
     setIsHydrated(true);
-  }, []);
+
+    return () => clearTimeout(timeout);
+  }, [id]);
 
   // Generate dates for next 7 days
   const dates = useMemo(() => {

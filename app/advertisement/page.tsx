@@ -56,9 +56,9 @@ export default function AdvertisementPage() {
 
   const stats = [
     { value: '50K+', label: 'Daily Footfall' },
-    { value: '10+', label: 'Screens' },
+    { value: '4+', label: 'Screens' },
     { value: '95%', label: 'Seat Occupancy' },
-    { value: '500K+', label: 'Monthly App Users' },
+    { value: '100K+', label: 'Monthly App Users' },
   ];
 
   return (

@@ -897,3 +897,72 @@
     transform: rotate(360deg);
   }
 }
+
+/* Light Theme Overrides */
+[data-theme="light"] .filters-title {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .filter-label {
+  color: #6b7280;
+}
+
+[data-theme="light"] .filter-select {
+  background-color: #ffffff;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+[data-theme="light"] .section-title {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .no-movies-text {
+  color: #6b7280;
+}
+
+[data-theme="light"] .promo-card {
+  background-color: #ffffff;
+  border-color: #d1d5db;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .promo-card-primary {
+  background: linear-gradient(to bottom right, rgba(229, 9, 20, 0.08), rgba(229, 9, 20, 0.02));
+}
+
+[data-theme="light"] .promo-card-accent {
+  background: linear-gradient(to bottom right, rgba(251, 191, 36, 0.12), rgba(251, 191, 36, 0.03));
+}
+
+[data-theme="light"] .promo-card-success {
+  background: linear-gradient(to bottom right, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.02));
+}
+
+[data-theme="light"] .promo-card-title {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .promo-card-text {
+  color: #6b7280;
+}
+
+[data-theme="light"] .features-title {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .feature-title {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .feature-text {
+  color: #6b7280;
+}
+
+[data-theme="light"] .hero-loading {
+  background-color: #f3f4f6;
+}
+
+[data-theme="light"] .movies-loading {
+  color: #6b7280;
+}

@@ -4,7 +4,7 @@
   max-width: 80rem;
   margin-left: auto;
   margin-right: auto;
-  padding: 4.5rem 1rem 4rem; /* 6rem top padding = 4rem header + 2rem spacing */
+  padding: 4.5rem 1rem 4rem;
 }
 
 @media (min-width: 640px) {
@@ -368,4 +368,100 @@
   color: var(--color-muted, #888888);
   margin: 0;
   line-height: 1.5;
+}
+
+/* Light Theme Overrides */
+[data-theme="light"] .about-hero-title {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .about-hero-subtitle {
+  color: #6b7280;
+}
+
+[data-theme="light"] .about-section-title {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .about-section-subtitle {
+  color: #6b7280;
+}
+
+[data-theme="light"] .about-mission-card {
+  background: linear-gradient(135deg, rgba(229, 9, 20, 0.06) 0%, #ffffff 100%);
+  border-color: #d1d5db;
+}
+
+[data-theme="light"] .about-mission-title {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .about-mission-text {
+  color: #6b7280;
+}
+
+[data-theme="light"] .about-value-card {
+  background-color: #ffffff;
+  border-color: #d1d5db;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .about-value-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .about-value-title {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .about-value-description {
+  color: #6b7280;
+}
+
+[data-theme="light"] .about-timeline-line {
+  background-color: #d1d5db;
+}
+
+[data-theme="light"] .about-timeline-title {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .about-timeline-description {
+  color: #6b7280;
+}
+
+[data-theme="light"] .about-team-card {
+  background-color: #ffffff;
+  border-color: #d1d5db;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .about-team-avatar {
+  background-color: #f3f4f6;
+}
+
+[data-theme="light"] .about-team-name {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .about-team-role {
+  color: #6b7280;
+}
+
+[data-theme="light"] .about-contact-card {
+  background-color: #ffffff;
+  border-color: #d1d5db;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .about-contact-title {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .about-contact-label {
+  color: #1a1a1a;
+}
+
+[data-theme="light"] .about-contact-value {
+  color: #6b7280;
 }
