@@ -1,9 +1,7 @@
 /* Confirmation Page Styles */
 
 .confirmation-page {
-  max-width: 56rem;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
   padding-left: 1rem;
   padding-right: 1rem;
   padding-bottom: 4rem;
@@ -25,9 +23,7 @@
 
 /* No Booking Found */
 .confirmation-no-booking {
-  max-width: 80rem;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
   padding: 4rem 1rem;
   text-align: center;
 }

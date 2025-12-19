@@ -7,9 +7,7 @@
 
 /* Not Found State */
 .movie-not-found {
-  max-width: 80rem;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
   padding: 4rem 1rem;
   padding-top: 7rem;
   text-align: center;
@@ -131,9 +129,7 @@
 }
 
 .movie-info-container {
-  max-width: 80rem;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -336,9 +332,7 @@
 
 /* Content Section */
 .movie-content {
-  max-width: 80rem;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
   padding: 0 1rem;
   margin-top: 2rem;
 }

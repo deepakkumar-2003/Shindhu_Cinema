@@ -1,9 +1,7 @@
 /* Booking Snacks Page Styles */
 
 .bsnacks-page {
-  max-width: 80rem;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
   padding-left: 1rem;
   padding-right: 1rem;
   padding-bottom: 8rem;
