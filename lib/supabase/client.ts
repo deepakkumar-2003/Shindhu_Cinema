@@ -8,13 +8,13 @@ export function getIsSupabaseConfigured(): boolean {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const isConfigured = Boolean(url && key && url.length > 0 && key.length > 0);
 
-  // Log configuration status for debugging (only in development)
-  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+  // Log configuration status for debugging (in all environments for troubleshooting)
+  if (typeof window !== 'undefined') {
     console.log('[Supabase] Configuration check:', {
       isConfigured,
       hasUrl: Boolean(url),
       hasKey: Boolean(key),
-      url: url ? `${url.substring(0, 20)}...` : 'missing'
+      urlPreview: url ? `${url.substring(0, 30)}...` : 'missing'
     });
   }
 

@@ -493,14 +493,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check Supabase configuration dynamically at runtime
     const isConfigured = getIsSupabaseConfigured();
 
-    console.log('[Auth] Google sign-in initiated, Supabase configured:', isConfigured);
+    // Get a fresh supabase client to ensure it's available
+    const supabaseClient = getSupabaseClient();
+
+    console.log('[Auth] Google sign-in initiated, Supabase configured:', isConfigured, 'Client exists:', !!supabaseClient);
 
     // Try real Google OAuth authentication with Supabase first
-    if (isConfigured && supabase) {
+    if (isConfigured && supabaseClient) {
       try {
         console.log('[Auth] Attempting real Google OAuth sign-in...');
 
-        const { data, error } = await supabase.auth.signInWithOAuth({
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
           options: {
             redirectTo: `${window.location.origin}/auth/callback`,
