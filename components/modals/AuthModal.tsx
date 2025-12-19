@@ -24,10 +24,15 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [gender, setGender] = useState<'male' | 'female' | 'other' | ''>('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [isLoading, setIsLoading] = useState(false);
+
+  // Separate loading states for each button type
+  const [isLoadingOtp, setIsLoadingOtp] = useState(false);
+  const [isLoadingEmail, setIsLoadingEmail] = useState(false);
+  const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
+  const [isLoadingSignup, setIsLoadingSignup] = useState(false);
+  const [isLoadingReset, setIsLoadingReset] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
 
   // Email verification states
@@ -39,7 +44,27 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
   const [isSendingEmailOtp, setIsSendingEmailOtp] = useState(false);
 
-  const { signIn, signUp, signInWithOTP, verifyOTP, signInWithGoogle, resetPassword } = useAuth();
+  // Phone verification states
+  const [phoneOtp, setPhoneOtp] = useState(['', '', '', '', '', '']);
+  const [phoneOtpSent, setPhoneOtpSent] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
+  const [phoneOtpError, setPhoneOtpError] = useState('');
+  const [phoneOtpTimer, setPhoneOtpTimer] = useState(0);
+  const [isVerifyingPhone, setIsVerifyingPhone] = useState(false);
+  const [isSendingPhoneOtp, setIsSendingPhoneOtp] = useState(false);
+
+  const {
+    signIn,
+    signUp,
+    signInWithOTP,
+    verifyOTP,
+    signInWithGoogle,
+    resetPassword,
+    sendPhoneOtp,
+    verifyPhoneOtp,
+    sendEmailOtp,
+    verifyEmailOtp,
+  } = useAuth();
 
   // Email OTP timer countdown
   useEffect(() => {
@@ -52,6 +77,17 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     return () => clearInterval(interval);
   }, [emailOtpTimer]);
 
+  // Phone OTP timer countdown
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (phoneOtpTimer > 0) {
+      interval = setInterval(() => {
+        setPhoneOtpTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [phoneOtpTimer]);
+
   // Reset email verification when email changes
   useEffect(() => {
     if (emailOtpSent || emailVerified) {
@@ -63,6 +99,18 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email]);
+
+  // Reset phone verification when phone changes
+  useEffect(() => {
+    if (phoneOtpSent || phoneVerified) {
+      setPhoneOtpSent(false);
+      setPhoneVerified(false);
+      setPhoneOtp(['', '', '', '', '', '']);
+      setPhoneOtpError('');
+      setPhoneOtpTimer(0);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phone]);
 
   const handleOtpChange = (index: number, value: string) => {
     if (value.length > 1) return;
@@ -114,23 +162,28 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
     setIsSendingEmailOtp(true);
 
-    // Simulate sending OTP to email (in real app, call API)
-    // For demo, we'll just simulate the OTP being sent
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Call real Supabase email OTP function with isSignup=true
+    // This will check if email is already registered and show error if so
+    const result = await sendEmailOtp(email, true);
 
     setIsSendingEmailOtp(false);
-    setEmailOtpSent(true);
-    setEmailOtpTimer(60);
-    setEmailOtp(['', '', '', '', '', '']);
-    setEmailOtpError('');
-    toast.success('OTP sent to your email');
 
-    // Focus first OTP input
-    setTimeout(() => {
-      const firstInput = document.getElementById('email-otp-0');
-      firstInput?.focus();
-    }, 100);
-  }, [email]);
+    if (result.success) {
+      setEmailOtpSent(true);
+      setEmailOtpTimer(60);
+      setEmailOtp(['', '', '', '', '', '']);
+      setEmailOtpError('');
+      toast.success('OTP sent to your email');
+
+      // Focus first OTP input
+      setTimeout(() => {
+        const firstInput = document.getElementById('email-otp-0');
+        firstInput?.focus();
+      }, 100);
+    } else {
+      toast.error(result.error || 'Failed to send OTP');
+    }
+  }, [email, sendEmailOtp]);
 
   const handleVerifyEmailOtp = async () => {
     const otpValue = emailOtp.join('');
@@ -141,26 +194,106 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
     setIsVerifyingEmail(true);
 
-    // Simulate OTP verification (in real app, call API)
-    // For demo, accept "123456" as valid OTP
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Call real Supabase email OTP verification function
+    const result = await verifyEmailOtp(email, otpValue);
 
-    // In a real implementation, you would verify with your backend
-    // For demo purposes, we'll accept "123456" as valid
-    if (otpValue === '123456') {
+    setIsVerifyingEmail(false);
+
+    if (result.success) {
       setEmailVerified(true);
       setEmailOtpError('');
       toast.success('Email verified successfully!');
     } else {
-      setEmailOtpError('Incorrect OTP. Please try again.');
+      setEmailOtpError(result.error || 'Incorrect OTP. Please try again.');
     }
-
-    setIsVerifyingEmail(false);
   };
 
   const handleResendEmailOtp = () => {
     if (emailOtpTimer > 0) return;
     handleSendEmailOtp();
+  };
+
+  // Phone OTP handlers
+  const handlePhoneOtpChange = (index: number, value: string) => {
+    if (value.length > 1) return;
+    const newOtp = [...phoneOtp];
+    newOtp[index] = value;
+    setPhoneOtp(newOtp);
+    setPhoneOtpError(''); // Clear error when typing
+
+    // Auto focus next input
+    if (value && index < 5) {
+      const nextInput = document.getElementById(`phone-otp-${index + 1}`);
+      nextInput?.focus();
+    }
+  };
+
+  const handlePhoneOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !phoneOtp[index] && index > 0) {
+      const prevInput = document.getElementById(`phone-otp-${index - 1}`);
+      prevInput?.focus();
+    }
+  };
+
+  const handleSendPhoneOtp = useCallback(async () => {
+    if (!phone || phone.length !== 10) {
+      toast.error('Please enter a valid 10-digit phone number');
+      return;
+    }
+
+    setIsSendingPhoneOtp(true);
+
+    // Call real Supabase phone OTP function with +91 country code and isSignup=true
+    // This will check if phone is already registered and show error if so
+    const phoneWithCode = `+91${phone}`;
+    const result = await sendPhoneOtp(phoneWithCode, true);
+
+    setIsSendingPhoneOtp(false);
+
+    if (result.success) {
+      setPhoneOtpSent(true);
+      setPhoneOtpTimer(60);
+      setPhoneOtp(['', '', '', '', '', '']);
+      setPhoneOtpError('');
+      toast.success('OTP sent to your phone');
+
+      // Focus first OTP input
+      setTimeout(() => {
+        const firstInput = document.getElementById('phone-otp-0');
+        firstInput?.focus();
+      }, 100);
+    } else {
+      toast.error(result.error || 'Failed to send OTP');
+    }
+  }, [phone, sendPhoneOtp]);
+
+  const handleVerifyPhoneOtp = async () => {
+    const otpValue = phoneOtp.join('');
+    if (otpValue.length !== 6) {
+      setPhoneOtpError('Please enter the complete 6-digit OTP');
+      return;
+    }
+
+    setIsVerifyingPhone(true);
+
+    // Call real Supabase phone OTP verification function with +91 country code
+    const phoneWithCode = `+91${phone}`;
+    const result = await verifyPhoneOtp(phoneWithCode, otpValue);
+
+    setIsVerifyingPhone(false);
+
+    if (result.success) {
+      setPhoneVerified(true);
+      setPhoneOtpError('');
+      toast.success('Phone verified successfully!');
+    } else {
+      setPhoneOtpError(result.error || 'Incorrect OTP. Please try again.');
+    }
+  };
+
+  const handleResendPhoneOtp = () => {
+    if (phoneOtpTimer > 0) return;
+    handleSendPhoneOtp();
   };
 
   const handleSendOtp = async () => {
@@ -169,11 +302,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       return;
     }
 
-    setIsLoading(true);
+    setIsLoadingOtp(true);
 
     const result = await signInWithOTP({ phone: `+91${phone}` });
 
-    setIsLoading(false);
+    setIsLoadingOtp(false);
 
     if (result.success) {
       setAuthMode('otp');
@@ -190,11 +323,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       return;
     }
 
-    setIsLoading(true);
+    setIsLoadingOtp(true);
 
     const result = await verifyOTP(`+91${phone}`, otpValue);
 
-    setIsLoading(false);
+    setIsLoadingOtp(false);
 
     if (result.success) {
       toast.success('Signed in successfully!');
@@ -211,11 +344,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       return;
     }
 
-    setIsLoading(true);
+    setIsLoadingEmail(true);
 
     const result = await signIn({ email, password });
 
-    setIsLoading(false);
+    setIsLoadingEmail(false);
 
     if (result.success) {
       toast.success('Signed in successfully!');
@@ -233,16 +366,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       return;
     }
 
-    if (!dateOfBirth) {
-      toast.error('Please enter your date of birth');
-      return;
-    }
-
-    if (!gender) {
-      toast.error('Please select your gender');
-      return;
-    }
-
     if (!phone || phone.length !== 10) {
       toast.error('Please enter a valid 10-digit phone number');
       return;
@@ -253,8 +376,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       return;
     }
 
-    if (!emailVerified) {
-      toast.error('Please verify your email address');
+    // Check if at least ONE verification is done (email OR phone)
+    // For now: Allow signup with EITHER email OR phone verified (not both mandatory)
+    if (!phoneVerified && !emailVerified) {
+      toast.error('Please verify either your phone number or email address');
       return;
     }
 
@@ -268,54 +393,50 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       return;
     }
 
-    setIsLoading(true);
+    setIsLoadingSignup(true);
 
+    // Signup - Supabase will handle duplicate email/phone detection
     const result = await signUp({
       email,
       password,
       name,
       phone: `+91${phone}`,
-      gender,
-      dateOfBirth,
     });
 
-    setIsLoading(false);
+    setIsLoadingSignup(false);
 
     if (result.success) {
       toast.success('Account created successfully! Please sign in to continue.');
       setAuthMode('login');
-      // Clear signup-specific fields but keep email for convenience
+      // Clear all fields - user must enter credentials manually on sign in
+      setEmail('');
+      setPhone('');
       setName('');
-      setGender('');
-      setDateOfBirth('');
       setPassword('');
       setEmailVerified(false);
       setEmailOtpSent(false);
       setEmailOtp(['', '', '', '', '', '']);
+      setPhoneVerified(false);
+      setPhoneOtpSent(false);
+      setPhoneOtp(['', '', '', '', '', '']);
     } else {
       toast.error(result.error || 'Sign up failed');
     }
   };
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true);
+    setIsLoadingGoogle(true);
 
     const result = await signInWithGoogle();
 
-    setIsLoading(false);
-
-    if (result.success) {
-      toast.success('Signed in successfully!');
-      onClose();
-      resetForm();
-    } else {
+    // Don't set loading to false immediately - if OAuth succeeds, page will redirect
+    // Only handle errors here
+    if (!result.success) {
+      setIsLoadingGoogle(false);
       toast.error(result.error || 'Google sign in failed');
     }
-  };
-
-  const handleAppleLogin = async () => {
-    // Apple Sign In - placeholder for future implementation
-    toast.error('Apple Sign In coming soon!');
+    // If success and using real OAuth, user will be redirected to Google
+    // If success and using demo mode, the auth context will update and trigger modal close
   };
 
   const handleForgotPassword = async () => {
@@ -324,11 +445,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       return;
     }
 
-    setIsLoading(true);
+    setIsLoadingReset(true);
 
     const result = await resetPassword(email);
 
-    setIsLoading(false);
+    setIsLoadingReset(false);
 
     if (result.success) {
       toast.success('Password reset email sent! Check your inbox.');
@@ -343,8 +464,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setEmail('');
     setPassword('');
     setName('');
-    setGender('');
-    setDateOfBirth('');
     setOtp(['', '', '', '', '', '']);
     setAuthMode('login');
     setShowPassword(false);
@@ -354,12 +473,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setEmailVerified(false);
     setEmailOtpError('');
     setEmailOtpTimer(0);
+    // Reset phone verification states
+    setPhoneOtp(['', '', '', '', '', '']);
+    setPhoneOtpSent(false);
+    setPhoneVerified(false);
+    setPhoneOtpError('');
+    setPhoneOtpTimer(0);
   };
 
   if (!isOpen) return null;
 
-  // Check if all signup fields are filled (including email verification)
-  const isSignUpFormValid = name.trim() && dateOfBirth && gender && phone.length === 10 && email && emailVerified && password.length >= 6;
+  // Check if all signup fields are filled
+  // For now: Allow signup with EITHER email OR phone verified (not both mandatory)
+  // Later: Can change to require both by using: && phoneVerified && emailVerified
+  const hasVerifiedContact = phoneVerified || emailVerified; // At least one must be verified
+  const isSignUpFormValid = name.trim() && phone.length === 10 && email && hasVerifiedContact && password.length >= 6;
 
   return (
     <div className="auth-modal-overlay">
@@ -423,10 +551,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
               <button
                 onClick={handleVerifyOtp}
-                disabled={isLoading || otp.join('').length !== 6}
+                disabled={isLoadingOtp || otp.join('').length !== 6}
                 className="auth-btn-primary"
               >
-                {isLoading ? 'Verifying...' : 'Verify OTP'}
+                {isLoadingOtp ? 'Verifying...' : 'Verify OTP'}
               </button>
 
               <div className="otp-text-center">
@@ -446,7 +574,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <button
                   className="auth-link-primary"
                   onClick={handleSendOtp}
-                  disabled={isLoading}
+                  disabled={isLoadingOtp}
                 >
                   Resend OTP
                 </button>
@@ -470,10 +598,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               </div>
               <button
                 onClick={handleForgotPassword}
-                disabled={isLoading || !email}
+                disabled={isLoadingReset || !email}
                 className="auth-btn-primary"
               >
-                {isLoading ? 'Sending...' : 'Send Reset Link'}
+                {isLoadingReset ? 'Sending...' : 'Send Reset Link'}
               </button>
               <div className="auth-mode-toggle">
                 <button
@@ -499,71 +627,83 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 />
               </div>
 
-              {/* Date of Birth */}
-              <div className="auth-form-group">
-                <label className="auth-form-label">Date of Birth <span className="auth-required">*</span></label>
-                <input
-                  type="date"
-                  value={dateOfBirth}
-                  onChange={(e) => setDateOfBirth(e.target.value)}
-                  className="auth-input auth-input-date"
-                  max={new Date().toISOString().split('T')[0]}
-                />
-              </div>
-
-              {/* Gender */}
-              <div className="auth-form-group">
-                <label className="auth-form-label">Gender <span className="auth-required">*</span></label>
-                <div className="auth-gender-options">
-                  <label className={`auth-gender-option ${gender === 'male' ? 'selected' : ''}`}>
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="male"
-                      checked={gender === 'male'}
-                      onChange={(e) => setGender(e.target.value as 'male' | 'female' | 'other')}
-                      className="auth-gender-radio"
-                    />
-                    <span>Male</span>
-                  </label>
-                  <label className={`auth-gender-option ${gender === 'female' ? 'selected' : ''}`}>
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="female"
-                      checked={gender === 'female'}
-                      onChange={(e) => setGender(e.target.value as 'male' | 'female' | 'other')}
-                      className="auth-gender-radio"
-                    />
-                    <span>Female</span>
-                  </label>
-                  <label className={`auth-gender-option ${gender === 'other' ? 'selected' : ''}`}>
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="other"
-                      checked={gender === 'other'}
-                      onChange={(e) => setGender(e.target.value as 'male' | 'female' | 'other')}
-                      className="auth-gender-radio"
-                    />
-                    <span>Other</span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Phone */}
+              {/* Phone with Verify Button */}
               <div className="auth-form-group">
                 <label className="auth-form-label">Mobile Number <span className="auth-required">*</span></label>
-                <div className="phone-input-wrapper">
-                  <span className="phone-country-code">+91</span>
+                <div className="email-verify-wrapper">
                   <input
                     type="tel"
                     placeholder="Enter mobile number"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                    className="auth-input auth-input-phone"
+                    className="auth-input auth-input-email-verify"
+                    disabled={phoneVerified}
                   />
+                  {phoneVerified ? (
+                    <span className="email-verified-tick">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="email-verify-btn"
+                      onClick={handleSendPhoneOtp}
+                      disabled={phone.length !== 10 || isSendingPhoneOtp || phoneOtpSent}
+                    >
+                      {isSendingPhoneOtp ? 'Sending...' : phoneOtpSent ? 'OTP Sent' : 'Verify Phone'}
+                    </button>
+                  )}
                 </div>
+
+                {/* Phone OTP Section - Shows after OTP is sent */}
+                {phoneOtpSent && !phoneVerified && (
+                  <div className="email-otp-section">
+                    <div className="email-otp-inputs">
+                      {phoneOtp.map((digit, index) => (
+                        <input
+                          key={index}
+                          id={`phone-otp-${index}`}
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={1}
+                          value={digit}
+                          onChange={(e) => handlePhoneOtpChange(index, e.target.value.replace(/\D/g, ''))}
+                          onKeyDown={(e) => handlePhoneOtpKeyDown(index, e)}
+                          className="email-otp-input"
+                        />
+                      ))}
+                    </div>
+
+                    {/* Error Message */}
+                    {phoneOtpError && (
+                      <p className="email-otp-error">{phoneOtpError}</p>
+                    )}
+
+                    {/* Confirm Button */}
+                    <button
+                      type="button"
+                      className="email-otp-confirm-btn"
+                      onClick={handleVerifyPhoneOtp}
+                      disabled={isVerifyingPhone || phoneOtp.join('').length !== 6}
+                    >
+                      {isVerifyingPhone ? 'Verifying...' : 'Confirm'}
+                    </button>
+
+                    {/* Resend OTP */}
+                    <div className="email-otp-resend">
+                      <button
+                        type="button"
+                        className="email-otp-resend-btn"
+                        onClick={handleResendPhoneOtp}
+                        disabled={phoneOtpTimer > 0}
+                      >
+                        Resend OTP {phoneOtpTimer > 0 ? `(${phoneOtpTimer}s)` : ''}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Email with Verify Button */}
@@ -679,10 +819,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               {/* Create Account Button */}
               <button
                 onClick={handleEmailSignUp}
-                disabled={isLoading || !isSignUpFormValid}
+                disabled={isLoadingSignup || !isSignUpFormValid}
                 className={`auth-btn-primary ${isSignUpFormValid ? '' : 'disabled'}`}
               >
-                {isLoading ? 'Creating Account...' : 'Create Account'}
+                {isLoadingSignup ? 'Creating Account...' : 'Create Account'}
               </button>
 
               {/* Social Sign Up Divider */}
@@ -698,7 +838,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               {/* Google Sign Up */}
               <button
                 onClick={handleGoogleLogin}
-                disabled={isLoading}
+                disabled={isLoadingGoogle}
                 className="social-login-btn google-login-btn"
               >
                 <svg className="social-icon" viewBox="0 0 24 24">
@@ -722,24 +862,25 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <span>Continue with Google</span>
               </button>
 
-              {/* Apple Sign Up */}
-              <button
-                onClick={handleAppleLogin}
-                disabled={isLoading}
-                className="social-login-btn apple-login-btn"
-              >
-                <svg className="social-icon" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                </svg>
-                <span>Continue with Apple</span>
-              </button>
-
               {/* Toggle to Sign In */}
               <div className="auth-mode-toggle">
                 <p className="auth-mode-text">
                   Already have an account?{' '}
                   <button
-                    onClick={() => setAuthMode('login')}
+                    onClick={() => {
+                      setAuthMode('login');
+                      // Clear all fields when switching to login - user must enter credentials manually
+                      setEmail('');
+                      setPhone('');
+                      setPassword('');
+                      setName('');
+                      setEmailVerified(false);
+                      setEmailOtpSent(false);
+                      setEmailOtp(['', '', '', '', '', '']);
+                      setPhoneVerified(false);
+                      setPhoneOtpSent(false);
+                      setPhoneOtp(['', '', '', '', '', '']);
+                    }}
                     className="auth-mode-btn"
                   >
                     Sign in
@@ -761,16 +902,17 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                     className="auth-input auth-input-phone"
+                    autoComplete="off"
                   />
                 </div>
               </div>
 
               <button
                 onClick={handleSendOtp}
-                disabled={isLoading || phone.length !== 10}
+                disabled={isLoadingOtp || phone.length !== 10}
                 className="auth-btn-primary"
               >
-                {isLoading ? 'Sending OTP...' : 'Continue with OTP'}
+                {isLoadingOtp ? 'Sending OTP...' : 'Continue with OTP'}
               </button>
 
               <div className="auth-divider">
@@ -785,7 +927,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               {/* Google Login */}
               <button
                 onClick={handleGoogleLogin}
-                disabled={isLoading}
+                disabled={isLoadingGoogle}
                 className="social-login-btn google-login-btn"
               >
                 <svg className="social-icon" viewBox="0 0 24 24">
@@ -809,18 +951,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <span>Continue with Google</span>
               </button>
 
-              {/* Apple Login */}
-              <button
-                onClick={handleAppleLogin}
-                disabled={isLoading}
-                className="social-login-btn apple-login-btn"
-              >
-                <svg className="social-icon" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                </svg>
-                <span>Continue with Apple</span>
-              </button>
-
               {/* Email Login Section */}
               <div className="email-login-section">
                 <div className="auth-form-group">
@@ -831,6 +961,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="auth-input"
+                    autoComplete="off"
                   />
                 </div>
                 <div className="auth-form-group">
@@ -842,6 +973,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="auth-input auth-input-password"
+                      autoComplete="new-password"
                     />
                     <button
                       type="button"
@@ -872,10 +1004,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
                 <button
                   onClick={handleEmailLogin}
-                  disabled={isLoading || !email || !password}
+                  disabled={isLoadingEmail || !email || !password}
                   className={`auth-btn-secondary ${email && password ? 'ready' : ''}`}
                 >
-                  {isLoading ? 'Signing in...' : 'Sign in with Email'}
+                  {isLoadingEmail ? 'Signing in...' : 'Sign in with Email'}
                 </button>
               </div>
 
@@ -884,7 +1016,20 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <p className="auth-mode-text">
                   Don&apos;t have an account?{' '}
                   <button
-                    onClick={() => setAuthMode('signup')}
+                    onClick={() => {
+                      setAuthMode('signup');
+                      // Clear all fields when switching to signup - fresh form
+                      setEmail('');
+                      setPhone('');
+                      setPassword('');
+                      setName('');
+                      setEmailVerified(false);
+                      setEmailOtpSent(false);
+                      setEmailOtp(['', '', '', '', '', '']);
+                      setPhoneVerified(false);
+                      setPhoneOtpSent(false);
+                      setPhoneOtp(['', '', '', '', '', '']);
+                    }}
                     className="auth-mode-btn"
                   >
                     Sign up
