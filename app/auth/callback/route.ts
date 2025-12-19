@@ -1,33 +1,55 @@
-import { NextResponse } from 'next/server';
-import { createServerSupabaseClient, isSupabaseConfigured } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import type { Database } from '@/lib/supabase/database.types';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
   const origin = requestUrl.origin;
 
-  // If Supabase is not configured, redirect with error
-  if (!isSupabaseConfigured) {
-    console.error('Auth callback error: Supabase is not configured');
+  // Check for Supabase configuration
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('[Auth Callback] Supabase is not configured');
     return NextResponse.redirect(`${origin}/?error=supabase_not_configured`);
   }
 
   if (code) {
-    const supabase = await createServerSupabaseClient();
+    // Create response to set cookies on
+    const response = NextResponse.redirect(origin);
 
-    if (!supabase) {
-      console.error('Auth callback error: Failed to create Supabase client');
-      return NextResponse.redirect(`${origin}/?error=auth_failed`);
-    }
+    // Create Supabase client that can read request cookies and write to response cookies
+    const supabase = createServerClient<Database>(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options);
+            });
+          },
+        },
+      }
+    );
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (error) {
-      console.error('Auth callback error:', error);
-      return NextResponse.redirect(`${origin}/?error=auth_failed`);
+      console.error('[Auth Callback] Error exchanging code for session:', error.message);
+      return NextResponse.redirect(`${origin}/?error=auth_failed&message=${encodeURIComponent(error.message)}`);
     }
+
+    console.log('[Auth Callback] Successfully exchanged code for session');
+    return response;
   }
 
-  // URL to redirect to after sign in process completes
+  // No code provided, redirect to home
+  console.warn('[Auth Callback] No code provided in callback URL');
   return NextResponse.redirect(origin);
 }
