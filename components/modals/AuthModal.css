@@ -427,17 +427,6 @@
   height: 1.25rem;
 }
 
-/* Apple Login Button */
-.apple-login-btn {
-  background-color: #000000;
-  border-color: #333333;
-}
-
-.apple-login-btn:hover:not(:disabled) {
-  background-color: #1a1a1a;
-  border-color: #444444;
-}
-
 /* Email Login Section */
 .email-login-section {
   display: flex;

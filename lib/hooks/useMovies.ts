@@ -51,6 +51,7 @@ export function useMovies(filters?: MovieFilters) {
 
       // If Supabase is not configured, use local mock data (already set)
       if (!isConfigured) {
+        console.log('[useMovies] Supabase not configured, using local data');
         setMovies(filterLocalMovies(filters));
         return;
       }
@@ -86,8 +87,15 @@ export function useMovies(filters?: MovieFilters) {
         const { data, error: fetchError } = await query;
 
         if (fetchError) {
-          console.error('Supabase error:', fetchError.message, fetchError.code, fetchError.details);
-          throw new Error(fetchError.message || 'Failed to fetch movies');
+          console.warn('[useMovies] Supabase fetch error, falling back to local data:', {
+            message: fetchError.message,
+            code: fetchError.code,
+            details: fetchError.details
+          });
+          // Fall back to local data on Supabase errors
+          setMovies(filterLocalMovies(filters));
+          setIsLoading(false);
+          return;
         }
 
         if (!data) {
@@ -159,8 +167,21 @@ export function useMovies(filters?: MovieFilters) {
         setMovies(transformedMovies);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to load movies';
-        console.error('Error fetching movies:', errorMessage);
-        setError(errorMessage);
+
+        // Check if this is a network error (Failed to fetch, timeout, etc.)
+        const isNetworkError = errorMessage.includes('Failed to fetch') ||
+                               errorMessage.includes('NetworkError') ||
+                               errorMessage.includes('timeout') ||
+                               errorMessage.includes('aborted');
+
+        if (isNetworkError) {
+          console.warn('[useMovies] Network error detected, falling back to local data:', errorMessage);
+          // Fall back to local data on network errors
+          setMovies(filterLocalMovies(filters));
+        } else {
+          console.error('[useMovies] Error fetching movies:', errorMessage);
+          setError(errorMessage);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -194,6 +215,7 @@ export function useMovie(id: string) {
 
       // If Supabase is not configured, use local mock data (already set)
       if (!isConfigured) {
+        console.log('[useMovie] Supabase not configured, using local data');
         setMovie(getLocalMovieById(id) || null);
         return;
       }
@@ -212,8 +234,14 @@ export function useMovie(id: string) {
           .single();
 
         if (movieError) {
-          console.error('Supabase error:', movieError.message);
-          throw new Error(movieError.message || 'Failed to fetch movie');
+          console.warn('[useMovie] Supabase fetch error, falling back to local data:', {
+            message: movieError.message,
+            code: movieError.code
+          });
+          // Fall back to local data on Supabase errors
+          setMovie(getLocalMovieById(id) || null);
+          setIsLoading(false);
+          return;
         }
 
         if (!movieData) {
@@ -268,8 +296,21 @@ export function useMovie(id: string) {
         setMovie(transformedMovie);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to load movie';
-        console.error('Error fetching movie:', errorMessage);
-        setError(errorMessage);
+
+        // Check if this is a network error
+        const isNetworkError = errorMessage.includes('Failed to fetch') ||
+                               errorMessage.includes('NetworkError') ||
+                               errorMessage.includes('timeout') ||
+                               errorMessage.includes('aborted');
+
+        if (isNetworkError) {
+          console.warn('[useMovie] Network error detected, falling back to local data:', errorMessage);
+          // Fall back to local data on network errors
+          setMovie(getLocalMovieById(id) || null);
+        } else {
+          console.error('[useMovie] Error fetching movie:', errorMessage);
+          setError(errorMessage);
+        }
       } finally {
         setIsLoading(false);
       }
