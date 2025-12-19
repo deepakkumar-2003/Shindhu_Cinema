@@ -171,8 +171,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           referral_code: 'SHINDHU' + Math.random().toString(36).substring(2, 8).toUpperCase(),
         };
 
-        const { data: createdProfile, error: createError } = await supabase
-          .from('profiles')
+        const { data: createdProfile, error: createError } = await (supabase
+          .from('profiles') as any)
           .insert(newProfile)
           .select()
           .single();
