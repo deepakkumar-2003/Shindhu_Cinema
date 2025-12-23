@@ -460,6 +460,16 @@
   color: var(--color-primary, #e50914);
 }
 
+/* City Selected State - Red text to indicate location is selected */
+.city-selector.city-selected {
+  color: var(--color-primary, #e50914);
+}
+
+.city-selector.city-selected .city-icon,
+.city-selector.city-selected .chevron-icon {
+  color: var(--color-primary, #e50914);
+}
+
 .city-icon {
   width: 1rem;
   height: 1rem;

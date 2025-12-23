@@ -350,7 +350,7 @@ export default function Header() {
               {/* City Selector */}
               <button
                 onClick={() => setIsCityModalOpen(true)}
-                className="city-selector"
+                className={`city-selector ${selectedCity ? 'city-selected' : ''}`}
               >
                 <svg className="city-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
