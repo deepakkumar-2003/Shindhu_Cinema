@@ -663,6 +663,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
+      // Redirect directly to reset-password page which will handle the code exchange
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
       });

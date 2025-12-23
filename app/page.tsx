@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import MovieCard from '@/components/movies/MovieCard';
 import { useMoviesByStatus } from '@/lib/hooks/useMovies';
@@ -13,6 +14,8 @@ const formats = ['All', '2D', '3D', 'Dolby Atmos'];
 const AUTO_SLIDE_INTERVAL = 5000; // 5 seconds
 
 export default function Home() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [selectedLanguage, setSelectedLanguage] = useState('All');
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [selectedFormat, setSelectedFormat] = useState('All');
@@ -22,6 +25,17 @@ export default function Home() {
 
   const { movies: nowShowingMovies, isLoading: nowShowingLoading } = useMoviesByStatus('now_showing');
   const { movies: comingSoonMovies, isLoading: comingSoonLoading } = useMoviesByStatus('coming_soon');
+
+  // Handle auth code redirect (fallback if proxy doesn't catch it)
+  useEffect(() => {
+    const code = searchParams.get('code');
+    if (code) {
+      // Redirect to auth callback with the code
+      const callbackUrl = `/auth/callback?code=${encodeURIComponent(code)}`;
+      console.log('[Home] Auth code detected, redirecting to callback');
+      router.replace(callbackUrl);
+    }
+  }, [searchParams, router]);
 
   // Wait for hydration to complete
   useEffect(() => {

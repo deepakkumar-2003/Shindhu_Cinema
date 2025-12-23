@@ -2,9 +2,49 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Script from 'next/script';
 import { useBookingStore, useUserStore, useUIStore } from '@/lib/store';
 import { createBooking } from '@/lib/supabase/services/bookings';
 import './page.css';
+
+// Razorpay types
+declare global {
+  interface Window {
+    Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
+  }
+}
+
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  handler: (response: RazorpayResponse) => void;
+  prefill: {
+    name?: string;
+    email?: string;
+    contact?: string;
+  };
+  theme: {
+    color: string;
+  };
+  modal?: {
+    ondismiss?: () => void;
+  };
+}
+
+interface RazorpayResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+
+interface RazorpayInstance {
+  open: () => void;
+  close: () => void;
+}
 
 const paymentMethods = [
   { id: 'upi', name: 'UPI', icon: '📱', description: 'Pay using any UPI app' },
@@ -25,6 +65,7 @@ export default function CheckoutPage() {
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvv, setCardCvv] = useState('');
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
   const hasCheckedState = useRef(false);
 
   const { isAuthenticated } = useUserStore();
@@ -92,6 +133,11 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (!isRazorpayLoaded) {
+      alert('Payment system is loading. Please try again in a moment.');
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
@@ -104,56 +150,121 @@ export default function CheckoutPage() {
         throw new Error('Please select at least one seat.');
       }
 
-      // Simulate payment processing delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Create Razorpay order
+      const orderResponse = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: finalTotal,
+          currency: 'INR',
+          receipt: `booking_${Date.now()}`,
+          notes: {
+            movieId: selectedMovie.id,
+            theaterId: selectedTheater.id,
+            showtimeId: selectedShowtime.id,
+          },
+        }),
+      });
 
-      // Generate a demo order ID
-      const orderId = 'DEMO-' + Date.now().toString(36).toUpperCase();
+      if (!orderResponse.ok) {
+        throw new Error('Failed to create payment order');
+      }
 
-      // Store booking data in localStorage for confirmation page
-      const bookingData = {
-        orderId,
-        movie: selectedMovie,
-        theater: selectedTheater,
-        showtime: selectedShowtime,
-        seats: selectedSeats,
-        snacks: cartSnacks,
-        snackPickupTime: snackPickupTime,
-        ticketAmount: getTicketTotal(),
-        snackAmount: getSnackTotal(),
-        convenienceFee: getConvenienceFee(),
-        taxAmount: getTax(),
-        discountAmount: promoDiscount,
-        promoCode: promoApplied ? promoCode : null,
-        paymentMethod: selectedPayment,
-        totalAmount: finalTotal,
-        status: 'confirmed',
-        bookingDate: new Date().toISOString(),
+      const orderData = await orderResponse.json();
+
+      // Open Razorpay checkout
+      const options: RazorpayOptions = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Shindhu Cinemas',
+        description: `${selectedMovie.title} - ${selectedSeats.length} Ticket(s)`,
+        order_id: orderData.orderId,
+        handler: async function (response: RazorpayResponse) {
+          try {
+            // Verify payment
+            const verifyResponse = await fetch('/api/razorpay/verify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            if (!verifyResponse.ok) {
+              throw new Error('Payment verification failed');
+            }
+
+            // Store booking data in localStorage for confirmation page
+            const bookingData = {
+              orderId: response.razorpay_order_id,
+              paymentId: response.razorpay_payment_id,
+              movie: selectedMovie,
+              theater: selectedTheater,
+              showtime: selectedShowtime,
+              seats: selectedSeats,
+              snacks: cartSnacks,
+              snackPickupTime: snackPickupTime,
+              ticketAmount: getTicketTotal(),
+              snackAmount: getSnackTotal(),
+              convenienceFee: getConvenienceFee(),
+              taxAmount: getTax(),
+              discountAmount: promoDiscount,
+              promoCode: promoApplied ? promoCode : null,
+              paymentMethod: 'razorpay',
+              totalAmount: finalTotal,
+              status: 'confirmed',
+              bookingDate: new Date().toISOString(),
+            };
+
+            // Save booked seats to localStorage for this showtime
+            const showtimeKey = `booked_seats_${selectedShowtime.id}`;
+            const existingBookedSeatsStr = localStorage.getItem(showtimeKey);
+            const existingBookedSeats: string[] = existingBookedSeatsStr ? JSON.parse(existingBookedSeatsStr) : [];
+
+            // Add newly booked seat IDs
+            const newSeatIds = selectedSeats.map(seat => seat.id);
+            const updatedBookedSeats = [...new Set([...existingBookedSeats, ...newSeatIds])];
+            localStorage.setItem(showtimeKey, JSON.stringify(updatedBookedSeats));
+
+            // Save as last booking
+            localStorage.setItem('lastBooking', JSON.stringify(bookingData));
+
+            // Add to bookings history
+            const existingHistory = localStorage.getItem('bookingsHistory');
+            const bookingsHistory = existingHistory ? JSON.parse(existingHistory) : [];
+            bookingsHistory.unshift(bookingData);
+            localStorage.setItem('bookingsHistory', JSON.stringify(bookingsHistory));
+
+            setIsProcessing(false);
+
+            // Navigate to confirmation with order ID
+            router.push(`/booking/confirmation?orderId=${response.razorpay_order_id}`);
+          } catch (error) {
+            setIsProcessing(false);
+            console.error('Payment verification error:', error);
+            alert('Payment verification failed. Please contact support.');
+          }
+        },
+        prefill: {
+          name: '',
+          email: '',
+          contact: '',
+        },
+        theme: {
+          color: '#dc2626',
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+          },
+        },
       };
 
-      // Save booked seats to localStorage for this showtime
-      const showtimeKey = `booked_seats_${selectedShowtime.id}`;
-      const existingBookedSeatsStr = localStorage.getItem(showtimeKey);
-      const existingBookedSeats: string[] = existingBookedSeatsStr ? JSON.parse(existingBookedSeatsStr) : [];
-
-      // Add newly booked seat IDs
-      const newSeatIds = selectedSeats.map(seat => seat.id);
-      const updatedBookedSeats = [...new Set([...existingBookedSeats, ...newSeatIds])]; // Remove duplicates
-      localStorage.setItem(showtimeKey, JSON.stringify(updatedBookedSeats));
-
-      // Save as last booking
-      localStorage.setItem('lastBooking', JSON.stringify(bookingData));
-
-      // Add to bookings history
-      const existingHistory = localStorage.getItem('bookingsHistory');
-      const bookingsHistory = existingHistory ? JSON.parse(existingHistory) : [];
-      bookingsHistory.unshift(bookingData); // Add to beginning
-      localStorage.setItem('bookingsHistory', JSON.stringify(bookingsHistory));
-
-      setIsProcessing(false);
-
-      // Navigate to confirmation with order ID
-      router.push(`/booking/confirmation?orderId=${orderId}`);
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
     } catch (error) {
       setIsProcessing(false);
       console.error('Payment error:', error);
@@ -165,8 +276,13 @@ export default function CheckoutPage() {
   const finalTotal = getGrandTotal() - promoDiscount;
 
   return (
-    <div className="checkout-container">
-      {/* Progress Indicator */}
+    <>
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        onLoad={() => setIsRazorpayLoaded(true)}
+      />
+      <div className="checkout-container">
+        {/* Progress Indicator */}
       <div className="progress-indicator">
         <div className="progress-step">
           <div className="progress-circle progress-circle-completed">✓</div>
@@ -442,5 +558,6 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
